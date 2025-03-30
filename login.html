@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود | ثبت نام</title>
+    <link rel="stylesheet" href="assets/css/lib/daisyui.min.css">
+    <script src="assets/js/lib/tailwind.min.js"></script>
+    <script src="assets/js/config.js"></script>
+    <link rel='stylesheet' href='assets/css/lib/uicons-regular-rounded.css'>
+    <link rel='stylesheet' href='assets/css/lib/uicons-solid-rounded.css'>
+    <link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+
+<body>
+    <div class="absolute w-[400px] h-[400px] rounded-full blur-3xl mouseover" transition:fade={{ duration: 300 }}
+        id="backdrop"></div>
+    <div class="pt-32">
+        <div class="card lg:w-8/12 w-10/12 mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl"
+            id="myCard">
+            <h1 class="font-fedra text-center text-3xl">ورود</h1>
+            <div class="text-center mt-5 flex justify-center items-center">
+                ثبت نام
+                <input type="checkbox" onchange="toggleForm(this)"
+                    class="toggle border-blue-500 bg-blue-500 [--tglbg:yellow] hover:bg-blue-700 mx-3" />
+                ورود | ثبت نام
+            </div>
+            <form action="/pages/player/questions.html" class="mt-8 check-form" id="login-form">
+                <div class="flex flex-wrap transition-all duration-150" id="login-container">
+                    <div class="lg:w-1/2 w-full lg:pe-1 my-3 check-input relative">
+                        <span class="mb-1 -text-error text-xs error-message absolute -top-4"></span>
+                        <div
+                            class="inp-con">
+                            <input type="text" data-validations="required" class="text-input" />
+                            <label>نام کاربری</label>
+                            <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                            <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 w-full lg:ps-1 my-3 check-input relative">
+                        <span class="mb-1 -text-error text-xs error-message absolute -top-4"></span>
+                        <div
+                            class="inp-con">
+                            <input type="text" data-max="5" data-validations="required,persian" class="text-input" />
+                            <label>گذرواژه</label>
+                            <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                            <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                        </div>
+                    </div>
+                    <span class="-text-error form-error mt-4 block text-center w-full"></span>
+                    <button
+                        class="w-full rounded-lg bg-gradient-to-t from-purple-900 to-purple-700 h-12 mt-4 flex items-center justify-center"
+                        type="submit">
+                        ورود
+                    </button>
+                </div>
+            </form>
+            <form action="/pages/designer/category.html" class="mt-8 check-form hidden" id="register-form">
+                <div class="flex flex-wrap opacity-0 transition-all duration-150" id="register-container">
+                    <div class="lg:w-1/2 w-full lg:pe-1 my-3 check-input relative">
+                        <span class="mb-1 -text-error text-xs error-message absolute -top-4"></span>
+                        <div
+                            class="inp-con">
+                            <input type="text" data-validations="required" class="text-input" />
+                            <label>نام</label>
+
+                            <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                            <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 w-full lg:ps-1 my-3 check-input relative">
+                        <span class="mb-1 -text-error text-xs error-message absolute -top-4"></span>
+                        <div
+                            class="inp-con">
+                            <input type="text" class="text-input" data-max="5" data-validations="required,persian" />
+                            <label>نام خانوادگی</label>
+
+                            <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                            <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 w-full lg:pe-1 my-3 check-input relative">
+                        <span class="mb-1 -text-error text-xs error-message absolute -top-4"></span>
+                        <div
+                            class="inp-con">
+                            <input type="text" data-validations="required" class="text-input" />
+                            <label>نام کاربری</label>
+                            <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                            <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 w-full lg:ps-1 my-3 check-input relative">
+                        <span class="mb-1 -text-error text-xs error-message absolute -top-4"></span>
+                        <div
+                            class="inp-con">
+                            <input type="text" data-validations="email" class="text-input" />
+                            <label>ایمیل</label>
+
+                            <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                            <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 w-full lg:pe-1 my-3 check-input relative">
+                        <span class="mb-1 -text-error text-xs error-message absolute -top-4"></span>
+                        <div
+                            class="inp-con">
+                            <input type="text" data-validations="required" class="text-input" />
+                            <label>گذرواژه</label>
+
+                            <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                            <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 w-full lg:ps-1 my-3 relative">
+                        <select class="select select-primary border border-2 border-purple-700 bg-transparent w-full pr-8 focus:outline-none focus:border=purple-700">
+                            <option disabled>نوع کاربر</option>
+                            <option value="0" selected>کاربر عادی</option>
+                            <option value="1">ادمین</option>
+                        </select>
+                    </div>
+                    <span class="-text-error form-error mt-4 block text-center w-full"></span>
+                    <button
+                        class="w-full rounded-lg bg-gradient-to-t from-purple-700 to-purple-500 h-12 mt-4 flex items-center justify-center"
+                        type="submit">
+                        ثبت نام
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="assets/js/login.js"></script>
+    <script src="assets/js/forms.js"></script>
+</body>
+
+</html>
