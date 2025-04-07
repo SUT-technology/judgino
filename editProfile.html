@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پروفایل</title>
+    <title>ویرایش پروفایل</title>
     <link rel="stylesheet" href="assets/css/lib/daisyui.min.css">
     <script src="assets/js/lib/tailwind.min.js"></script>
     <script src="assets/js/config.js"></script>
@@ -13,13 +13,53 @@
 </head>
 
 <body>
-<div class="card lg:w-8/12 w-10/12 mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
-    <div class="card lg:w-8/12 w-10/12 mx-auto bg-yellow-400 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
-        <h2 class=class="text-2xl font-bold>ویرایش پروفایل</h2>
-    </div>
-</div>
-<br>
-<br>
+    <header>
+        <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
+                class="fi fi-sr-bars-staggered text-2xl"></i></button>
+        <div id="backdrop-menu" onclick="handlemenu()"
+            class="fixed top-0 right-0 bg-black bg-opacity-50 w-screen h-screen lg:hidden hidden z-10"></div>
+        <nav class="bg-gray-20 bg-opacity-45 backdrop-blur-3xl p-3 lg:w-2/12 w-1/2 h-[90vh] fixed lg:right-0 right-[-100%] top-[5%] rounded-l-2xl shadow-lg transition-all duration-300 z-20"
+            id="menu">
+            <div class="text-center font-fedra text-2xl mt-5">
+                judgino
+            </div>
+            <ul class="menu rounded-box mt-20">
+                <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-home"></i>
+                        سوال ها
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-edit"></i>
+                        سوال جدید
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-checkbox"></i>
+                        ارسال ها
+                    </a>
+                </li>
+                </li>
+                <li class="mb-3">
+                    <a href="/pages/player/scores.html">
+                        <i class="fi fi-rr-user"></i>
+                        پروفایل
+                    </a>
+                </li>
+                <li class="mb-3 bg-gray-38 rounded-lg">
+                    <a href="/pages/player/questions.html">
+                        <i class="fi fi-rr-user-pen"></i>
+                        ویرایش پروفایل
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+<div class="lg:w-10/12 p-3 mr-auto mt-6">
+    <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
 <div>
     <form action="/pages/designer/category.html" class="mt-8 check-form">
         <div class="card lg:w-8/12 w-10/12 mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl"
@@ -100,15 +140,9 @@
         </div>
     </form>
 </div>
-<br>
-<br>
-<div class="flex justify-center mt-8 ">
-    <button class="join-item btn bg-gradient-to-t from-purple-800 to-purple-400 bg-opacity-40">سوال ها</button>
-    <button class="join-item btn bg-gradient-to-t from-purple-800 to-purple-400 bg-opacity-40">سوال جدید</button>
-    <button class="join-item btn bg-gradient-to-t from-purple-800 to-purple-400 bg-opacity-40">ارسال ها</button>
-    <button class="join-item btn bg-gradient-to-t from-purple-800 to-purple-400 bg-opacity-40">پروفایل</button>
-    <button class="join-item btn btn-active bg">ویرایش پروفایل</button>
+</section>
 </div>
 <script src="/assets/js/main.js"></script>
+<script src="/assets/js/forms.js"></script>
 </body>
 </html>
