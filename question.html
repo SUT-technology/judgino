@@ -75,10 +75,69 @@
                     spellcheck="false"
                     class="mt-6 w-full min-h-[200px] p-4 bg-gray-800 rounded-lg border border-gray-700 whitespace-pre-wrap overflow-y-auto focus:outline-none"
                 >متن سوال را وارد کنید:</div>
+                <br>
+                <br>
+                <div class="flex w-full">
+                <div
+                    class="inp-con">
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
+                    <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                    <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                </div>
+                <div class="divider divider-horizontal"></div>
+                <div
+                    class="inp-con">
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
+                    <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                    <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                </div>
             </div>
+                <br>
+                <br>
+                <div class="flex w-full">
+                    <div
+                    class="inp-con">
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="ورودی:" py-3/>
+                    <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                    <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                </div>
+                    <div class="divider divider-horizontal"></div>
+                    <div
+                    class="inp-con">
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="خروجی:" py-3/>
+                    <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                    <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                </div>
+                
+            </div>
+            <br>
+            <br>  
+            <div class="bg-gray-800 m-4 p-4 rounded-lg space-y-4">
+                    <label for="daysSlider" class="block mb-2 text-lg">📅 روز: <span id="daysValue">0</span></label>
+                    <input id="daysSlider" type="range" min="1" max="365" value="0"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                  </div>
+                  <div class="bg-gray-800 m-4 p-4 rounded-lg space-y-4">
+                    <label for="hoursSlider" class="block mb-2 text-lg">🕒 ساعت: <span id="hoursValue">0</span></label>
+                    <input id="hoursSlider" type="range" min="0" max="23" value="0"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                  </div>
+                  <div class="bg-gray-800 m-4 p-4 rounded-lg space-y-4">
+                    <label for="minutesSlider" class="block mb-2 text-lg">⏱️ دقیقه: <span id="minutesValue">0</span></label>
+                    <input id="minutesSlider" type="range" min="0" max="59" value="0"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                  </div>
+                  <div>
+                    <button 
+      class="mt-6 px-6 py-2 bg-gray-800 hover:bg-gray-900 text-white text-lg rounded-lg transition duration-200">
+      طرح سوال
+    </button>
+                </div>
+                </div>
+        
         </section>
     </div>
-    
+    <script src="/assets/js/slider.js"></script>
     <script src="/assets/js/forms.js"></script>
     <script src="/assets/js/main.js"></script>
     </body>
