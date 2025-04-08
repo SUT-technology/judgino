@@ -62,18 +62,24 @@
     <div class="lg:w-10/12 p-3 mr-auto mt-6">
         <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
             <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
-                <h2 class="text-2xl font-bold">متن سوال</h2>
+                <div
+                    class="inp-con">
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="عنوان" py-3/>
+                    <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                    <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                </div>
+                <br>
                 <div 
                     id="textEditor"
                     contenteditable="true"
                     spellcheck="false"
-                    class="mt-6 w-full min-h-[200px] p-4 bg-gray-800 rounded-lg border border-gray-700 font-mono whitespace-pre-wrap overflow-y-auto focus:outline-none"
-                ></div>
+                    class="mt-6 w-full min-h-[200px] p-4 bg-gray-800 rounded-lg border border-gray-700 whitespace-pre-wrap overflow-y-auto focus:outline-none"
+                >متن سوال را وارد کنید:</div>
             </div>
         </section>
     </div>
     
-    
+    <script src="/assets/js/forms.js"></script>
     <script src="/assets/js/main.js"></script>
     </body>
     </html>
