@@ -15,8 +15,57 @@
 
 <body>
 
-    <div class="bg-gray-20 bg-opacity-45 backdrop-blur-2xl p-3 mx-auto w-4/5 mt-10 h-[90vh] rounded-3xl shadow-lg">
-        <h1 class="text-4xl text-center font-fedra mb-5">لیست سوالات</h1>
+    header>
+        <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
+                    class="fi fi-sr-bars-staggered text-2xl"></i></button>
+        <div id="backdrop-menu" onclick="handlemenu()"
+             class="fixed top-0 right-0 bg-black bg-opacity-50 w-screen h-screen lg:hidden hidden z-10"></div>
+        <nav class="bg-gray-20 bg-opacity-45 backdrop-blur-3xl p-3 lg:w-2/12 w-1/2 h-[90vh] fixed lg:right-0 right-[-100%] top-[5%] rounded-l-2xl shadow-lg transition-all duration-300 z-20"
+             id="menu">
+            <div class="text-center font-fedra text-2xl mt-5">
+                judgino
+            </div>
+            <ul class="menu rounded-box mt-20">
+                <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-home"></i>
+                        سوال ها
+                    </a>
+                </li>
+                <li class="mb-3 bg-gray-38 rounded-lg">
+                    <a href="#">
+                        <i class="fi fi-rr-edit"></i>
+                        سوال جدید
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-checkbox"></i>
+                        ارسال ها
+                    </a>
+                </li>
+                </li>
+                <li class="mb-3">
+                    <a href="/pages/player/scores.html">
+                        <i class="fi fi-rr-user"></i>
+                        پروفایل
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="/pages/player/questions.html">
+                        <i class="fi fi-rr-user-pen"></i>
+                        ویرایش پروفایل
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="lg:w-10/12 p-3 mr-auto mt-6">
+        <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
+            <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
+            
+                <h1 class="text-4xl text-center font-fedra mb-5">لیست سوالات</h1>
 
         <!-- Filter Input -->
         <div class="mb-4">
@@ -69,7 +118,9 @@
             <span id="pageInfo" class="mx-6">صفحه 1 از 1</span>
             <button id="nextPage" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
         </div>
-
+            
+            </div>
+        </section>
     </div>
 
     <script>

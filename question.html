@@ -14,51 +14,103 @@
 </head>
 
 <body>
-
-    <div class="bg-gray-20 bg-opacity-45 backdrop-blur-2xl p-3 mx-auto w-4/5 mt-10 h-[90vh] rounded-3xl shadow-lg">
-        <h1 class="text-4xl text-center font-fedra mb-5">نام سوال</h1>
-
-        <!-- Question Details -->
-        <div class="mb-4">
-            <p><strong>تاریخ ارسال:</strong> امروز<span id="senderDate"></span></p>
-            <div class="flex justify-between">
-                <p><strong>محدودیت زمان:</strong><span id="timeLimit"> ۴ ثانیه</span></p>
-                <p><strong>محدودیت حافظه:</strong><span id="memoryLimit"> ۲ مگابایت</span></p>
-                <p><strong>مهلت ارسال:</strong><span id="deadline"> فردا</span></p>
+    header>
+        <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
+                    class="fi fi-sr-bars-staggered text-2xl"></i></button>
+        <div id="backdrop-menu" onclick="handlemenu()"
+             class="fixed top-0 right-0 bg-black bg-opacity-50 w-screen h-screen lg:hidden hidden z-10"></div>
+        <nav class="bg-gray-20 bg-opacity-45 backdrop-blur-3xl p-3 lg:w-2/12 w-1/2 h-[90vh] fixed lg:right-0 right-[-100%] top-[5%] rounded-l-2xl shadow-lg transition-all duration-300 z-20"
+             id="menu">
+            <div class="text-center font-fedra text-2xl mt-5">
+                judgino
             </div>
+            <ul class="menu rounded-box mt-20">
+                <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-home"></i>
+                        سوال ها
+                    </a>
+                </li>
+                <li class="mb-3 bg-gray-38 rounded-lg">
+                    <a href="#">
+                        <i class="fi fi-rr-edit"></i>
+                        سوال جدید
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-checkbox"></i>
+                        ارسال ها
+                    </a>
+                </li>
+                </li>
+                <li class="mb-3">
+                    <a href="/pages/player/scores.html">
+                        <i class="fi fi-rr-user"></i>
+                        پروفایل
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="/pages/player/questions.html">
+                        <i class="fi fi-rr-user-pen"></i>
+                        ویرایش پروفایل
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
 
-            <!-- Horizontal line before the question body -->
-            <hr class="my-4">
+    <div class="lg:w-10/12 p-3 mr-auto mt-6">
+        <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
+            <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
+                <!-- <div class="bg-gray-20 bg-opacity-45 backdrop-blur-2xl p-3 mx-auto w-4/5 mt-10 h-[90vh] rounded-3xl shadow-lg"> -->
+                <h1 class="text-4xl text-center font-fedra mb-5">نام سوال</h1>
 
-            <div id="questionBody">
-                <!--
-                question will be here
-                -->
-                tst
-                tst
+                <!-- Question Details -->
+                <div class="mb-4">
+                    <p><strong>تاریخ ارسال:</strong> امروز<span id="senderDate"></span></p>
+                </div>
+                <div class="flex justify-between">
+                    <p><strong>محدودیت زمان:</strong><span id="timeLimit"> ۴ ثانیه</span></p>
+                    <p><strong>محدودیت حافظه:</strong><span id="memoryLimit"> ۲ مگابایت</span></p>
+                    <p><strong>مهلت ارسال:</strong><span id="deadline"> فردا</span></p>
+                </div>
+
+                <!-- Horizontal line before the question body -->
+                <hr class="my-4">
+
+                <div id="questionBody">
+                    <!--
+                    question will be here
+                    -->
+                    tst
+                    tst
+                </div>
+
+                <!-- Horizontal line after the question body -->
+                <hr class="my-4">
+            
+
+                <!-- File Upload for Answer Submission -->
+                <div class="mb-4">
+                    <label for="answer" class="block text-sm font-medium text-gray-400">پاسخ خود را ارسال کنید:</label>
+                    <input type="file" id="answer" class="p-1 w-1/3 rounded-md border">
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mb-4">
+                    <button id="submitAnswer" class="p-2 w-1/3 bg-blue-500 text-white rounded-md">ارسال پاسخ</button>
+                </div>
+
+                <!-- View Submissions Button -->
+                <div class="mb-4">
+                    <button id="viewSubmissions" class="p-2 w-1/3 bg-green-500 text-white rounded-md">مشاهده ارسال‌ها</button>
+                </div>
+
             </div>
-
-            <!-- Horizontal line after the question body -->
-            <hr class="my-4">
-        </div>
-
-        <!-- File Upload for Answer Submission -->
-        <div class="mb-4">
-            <label for="answer" class="block text-sm font-medium text-gray-400">پاسخ خود را ارسال کنید:</label>
-            <input type="file" id="answer" class="p-1 w-1/5 rounded-md border">
-        </div>
-
-        <!-- Submit Button -->
-        <div class="mb-4">
-            <button id="submitAnswer" class="p-2 w-1/5 bg-blue-500 text-white rounded-md">ارسال پاسخ</button>
-        </div>
-
-        <!-- View Submissions Button -->
-        <div class="mb-4">
-            <button id="viewSubmissions" class="p-2 w-1/5 bg-green-500 text-white rounded-md">مشاهده ارسال‌ها</button>
-        </div>
-
+        </section>
     </div>
+
 
     <script>
         // Fetch question details from the backend API
