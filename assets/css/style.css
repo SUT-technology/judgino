@@ -123,3 +123,14 @@ body {
   opacity: 0.8;
 }
 
+.table-con td, .table-con th{
+  padding: 10px 20px;
+}
+
+.table-con tr:not(:last-child){
+  border-bottom:1px solid #8382827f;
+}
+
+.table-con tr:nth-child(odd):hover{
+  background-color: rgba(35, 33, 47, 0.957);
+} 
