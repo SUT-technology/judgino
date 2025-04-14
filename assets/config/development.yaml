@@ -1,0 +1,11 @@
+server:
+  port: 8000
+db:
+  port: 5432
+  db_name: judgino_db
+  host: localhost
+  password: 12345678
+  username: postgres
+logger:
+  level: debug
+env: dev

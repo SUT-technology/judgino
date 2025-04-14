@@ -10,9 +10,9 @@
 */
 @font-face {
     font-family: "uicons-solid-rounded";
-    src:url("/assets/fonts/uicons/uicons-solid-rounded.woff") format("woff"),
-    url("/assets/fonts/uicons/uicons-solid-rounded.woff2") format("woff2"),
-    url("/assets/fonts/uicons/uicons-solid-rounded.eot#iefix") format("embedded-opentype");
+    src:url("/static/fonts/uicons/uicons-solid-rounded.woff") format("woff"),
+    url("/static/fonts/uicons/uicons-solid-rounded.woff2") format("woff2"),
+    url("/static/fonts/uicons/uicons-solid-rounded.eot#iefix") format("embedded-opentype");
     font-display: swap;
 }
     i[class^="fi-sr-"]:before, i[class*=" fi-sr-"]:before, span[class^="fi-sr-"]:before, span[class*="fi-sr-"]:before {
