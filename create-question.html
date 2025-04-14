@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پروفایل</title>
+    <link rel="stylesheet" href="assets/css/lib/daisyui.min.css">
+    <script src="assets/js/lib/tailwind.min.js"></script>
+    <script src="assets/js/config.js"></script>
+    <link rel='stylesheet' href='assets/css/lib/uicons-regular-rounded.css'>
+    <link rel='stylesheet' href='assets/css/lib/uicons-solid-rounded.css'>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+    <header>
+        <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
+                    class="fi fi-sr-bars-staggered text-2xl"></i></button>
+        <div id="backdrop-menu" onclick="handlemenu()"
+             class="fixed top-0 right-0 bg-black bg-opacity-50 w-screen h-screen lg:hidden hidden z-10"></div>
+        <nav class="bg-gray-20 bg-opacity-45 backdrop-blur-3xl p-3 lg:w-2/12 w-1/2 h-[90vh] fixed lg:right-0 right-[-100%] top-[5%] rounded-l-2xl shadow-lg transition-all duration-300 z-20"
+             id="menu">
+            <div class="text-center font-fedra text-2xl mt-5">
+                judgino
+            </div>
+            <ul class="menu rounded-box mt-20">
+                <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-home"></i>
+                        سوال ها
+                    </a>
+                </li>
+                <li class="mb-3 bg-gray-38 rounded-lg">
+                    <a href="#">
+                        <i class="fi fi-rr-edit"></i>
+                        سوال جدید
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-checkbox"></i>
+                        ارسال ها
+                    </a>
+                </li>
+                </li>
+                <li class="mb-3">
+                    <a href="/pages/player/scores.html">
+                        <i class="fi fi-rr-user"></i>
+                        پروفایل
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="/pages/player/questions.html">
+                        <i class="fi fi-rr-user-pen"></i>
+                        ویرایش پروفایل
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="lg:w-10/12 p-3 mr-auto mt-6">
+        <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
+            <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
+                <div
+                    class="inp-con">
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="عنوان" py-3/>
+                    <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                    <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                </div>
+                <br>
+                <div 
+                    id="textEditor"
+                    contenteditable="true"
+                    spellcheck="false"
+                    class="mt-6 w-full min-h-[200px] p-4 bg-gray-800 rounded-lg border border-gray-700 whitespace-pre-wrap overflow-y-auto focus:outline-none"
+                >متن سوال را وارد کنید:</div>
+                <br>
+                <br>
+                <div class="flex w-full">
+                <div
+                    class="inp-con">
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
+                    <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                    <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                </div>
+                <div class="divider divider-horizontal"></div>
+                <div
+                    class="inp-con">
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
+                    <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                    <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                </div>
+            </div>
+                <br>
+                <br>
+                <div class="flex w-full">
+                    <div
+                    class="inp-con">
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="ورودی:" py-3/>
+                    <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                    <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                </div>
+                    <div class="divider divider-horizontal"></div>
+                    <div
+                    class="inp-con">
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="خروجی:" py-3/>
+                    <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
+                    <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
+                </div>
+                
+            </div>
+            <br>
+            <br>  
+            <div class="bg-gray-800 m-4 p-4 rounded-lg space-y-4">
+                    <label for="daysSlider" class="block mb-2 text-lg">📅 روز: <span id="daysValue">0</span></label>
+                    <input id="daysSlider" type="range" min="1" max="365" value="0"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                  </div>
+                  <div class="bg-gray-800 m-4 p-4 rounded-lg space-y-4">
+                    <label for="hoursSlider" class="block mb-2 text-lg">🕒 ساعت: <span id="hoursValue">0</span></label>
+                    <input id="hoursSlider" type="range" min="0" max="23" value="0"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                  </div>
+                  <div class="bg-gray-800 m-4 p-4 rounded-lg space-y-4">
+                    <label for="minutesSlider" class="block mb-2 text-lg">⏱️ دقیقه: <span id="minutesValue">0</span></label>
+                    <input id="minutesSlider" type="range" min="0" max="59" value="0"
+                      class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                  </div>
+                  <div>
+                    <button 
+      class="mt-6 px-6 py-2 bg-gray-800 hover:bg-gray-900 text-white text-lg rounded-lg transition duration-200">
+      طرح سوال
+    </button>
+                </div>
+                </div>
+        
+        </section>
+    </div>
+    <script src="/assets/js/slider.js"></script>
+    <script src="/assets/js/forms.js"></script>
+    <script src="/assets/js/main.js"></script>
+    </body>
+    </html>
