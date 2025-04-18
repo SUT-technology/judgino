@@ -20,3 +20,10 @@ func (c usersTable) GetUserById(ctx context.Context, id uint) (*entity.User, err
 	c.db.First(&user, 1)
 	return &user, nil
 }
+
+func (c usersTable) FindUserAndUpdate(ctx context.Context, id uint,data map[string]any) (*entity.User, error) {
+	var user entity.User
+	c.db.First(&user, 1)
+	c.db.Model(&user).Updates(data)
+	return &user , nil
+}
