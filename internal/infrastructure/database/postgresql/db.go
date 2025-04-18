@@ -24,5 +24,6 @@ func (g *GormQuerier) First(dest interface{}, query string, args ...interface{})
 func New(db *gorm.DB) repository.Tables {
 	return repository.Tables{
 		Users: newUsersTable(db),
+		Questions: newQuestionsTable(db),
 	}
 }

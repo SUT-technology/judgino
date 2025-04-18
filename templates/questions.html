@@ -15,7 +15,7 @@
 
 <body>
 
-    header>
+    <header>
         <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
                     class="fi fi-sr-bars-staggered text-2xl"></i></button>
         <div id="backdrop-menu" onclick="handlemenu()"
@@ -69,14 +69,14 @@
 
         <!-- Filter Input -->
         <div class="mb-4">
-            <input type="text" id="filterInput" placeholder="جستجوی سوالات..." class="p-2 w-full rounded-md border mb-4">
+            <input type="text" id="searchFilter" placeholder="جستجوی سوالات..." class="p-2 w-full rounded-md border mb-4">
             <select id="questionFilter" class="p-2 w-1/4 rounded-md border">
                 <option value="all">تمام سوالات</option>
                 <option value="mine">سوالات من</option>
             </select>
-            <select id="questionFilter" class="p-2 w-1/4 rounded-md border">
-                <option value="all">به ترتیب تاریخ</option>
-                <option value="mine">به ترتیب مهلت</option>
+            <select id="sortFilter" class="p-2 w-1/4 rounded-md border">
+                <option value="publish_date">به ترتیب تاریخ انتشار</option>
+                <option value="deadline">به ترتیب مهلت</option>
             </select>
         </div>
 
@@ -90,32 +90,18 @@
                     </tr>
                 </thead>
                 <tbody id="questions-list">
-                    <tr>
-                        <th class="2">تست</th>
-                        <th class="2">تست</th>
-                        <th class="2">مهلت</th>
-                    </tr>
-                    <tr>
-                        <th class="2">تست</th>
-                        <th class="2">تست</th>
-                        <th class="2">مهلت</th>
-                    </tr>
-                    <tr>
-                        <th class="2">تست</th>
-                        <th class="2">تست</th>
-                        <th class="2">مهلت</th>
-                    </tr>
-                    <tr>
-                        <th class="2">تست</th>
-                        <th class="2">تست</th>
-                        <th class="2">مهلت</th>
-                    </tr>
+                    {{range .questions}}
+                        <li>{{.Title}} - {{.PublishDate}} - {{.Deadline}}</li>
+                        <th class="2">{{.Title}}</th>
+                        <th class="2">{{.PublishDate}}</th>
+                        <th class="2">{{.Deadline}}</th>
+                    {{end}}
                 </tbody>
             </table>
         </div>
         <div class="flex justify-center items-center mt-4">
-            <button id="prevPage" class="p-2 bg-gray-500 text-white rounded-md" disabled>قبلی</button>
-            <span id="pageInfo" class="mx-6">صفحه 1 از 1</span>
+            <button id="prevPage" class="p-2 bg-gray-500 text-white rounded-md">قبلی</button>
+            <span id="pageInfo" class="mx-6"></span>
             <button id="nextPage" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
         </div>
             
@@ -124,91 +110,189 @@
     </div>
 
     <script>
-        // Number of questions per page
-        const questionsPerPage = 5;
-        let currentPage = 1;
-        let questionsData = [];
+        // When the input or select options change, trigger a request to the backend
+        const searchFilter = document.getElementById('searchFilter');
+        const questionFilter = document.getElementById('questionFilter');
+        const sortFilter = document.getElementById('sortFilter');
 
-        // Fetch questions from the backend API
-        fetch('YOUR_BACKEND_API_URL/questions')
-            .then(response => response.json())
-            .then(data => {
-                questionsData = data;
-                renderQuestions();
 
-                // Filter functionality
-                const filterInput = document.getElementById('filterInput');
-                filterInput.addEventListener('input', () => {
-                    renderQuestions();
-                });
+        const   prevPageBtn = document.getElementById('prevPage');
+        const   nextPageBtn = document.getElementById('nextPage');
+        const   pageInfo = document.getElementById('pageInfo');
 
-                // Sort functionality
-                const questionSort = document.getElementById('questionSort');
-                questionSort.addEventListener('change', () => {
-                    renderQuestions();
-                });
+        let currentPage = 1;  // Track the current page
+        let totalPages = 5;   // Total pages, needs to be set after the first request
+        pageInfo.textContent = `صفحه ${currentPage} از ${totalPages}`;
 
-                // Pagination buttons
-                const prevPageBtn = document.getElementById('prevPage');
-                const nextPageBtn = document.getElementById('nextPage');
-                const pageInfo = document.getElementById('pageInfo');
 
-                prevPageBtn.addEventListener('click', () => {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        renderQuestions();
-                    }
-                });
 
-                nextPageBtn.addEventListener('click', () => {
-                    if (currentPage < Math.ceil(questionsData.length / questionsPerPage)) {
-                        currentPage++;
-                        renderQuestions();
-                    }
-                });
+        // When input or select options change, trigger a request to the backend
+        searchFilter.addEventListener('input', handlePaginationChange);
+        questionFilter.addEventListener('change', handlePaginationChange);
+        sortFilter.addEventListener('change', handlePaginationChange);
 
-                function renderQuestions() {
-                    const filterText = filterInput.value.toLowerCase();
-                    const sortValue = questionSort.value;
+        // "Previous" button click
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                handlePaginationChange();
+            }
+        });
 
-                    // Filter and sort questions
-                    let filteredQuestions = questionsData.filter(question =>
-                        question.title.toLowerCase().includes(filterText) ||
-                        new Date(question.publish_date).toLocaleDateString().toLowerCase().includes(filterText) ||
-                        new Date(question.deadline).toLocaleDateString().toLowerCase().includes(filterText)
-                    );
+        // "Next" button click
+        nextPageBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                handlePaginationChange();
+            }
+        });
 
-                    if (sortValue === 'date') {
-                        filteredQuestions.sort((a, b) => new Date(a.publish_date) - new Date(b.publish_date));
-                    } else if (sortValue === 'deadline') {
-                        filteredQuestions.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
-                    }
+        searchFilter.addEventListener('input', () => {
+            const searchValue = searchFilter.value;
+            const questionValue = questionFilter.value;
+            const sortValue = sortFilter.value;
 
-                    // Paginate questions
-                    const startIdx = (currentPage - 1) * questionsPerPage;
-                    const paginatedQuestions = filteredQuestions.slice(startIdx, startIdx + questionsPerPage);
-
-                    const questionsList = document.getElementById('questions-list');
-                    questionsList.innerHTML = '';
-                    paginatedQuestions.forEach(question => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td class="2">${question.title}</td>
-                            <td class="2">${new Date(question.publish_date).toLocaleDateString()}</td>
-                            <td class="2">${new Date(question.deadline).toLocaleDateString()}</td>
-                        `;
-                        questionsList.appendChild(row);
-                    });
-
-                    // Update pagination info
-                    pageInfo.textContent = `صفحه ${currentPage} از ${Math.ceil(filteredQuestions.length / questionsPerPage)}`;
-
-                    // Disable/enable pagination buttons
-                    prevPageBtn.disabled = currentPage === 1;
-                    nextPageBtn.disabled = currentPage === Math.ceil(filteredQuestions.length / questionsPerPage);
-                }
+            // Send data to the backend via GET request
+            const queryString = `searchValue=${searchValue}&questionValue=${questionValue}&sortValue=${sortValue}&page=${currentPage}`;
+            fetch(`/questions?${queryString}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Handle the response
+                    updateQuestionsList(data);
             })
-            .catch(error => console.error('Error fetching questions:', error));
+            .catch(error => console.error('Error:', error));
+        });
+
+
+        // Function to handle the request to the backend with current page and filter values
+        function handlePaginationChange() {
+            const searchValue = searchFilter.value;
+            const questionValue = questionFilter.value;
+            const sortValue = sortFilter.value;
+
+            const queryString = `searchValue=${searchValue}&questionValue=${questionValue}&sortValue=${sortValue}&page=${currentPage}`;
+
+            // Send the data to the backend
+            fetch(`/questions?${queryString}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Handle the response
+                    updateQuestionsList(data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Function to update the questions list and pagination information
+        function updateQuestionsList(data) {
+            const questionsList = document.getElementById('questions-list');
+            questionsList.innerHTML = ''; // Clear existing questions
+
+            data.questions.forEach(question => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="2">${question.title}</td>
+                    <td class="2">${new Date(question.publish_date).toLocaleDateString()}</td>
+                    <td class="2">${new Date(question.deadline).toLocaleDateString()}</td>
+                `;
+                questionsList.appendChild(row);
+            });
+
+            // Update the pagination info
+            totalPages = data.totalPages;  // Update the total pages from the response
+            pageInfo.textContent = `صفحه ${currentPage} از ${totalPages}`;
+
+            // Disable/enable pagination buttons
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages;
+            handlePaginationChange();
+        }
+
+
+        // Number of questions per page
+        // const questionsPerPage = 5;
+        // let currentPage = 1;
+        // let questionsData = [];
+
+        // // Fetch questions from the backend API
+        // fetch('YOUR_BACKEND_API_URL/questions')
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         questionsData = data;
+        //         renderQuestions();
+
+        //         // Filter functionality
+        //         const filterInput = document.getElementById('filterInput');
+        //         filterInput.addEventListener('input', () => {
+        //             renderQuestions();
+        //         });
+
+        //         // Sort functionality
+        //         const questionSort = document.getElementById('questionSort');
+        //         questionSort.addEventListener('change', () => {
+        //             renderQuestions();
+        //         });
+
+        //         // Pagination buttons
+        //         const prevPageBtn = document.getElementById('prevPage');
+        //         const nextPageBtn = document.getElementById('nextPage');
+        //         const pageInfo = document.getElementById('pageInfo');
+
+        //         prevPageBtn.addEventListener('click', () => {
+        //             if (currentPage > 1) {
+        //                 currentPage--;
+        //                 renderQuestions();
+        //             }
+        //         });
+
+        //         nextPageBtn.addEventListener('click', () => {
+        //             if (currentPage < Math.ceil(questionsData.length / questionsPerPage)) {
+        //                 currentPage++;
+        //                 renderQuestions();
+        //             }
+        //         });
+
+        //         function renderQuestions() {
+        //             const filterText = filterInput.value.toLowerCase();
+        //             const sortValue = questionSort.value;
+
+        //             // Filter and sort questions
+        //             let filteredQuestions = questionsData.filter(question =>
+        //                 question.title.toLowerCase().includes(filterText) ||
+        //                 new Date(question.publish_date).toLocaleDateString().toLowerCase().includes(filterText) ||
+        //                 new Date(question.deadline).toLocaleDateString().toLowerCase().includes(filterText)
+        //             );
+
+        //             if (sortValue === 'date') {
+        //                 filteredQuestions.sort((a, b) => new Date(a.publish_date) - new Date(b.publish_date));
+        //             } else if (sortValue === 'deadline') {
+        //                 filteredQuestions.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+        //             }
+
+        //             // Paginate questions
+        //             const startIdx = (currentPage - 1) * questionsPerPage;
+        //             const paginatedQuestions = filteredQuestions.slice(startIdx, startIdx + questionsPerPage);
+
+        //             const questionsList = document.getElementById('questions-list');
+        //             questionsList.innerHTML = '';
+        //             paginatedQuestions.forEach(question => {
+        //                 const row = document.createElement('tr');
+        //                 row.innerHTML = `
+        //                     <td class="2">${question.title}</td>
+        //                     <td class="2">${new Date(question.publish_date).toLocaleDateString()}</td>
+        //                     <td class="2">${new Date(question.deadline).toLocaleDateString()}</td>
+        //                 `;
+        //                 questionsList.appendChild(row);
+        //             });
+
+        //             // Update pagination info
+        //             pageInfo.textContent = `صفحه ${currentPage} از ${Math.ceil(filteredQuestions.length / questionsPerPage)}`;
+
+        //             // Disable/enable pagination buttons
+        //             prevPageBtn.disabled = currentPage === 1;
+        //             nextPageBtn.disabled = currentPage === Math.ceil(filteredQuestions.length / questionsPerPage);
+        //         }
+        //     })
+        //     .catch(error => console.error('Error fetching questions:', error));
     </script>
     <script src="/static/js/main.js"></script>
 </body>

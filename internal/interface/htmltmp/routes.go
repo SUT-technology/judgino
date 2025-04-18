@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/SUT-technology/judgino/internal/domain/service"
+
 )
 
 type Group struct {
@@ -28,9 +29,14 @@ func (g *Group) Handle(method string, path string, handlerFunc http.HandlerFunc)
 
 func registerRoutes(mux *http.ServeMux, srvc service.Service, middlewares *middlewares) {
 	// Create groups with middleware
-	// swaggerGroup := NewGroup("/swagger", middlewares.loggingMiddleware, mux)
 	authGroup := NewGroup("/auth", middlewares.JWTMiddleware, mux)
+
+
+	// TODO
+	questionsGroup := NewGroup("/questions", middlewares.loggingMiddleware, mux)
+
 
 	// Register routes within groups
 	NewAuthHndlr(authGroup, srvc)
+	NewQuestionsHndlr(questionsGroup, srvc)
 }

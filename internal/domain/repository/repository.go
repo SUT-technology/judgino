@@ -19,6 +19,7 @@ type Pool interface {
 
 type Tables struct {
 	Users UserRepository
+	Questions QuestionRepository
 }
 
 type Repo struct {
