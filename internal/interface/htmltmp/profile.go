@@ -32,6 +32,7 @@ func NewProfileHndlr(g *Group, srvc service.Service) ProfileHndlr {
 
 type ProfileData struct {
 	UserId    uint
+	CurrentUserId uint
 	Username string
 	Phone string
 	Email string
@@ -50,7 +51,6 @@ func (h *ProfileHndlr) HandleChangeRole(w http.ResponseWriter, r *http.Request) 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	fmt.Println(data)
 	if err != nil {
-		fmt.Println("hjghjghjgjhkg")
 		http.Error(w, "invalid body", http.StatusBadRequest)
 		return
 	}
@@ -82,7 +82,8 @@ func (h *ProfileHndlr) HandleDynamicProfile(w http.ResponseWriter, r *http.Reque
 	}
 
 	data := ProfileData {
-		UserId: userId,             
+		UserId: userId,    
+		CurrentUserId: currentUser.ID,         
 		Username: user.Username,
 		Phone: user.Phone,
 		Email: user.Email,
@@ -97,7 +98,10 @@ func (h *ProfileHndlr) HandleDynamicProfile(w http.ResponseWriter, r *http.Reque
 
 
 	tmpl := template.Must(template.New("profile.html").Funcs(template.FuncMap{
-		"eq": func(a, b string) bool {
+		"eqs": func(a, b string) bool {
+			return a == b
+		},
+		"equi": func(a, b uint) bool {
 			return a == b
 		},
 	}).ParseFiles("D:/GOprojects/practice/judgino/templates/profile.html"))
