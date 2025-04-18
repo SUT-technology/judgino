@@ -27,6 +27,7 @@ func NewProfileHndlr(g *Group, srvc service.Service) ProfileHndlr {
 }
 
 type ProfileData struct {
+	UserId    uint
 	Username string
 	Phone string
 	Email string
@@ -65,6 +66,7 @@ func (h *ProfileHndlr) HandleDynamicProfile(w http.ResponseWriter, r *http.Reque
 	}
 
 	data := ProfileData {
+		UserId: userId,             
 		Username: user.Username,
 		Phone: user.Phone,
 		Email: user.Email,
@@ -73,11 +75,15 @@ func (h *ProfileHndlr) HandleDynamicProfile(w http.ResponseWriter, r *http.Reque
 		NotAccepted: user.SubmissionsCount-user.SolvedQuestionsCount,
 		Total: user.SubmissionsCount,
 		SolvedPercentage:  p,
-		IsCurrentUserAdmin: currentUser.Role=="Admin",
+		IsCurrentUserAdmin: currentUser.Role=="admin",
 		err: err,
 	}
 
 
-	tmpl := template.Must(template.ParseFiles("D:/GOprojects/practice/judgino/templates/profile.html"))
+	tmpl := template.Must(template.New("profile.html").Funcs(template.FuncMap{
+		"eq": func(a, b string) bool {
+			return a == b
+		},
+	}).ParseFiles("D:/GOprojects/practice/judgino/templates/profile.html"))
 	tmpl.Execute(w,data)
 }

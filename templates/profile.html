@@ -78,19 +78,22 @@
                     <span class="text-gray-200">{{.Email}}</span>
                 </div>
                 {{if .IsCurrentUserAdmin}}
+                <fieldset class="fieldset">
+                    <span class="text-gray-400 font-medium">نقش:</span>
+                    <select class="select" id="role-select">
+                      <option selected>{{.Role}}</option>
+                      {{if eq .Role "admin"}}
+                      <option>user</option>
+                      {{else}}
+                      <option>admin</option>
+                      {{end}}
+                    </select>
+                </fieldset>
+                {{else}}
                 <div class="flex justify-between">
                     <span class="text-gray-400 font-medium">نقش:</span>
                     <span class="text-gray-200">{{.Role}}</span>
                 </div>
-                {{else}}
-                <fieldset class="fieldset">
-                    <span class="text-gray-400 font-medium">نقش:</span>
-                    <select class="select">
-                      <option disabled selected>{{.Role}}</option>
-                      <option>user</option>
-                      <option>admin</option>
-                    </select>
-                  </fieldset>
                 {{end}}
             </div>
         </div>
@@ -130,7 +133,31 @@
     </section>
 </div>
 
-
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const select = document.getElementById("role-select");
+        select.addEventListener("change", function () {
+            console.log("dfndskgsdkjlvndfkjvndkfjknsdfb")
+            const selectedRole = select.value;
+            fetch(`/profile/{{.UserId}}/change_role`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ role: selectedRole })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Role changed successfully!");
+                    window.location.reload(); // optional
+                } else {
+                    alert("Failed to change role.");
+                }
+            });
+        });
+    });
+  </script>
+<!-- <script src="/static/js/bridge.js"></script> -->
 <script src="/static/js/main.js"></script>
 </body>
 </html>
