@@ -2,10 +2,12 @@ package htmltmp
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
-	"html/template"
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
 	"github.com/SUT-technology/judgino/internal/domain/service"
@@ -21,6 +23,8 @@ func NewProfileHndlr(g *Group, srvc service.Service) ProfileHndlr {
 	}
 
 	g.Handle("GET", "/", handler.HandleDynamicProfile)
+	g.Handle("POST", "/change-role", handler.HandleChangeRole)
+
 
 
 	return handler
@@ -40,21 +44,33 @@ type ProfileData struct {
 	err error
 }
 
+func (h *ProfileHndlr) HandleChangeRole(w http.ResponseWriter, r *http.Request) {
+
+	var data dto.UpdateUserDTO
+	err := json.NewDecoder(r.Body).Decode(&data)
+	fmt.Println(data)
+	if err != nil {
+		fmt.Println("hjghjghjgjhkg")
+		http.Error(w, "invalid body", http.StatusBadRequest)
+		return
+	}
+	h.Services.PrflSrvc.ChangeRole(context.Background(),data)
+}
+
+
 func (h *ProfileHndlr) HandleDynamicProfile(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
-	// currentUserId := r.Context().Value("userId").(int)
 	currentUserProfileDto := dto.ProfileDTO{
 		UserId: 1,
 	}
 	currentUser,_:=h.Services.PrflSrvc.GetProfileById(context.Background(),currentUserProfileDto)
 
-	userIDstr , _ := strconv.ParseUint(strings.TrimPrefix(path, "/profile/"),10,64)
-	userId := uint(userIDstr)
+	userID64 , _ := strconv.ParseUint(strings.TrimPrefix(path, "/profile/"),10,64)
+	userId := uint(userID64)
 	profileDto := dto.ProfileDTO{
 		UserId: userId,
 	}
-
 	user,err:=h.Services.PrflSrvc.GetProfileById(context.Background(),profileDto)
 
 	var p int

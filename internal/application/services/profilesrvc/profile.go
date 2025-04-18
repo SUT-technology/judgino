@@ -27,7 +27,8 @@ func (c PrflSrvc) GetProfileById(ctx context.Context, ProfileDTO dto.ProfileDTO)
 	)
 
 	queryFuncFindProfile := func(r *repository.Repo) error {
-		user, err = r.Tables.Users.GetUserById(ctx, 1)
+		
+		user, err = r.Tables.Users.GetUserById(ctx, ProfileDTO.UserId)
 		if err != nil {
 			return fmt.Errorf("find customer by id: %w", err)
 		}
@@ -42,16 +43,15 @@ func (c PrflSrvc) GetProfileById(ctx context.Context, ProfileDTO dto.ProfileDTO)
 	return user, nil
 }
 
-func (c PrflSrvc) ChangeRole(ctx context.Context, ProfileDTO dto.ProfileDTO) (*entity.User, error) {
+func (c PrflSrvc) ChangeRole(ctx context.Context, UpdateUserDTO dto.UpdateUserDTO) (*entity.User, error) {
 
 	var (
 		user *entity.User
 		err  error
-		data map[string]any
 	)
 
 	queryFuncUpdateUser := func(r *repository.Repo) error {
-		user, err = r.Tables.Users.FindUserAndUpdate(ctx, 1,data)
+		user, err = r.Tables.Users.FindUserAndUpdate(ctx,UpdateUserDTO)
 		if err != nil {
 			return fmt.Errorf("find customer by id: %w", err)
 		}

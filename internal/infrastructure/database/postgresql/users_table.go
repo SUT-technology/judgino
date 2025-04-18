@@ -3,6 +3,7 @@ package postgresql
 import (
 	"context"
 
+	"github.com/SUT-technology/judgino/internal/domain/dto"
 	"github.com/SUT-technology/judgino/internal/domain/entity"
 	"gorm.io/gorm"
 )
@@ -17,13 +18,20 @@ func newUsersTable(db *gorm.DB) usersTable {
 
 func (c usersTable) GetUserById(ctx context.Context, id uint) (*entity.User, error) {
 	var user entity.User
-	c.db.First(&user, 1)
+	c.db.First(&user, id)
 	return &user, nil
 }
 
-func (c usersTable) FindUserAndUpdate(ctx context.Context, id uint,data map[string]any) (*entity.User, error) {
+func (c usersTable) FindUserAndUpdate(ctx context.Context, data dto.UpdateUserDTO) (*entity.User, error) {
 	var user entity.User
-	c.db.First(&user, 1)
-	c.db.Model(&user).Updates(data)
-	return &user , nil
+
+	if err := c.db.WithContext(ctx).First(&user, data.ID).Error; err != nil {
+		return nil, err
+	}
+
+	if err := c.db.WithContext(ctx).Model(&user).Updates(data).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }

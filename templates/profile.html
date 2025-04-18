@@ -137,14 +137,14 @@
     document.addEventListener("DOMContentLoaded", function () {
         const select = document.getElementById("role-select");
         select.addEventListener("change", function () {
-            console.log("dfndskgsdkjlvndfkjvndkfjknsdfb")
             const selectedRole = select.value;
-            fetch(`/profile/{{.UserId}}/change_role`, {
+            const userId = `{{.UserId}}`; 
+            fetch(`/profile/change-role`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ role: selectedRole })
+                body: JSON.stringify({ ID: parseInt(userId),Role: selectedRole })
             })
             .then(response => {
                 if (response.ok) {
