@@ -22,6 +22,7 @@ func NewProfileHndlr(g *Group, srvc service.Service) ProfileHndlr {
 
 	g.Handle("GET", "/", handler.HandleDynamicProfile)
 
+
 	return handler
 }
 
@@ -34,11 +35,19 @@ type ProfileData struct {
 	Accepted int64
 	Total int64
 	SolvedPercentage int
+	IsCurrentUserAdmin bool
 	err error
 }
 
 func (h *ProfileHndlr) HandleDynamicProfile(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
+
+	// currentUserId := r.Context().Value("userId").(int)
+	currentUserProfileDto := dto.ProfileDTO{
+		UserId: 1,
+	}
+	currentUser,_:=h.Services.PrflSrvc.GetProfileById(context.Background(),currentUserProfileDto)
+
 	userIDstr , _ := strconv.ParseUint(strings.TrimPrefix(path, "/profile/"),10,64)
 	userId := uint(userIDstr)
 	profileDto := dto.ProfileDTO{
@@ -64,6 +73,7 @@ func (h *ProfileHndlr) HandleDynamicProfile(w http.ResponseWriter, r *http.Reque
 		NotAccepted: user.SubmissionsCount-user.SolvedQuestionsCount,
 		Total: user.SubmissionsCount,
 		SolvedPercentage:  p,
+		IsCurrentUserAdmin: currentUser.Role=="Admin",
 		err: err,
 	}
 

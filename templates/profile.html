@@ -77,11 +77,21 @@
                     <span class="text-gray-400 font-medium">ایمیل:</span>
                     <span class="text-gray-200">{{.Email}}</span>
                 </div>
-
+                {{if .IsCurrentUserAdmin}}
                 <div class="flex justify-between">
                     <span class="text-gray-400 font-medium">نقش:</span>
                     <span class="text-gray-200">{{.Role}}</span>
                 </div>
+                {{else}}
+                <fieldset class="fieldset">
+                    <span class="text-gray-400 font-medium">نقش:</span>
+                    <select class="select">
+                      <option disabled selected>{{.Role}}</option>
+                      <option>user</option>
+                      <option>admin</option>
+                    </select>
+                  </fieldset>
+                {{end}}
             </div>
         </div>
         <br>
