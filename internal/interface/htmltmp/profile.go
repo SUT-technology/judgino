@@ -30,9 +30,10 @@ type ProfileData struct {
 	Phone string
 	Email string
 	Role string
-	Attempted int64
+	NotAccepted int64
 	Accepted int64
-	total int64
+	Total int64
+	SolvedPercentage int
 	err error
 }
 
@@ -46,12 +47,23 @@ func (h *ProfileHndlr) HandleDynamicProfile(w http.ResponseWriter, r *http.Reque
 
 	user,err:=h.Services.PrflSrvc.GetProfileById(context.Background(),profileDto)
 
+	var p int
+
+	if user.SubmissionsCount == 0 {
+		p=0
+	} else {
+		p=100*int(user.SolvedQuestionsCount/user.SubmissionsCount)
+	}
+
 	data := ProfileData {
 		Username: user.Username,
 		Phone: user.Phone,
 		Email: user.Email,
 		Role: user.Role,
-		Accepted: user
+		Accepted: user.SolvedQuestionsCount,
+		NotAccepted: user.SubmissionsCount-user.SolvedQuestionsCount,
+		Total: user.SubmissionsCount,
+		SolvedPercentage:  p,
 		err: err,
 	}
 

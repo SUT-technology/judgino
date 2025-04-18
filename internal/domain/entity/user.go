@@ -12,4 +12,5 @@ type User struct {
     Role                 string `gorm:"size:255;not null"`
     CreatedQuestionsCount int64 `gorm:"not null"`
     SolvedQuestionsCount  int64 `gorm:"not null"`
+    SubmissionsCount      int64 `gorm:"not null"`
 }

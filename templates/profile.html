@@ -93,21 +93,21 @@
                 <div class="card bg-base-300 rounded-box grid h-20 grow place-items-center">
                     <div class="flex flex-col">
                         <span class="text-gray-400 font-medium text-center">تلاش شده</span>
-                        <span class="text-gray-200 text-center">10</span>
+                        <span class="text-gray-200 text-center">{{.Total}}</span>
                     </div>
                 </div>
                 <div class="divider divider-horizontal"></div>
                 <div class="card bg-base-300 rounded-box grid h-20 grow place-items-center">
                     <div class="flex flex-col">
                         <span class="text-gray-400 font-medium text-center">حل شده</span>
-                        <span class="text-gray-200 text-center">6</span>
+                        <span class="text-gray-200 text-center">{{.Accepted}}</span>
                     </div>
                 </div>
                 <div class="divider divider-horizontal"></div>
                 <div class="card bg-base-300 rounded-box grid h-20 grow place-items-center">
                     <div class="flex flex-col">
                         <span class="text-gray-400 text-center font-medium">حل نشده</span>
-                        <span class="text-gray-200 text-center">4</span>
+                        <span class="text-gray-200 text-center">{{.NotAccepted}}</span>
                     </div>
                 </div>
             </div>
@@ -115,7 +115,7 @@
             <div class="w-full bg-gray-200 rounded-full h-4">
                 <div class="bg-blue-500 h-4 rounded-full" style="width: 60%;"></div>
             </div>
-            <p class="text-sm text-gray-600 mt-2">60% حل شده</p>
+            <p class="text-sm text-gray-600 mt-2">{{.SolvedPercentage}}% حل شده</p>
         </div>
     </section>
 </div>
