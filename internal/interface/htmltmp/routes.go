@@ -30,7 +30,8 @@ func registerRoutes(mux *http.ServeMux, srvc service.Service, middlewares *middl
 	// Create groups with middleware
 	// swaggerGroup := NewGroup("/swagger", middlewares.loggingMiddleware, mux)
 	authGroup := NewGroup("/auth", middlewares.JWTMiddleware, mux)
-
-	// Register routes within groups
 	NewAuthHndlr(authGroup, srvc)
+
+	profileGroup := NewGroup("/profile", middlewares.JWTMiddleware, mux)
+	NewProfileHndlr(profileGroup, srvc)
 }
