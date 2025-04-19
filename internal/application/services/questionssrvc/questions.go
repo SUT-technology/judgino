@@ -24,15 +24,23 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 		questions []*entity.Question
 		err  error
 	)
-	if questionsDto.PageAction == "next" && questionsDto.PageParam < 10 {
+	questionsCount, err := c.QuestionsCount(ctx, questionsDto)
+	if err != nil {
+		return dto.QuestionsResponse{}, err
+	}
+	totalPages := questionsCount / 10 + 1
+	if questionsDto.PageAction == "next" && questionsDto.PageParam < (totalPages) {
 		questionsDto.PageParam++
 	}
 	if questionsDto.PageAction == "prev" && questionsDto.PageParam > 1 {
 		questionsDto.PageParam--
 	}
+	if questionsDto.PageParam > (totalPages) {
+		questionsDto.PageParam = (totalPages)
+	}
 
 	queryFuncFindQuestions := func(r *repository.Repo) error {
-		questions, err = r.Tables.Questions.GetQuestionByFilter(ctx, questionsDto.SearchValue, questionsDto.QuestionValue, questionsDto.SortValue, int(questionsDto.PageParam), questionsDto.UserId)
+		questions, err = r.Tables.Questions.GetQuestionByFilter(ctx, questionsDto.SearchFilter, questionsDto.QuestionValue, questionsDto.SortValue, int(questionsDto.PageParam), questionsDto.UserId)
 		if err != nil {
 			return fmt.Errorf("failed to get questions: %w", err)
 		}
@@ -53,15 +61,19 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 		}
 	}
 
-	questionsCount, err := c.QuestionsCount(ctx, questionsDto)
+	questionsCount, err = c.QuestionsCount(ctx, questionsDto)
 	if err != nil {
 		return dto.QuestionsResponse{}, err
 	}
+	totalPages = questionsCount / 10 + 1
 
 	resp := dto.QuestionsResponse{
 		Questions:  questionsData,
-		TotalPages: questionsCount/10 + 1,
-		CurrentPage: int(questionsDto.PageParam),
+		TotalPages: totalPages,
+		CurrentPage: (questionsDto.PageParam),
+		SearchFilter: questionsDto.SearchFilter,
+		QuestionFilter: questionsDto.QuestionValue,
+		SortFilter: questionsDto.SortValue,
 	}
 
 
@@ -102,7 +114,7 @@ func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.Ques
 	)
 
 	queryFuncFindQuestions := func(r *repository.Repo) error {
-		count, err = r.Tables.Questions.GetQuestionsCount(ctx, questionsDto.SearchValue, questionsDto.QuestionValue, questionsDto.UserId)
+		count, err = r.Tables.Questions.GetQuestionsCount(ctx, questionsDto.SearchFilter, questionsDto.QuestionValue, questionsDto.UserId)
 		if err != nil {
 			return fmt.Errorf("failed to get questions count: %w", err)
 		}

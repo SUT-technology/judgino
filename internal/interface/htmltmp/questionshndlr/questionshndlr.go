@@ -3,7 +3,6 @@ package questionshndlr
 import (
 	"net/http"
 
-
 	"github.com/SUT-technology/judgino/internal/domain/dto"
 	"github.com/SUT-technology/judgino/internal/domain/service"
 	"github.com/SUT-technology/judgino/internal/interface/htmltmp/serde"
@@ -38,7 +37,7 @@ func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 	
 	questionsDto := dto.QuestionRequest{
 		UserId:       uint(userId),
-		SearchValue:  "",
+		SearchFilter:  "",
 		QuestionValue: "all",
 		SortValue:    "publish_date",
 		PageParam: 1,

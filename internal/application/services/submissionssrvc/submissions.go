@@ -30,11 +30,21 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 		return dto.SubmissionsResponse{}, fmt.Errorf("user is not admin and submission value is all")
 	}
 
-	if submissionDto.PageAction == "next" && submissionDto.PageParam < 10 {
+	submissionsCount, err := c.SubmissionsCount(ctx, submissionDto)
+	if err != nil {
+		return dto.SubmissionsResponse{}, err
+	}
+	totalPages := submissionsCount / 10 + 1
+
+	if submissionDto.PageAction == "next" && submissionDto.PageParam < uint(totalPages) {
 		submissionDto.PageParam++
 	}
 	if submissionDto.PageAction == "prev" && submissionDto.PageParam > 1 {
 		submissionDto.PageParam--
+	}
+
+	if submissionDto.PageParam > uint(totalPages) {
+		submissionDto.PageParam = uint(totalPages)
 	}
 	
 
@@ -96,16 +106,19 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 		}
 	}
 
-	submissionsCount, err := c.SubmissionsCount(ctx, submissionDto)
+	submissionsCount, err = c.SubmissionsCount(ctx, submissionDto)
 	if err != nil {
 		return dto.SubmissionsResponse{}, err
 	}
+	totalPages = submissionsCount / 10 + 1
 
 	resp := dto.SubmissionsResponse{
 		Submissions: submissionsData,
-		TotalPages:  submissionsCount/10 + 1,
+		TotalPages:  totalPages,
 		QuestionId:  submissionDto.QuestionId,
 		CurrentPage: int(submissionDto.PageParam),
+		SubmissionFilter: submissionDto.SubmissionValue,
+		FinalFilter: submissionDto.FinalValue,
 	}
 	return resp, nil
 }

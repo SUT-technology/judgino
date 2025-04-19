@@ -6,7 +6,7 @@ type SubmissionRequest struct {
 	QuestionId int
 	SubmissionValue string `form:"submissionFilter"`
 	FinalValue string `form:"finalFilter"`
-	PageParam uint `form:"pageNumber"`
+	PageParam uint `form:"pageInfo"`
 	PageAction string `form:"page"`
 }
 
@@ -22,4 +22,6 @@ type SubmissionsResponse struct {
 	TotalPages  int          `json:"TotalPages"`
 	QuestionId int `json:"QuestionId"`
 	CurrentPage int `json:"CurrentPage"`
+	SubmissionFilter string `json:"SubmissionFilter"`
+	FinalFilter string `json:"FinalFilter"`
 }

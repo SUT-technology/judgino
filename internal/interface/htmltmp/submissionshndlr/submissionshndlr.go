@@ -1,6 +1,7 @@
 package submissionshndlr
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -21,8 +22,8 @@ func New(g *echo.Group, srvc service.Service) SubmissionsHndlr {
 	}
 	g.GET("/{question_id}", handler.ShowSubmissions)
 	g.GET("/:question_id", handler.ShowSubmissions)
-	g.POST("/{question_id}", handler.ShowSubmissions)
-	g.POST("/:question_id", handler.ShowSubmissions)
+	g.POST("/{question_id}", handler.ShowSubmissionsWithFilter)
+	g.POST("/:question_id", handler.ShowSubmissionsWithFilter)
 
 
 	return handler
@@ -68,6 +69,8 @@ func (q *SubmissionsHndlr) ShowSubmissionsWithFilter(c echo.Context) error {
 	questionID := c.Param("question_id")
 	questionIDInt, _ := strconv.Atoi(questionID)
 	submissionDto.QuestionId = questionIDInt
+
+	fmt.Printf("submissionDto: %+v\n", submissionDto)
 	
 	resp, err := q.Services.SubmissionSrvc.GetSubmissions(ctx, submissionDto)
 	if err != nil {

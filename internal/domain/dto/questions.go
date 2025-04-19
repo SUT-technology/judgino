@@ -2,10 +2,10 @@ package dto
 
 type QuestionRequest struct {
 	UserId 	uint 
-	SearchValue string `form:"searchFilter"`
+	SearchFilter string `form:"SearchFilter"`
 	QuestionValue string `form:"questionFilter"`
 	SortValue string `form:"sortFilter"`
-	PageParam uint `form:"pageNumber"`
+	PageParam int `form:"pageInfo"`
 	PageAction string `form:"page"`
 }
 type Question struct {
@@ -17,4 +17,7 @@ type QuestionsResponse struct {
 	Questions []Question `json:"Questions"`
 	TotalPages  int          `json:"TotalPages"`
 	CurrentPage int `json:"CurrentPage"`
+	SearchFilter string `json:"SearchFilter"`
+	QuestionFilter string `json:"questionFilter"`
+	SortFilter string `json:"sortFilter"`
 }

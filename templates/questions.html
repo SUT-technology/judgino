@@ -63,67 +63,59 @@
 
     <div class="lg:w-10/12 p-3 mr-auto mt-6">
         <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
-            <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
+            <form action="/questions" method="POST" id="filter">
+                <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
             
-                <h1 class="text-4xl text-center font-fedra mb-5">لیست سوالات</h1>
-
-                <form id="filter" action="/questions" method="POST">
+                    <h1 class="text-4xl text-center font-fedra mb-5">لیست سوالات</h1>
+    
                     <div class="mb-4">
-                        <input type="text" id="searchFilter" name="searchFilter" placeholder="جستجوی سوالات..." class="p-2 w-full rounded-md border mb-4">
+                        <input type="text" id="SearchFilter" name="SearchFilter" placeholder="جستجوی سوالات..." class="p-2 w-full rounded-md border mb-4" value="{{.SearchFilter}}">
                         <select id="questionFilter" name="questionFilter" class="p-2 w-1/4 rounded-md border">
-                            <option value="all" selected disabled hidden>سوالات</option>
-                            <option value="all">تمام سوالات</option>
-                            <option value="mine">سوالات من</option>
+                            <option value="all" {{if eq .QuestionFilter "all"}} selected {{end}}>تمام سوالات</option>
+                            <option value="mine" {{if eq .QuestionFilter "mine"}} selected {{end}}>سوالات من</option>
                         </select>
                         <select id="sortFilter" name="sortFilter" class="p-2 w-1/4 rounded-md border">
-                            <option value="publish_date" selected disabled hidden>ترتیب</option>
-                            <option value="publish_date">به ترتیب تاریخ انتشار</option>
-                            <option value="deadline">به ترتیب مهلت</option>
+                            <option value="publish_date" {{if eq .SortFilter "publish_date"}} selected {{end}}>به ترتیب تاریخ انتشار</option>
+                            <option value="deadline" {{if eq .SortFilter "deadline"}} selected {{end}}>به ترتیب مهلت</option>
                         </select>
                     </div>
                     
-                    <button type="submit" onclick="submitBothForms(event)" class="p-2 bg-gray-500 text-white rounded-md">ارسال</button>
-                </form>
-                
-
-                <div class="overflow-x-auto w-3/4 mx-auto bg-base--gray rounded-xl table-con bg-opacity-75">
-                    <table class="table-auto w-full text-center border-collapse">
-                        <thead>
-                            <tr>
-                                <th class="2">عنوان</th>
-                                <th class="2">تاریخ انتشار</th>
-                                <th class="2">مهلت</th>
-                            </tr>
-                        </thead>
-                        <tbody id="questions-list">
-                            {{range .Questions}}
+                    <button type="submit" class="p-2 w-60 bg-gray-500 text-white rounded-md">ارسال</button>
+                    
+    
+                    <div class="overflow-x-auto w-3/4 mx-auto bg-base--gray rounded-xl table-con bg-opacity-75">
+                        <table class="table-auto w-full text-center border-collapse">
+                            <thead>
                                 <tr>
-                                    <td class="2">{{.Title}}</td>
-                                    <td class="2">{{.PublishDate}}</td>
-                                    <td class="2">{{.Deadline}}</td>
+                                    <th class="2">عنوان</th>
+                                    <th class="2">تاریخ انتشار</th>
+                                    <th class="2">مهلت</th>
                                 </tr>
-                            {{end}}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="questions-list">
+                                {{range .Questions}}
+                                    <tr>
+                                        <td class="2">{{.Title}}</td>
+                                        <td class="2">{{.PublishDate}}</td>
+                                        <td class="2">{{.Deadline}}</td>
+                                    </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex justify-center items-center mt-4">
+                        <input type="hidden" id="pageInfo" name="pageInfo" value="{{.CurrentPage}}">
+                        <button type="submit" name="page" value="prev" class="p-2 bg-gray-500 text-white rounded-md">قبلی</button>
+                    
+                        <span class="mx-6">صفحه {{.CurrentPage}} از {{.TotalPages}}</span>
+                    
+                        <button type="submit" name="page" value="next" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
+                    </div>
+                
                 </div>
-                <div class="flex justify-center items-center mt-4">
-                    <form id="page" action="/questions" method="POST" class="flex items-center">
-                        <button type="submit" name="page" value="prev" onclick="submitBothForms(event)" class="p-2 bg-gray-500 text-white rounded-md">قبلی</button>
-                        <span id="pageInfo" name="pageNumer" value="{{.CurrentPage}}" class="mx-6">صفحه {{.CurrentPage}} از {{.TotalPages}}</span>
-                        <button type="submit" name="page" value="next" onclick="submitBothForms(event)" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
-                    </form>
-                </div>
-            
-            </div>
+            </form>
         </section>
     </div>
-    <script>
-        function submitBothForms(event) {
-          event.preventDefault(); // Prevents the default form submission
-          document.getElementById("filter").submit(); // Submit the first form
-          document.getElementById("page").submit(); // Submit the second form
-        }
-      </script>
     <script src="/static/js/main.js"></script>
 </body>
 
