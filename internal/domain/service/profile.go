@@ -8,6 +8,6 @@ import (
 )
 
 type ProfileService interface {
-	GetProfileById(ctx context.Context, profileDto dto.ProfileDTO) (*entity.User, error)
+	GetProfileById(ctx context.Context, profileDto dto.ProfileDTO) (*dto.ProfileResponeDTO, error)
 	ChangeRole(ctx context.Context,updateUserDTO dto.UpdateUserDTO) (*entity.User,error)
 }
