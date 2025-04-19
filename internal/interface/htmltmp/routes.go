@@ -8,6 +8,12 @@ import (
 
 func register(e *echo.Echo, srvc service.Service, m *middlewares) {
 
+func registerRoutes(mux *http.ServeMux, srvc service.Service, middlewares *middlewares) {
+	// Create groups with middleware
+	// swaggerGroup := NewGroup("/swagger", middlewares.loggingMiddleware, mux
+
+	profileGroup := NewGroup("/profile", middlewares.JWTMiddleware, mux)
+	NewProfileHndlr(profileGroup, srvc)
 	auth := e.Group("/auth", m.JWTMiddleware)
 
 	authhdnlr.New(auth, srvc)
