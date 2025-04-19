@@ -1,31 +1,96 @@
 package htmltmp
 
 import (
-	"fmt"
-	"net/http"
+	"context"
+	"errors"
+	"html/template"
+	"io"
+	"log/slog"
+	"slices"
+	"time"
 
 	"github.com/SUT-technology/judgino/internal/domain/service"
 	"github.com/SUT-technology/judgino/internal/interface/config"
+	"github.com/SUT-technology/judgino/pkg/slogger"
+	"github.com/go-playground/validator/v10"
+	"github.com/labstack/echo/v4"
 )
 
 type Server struct {
+	srv    *echo.Echo
+	defers []func()
 }
 
 func NewServer(srvc service.Service, cfg config.Server) *Server {
+	var dfrs []func()
+
+	e := echo.New()
+	e.Debug = true
+	e.HideBanner = true
+	e.HidePort = true
+	e.Validator = &Validator{validator: validator.New()}
+
+	closer := func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		err := e.Shutdown(ctx)
+		if err != nil {
+			slog.Error("close HTTP server", slogger.Err("error", err))
+		}
+	}
+	dfrs = append(dfrs, closer)
+
+	// manage middlewares
+	var middleware []echo.MiddlewareFunc
 	m := newMiddlewares(cfg)
 
-	// Create your main handler (ServeMux)
-	mux := http.NewServeMux()
+	if cfg.Logger {
+		middleware = append(middleware, m.loggerMiddleware)
+	}
 
-	registerRoutes(mux, srvc, m)
+	// application specific middlewares
+	middleware = append(middleware, m.corsMiddleware())
 
-	handlerWithMiddleware := use(mux, []Middleware{
-		m.loggingMiddleware, // Apply the global logging middleware
-	})
-	// Start the server
-	fmt.Println("Server running at :", cfg.Port)
-	port := ":" + cfg.Port
-	http.ListenAndServe(port, handlerWithMiddleware)
+	// default recover middleware
+	middleware = append(middleware, m.recoverMiddleware)
 
-	return &Server{}
+	// applying middlewares and create a new server
+	e.Use(middleware...)
+
+	e.Renderer = &TemplateRenderer{
+		templates: template.Must(template.ParseGlob("./templates/*.html")),
+	}
+
+	register(e, srvc, m)
+
+	return &Server{srv: e, defers: dfrs}
+}
+
+func (s *Server) Start(addr string) error {
+	return s.srv.Start(addr)
+}
+
+func (s *Server) Stop() {
+	for _, f := range slices.Backward(s.defers) {
+		f()
+	}
+}
+
+type Validator struct {
+	validator *validator.Validate
+}
+
+func (v *Validator) Validate(i interface{}) error {
+	if err := v.validator.Struct(i); err != nil {
+		return errors.New("validate failed")
+	}
+	return nil
+}
+
+type TemplateRenderer struct {
+	templates *template.Template
+}
+
+func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
 }

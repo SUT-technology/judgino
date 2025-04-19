@@ -1,6 +1,10 @@
 package config
 
-import "github.com/go-playground/validator/v10"
+import (
+	"time"
+
+	"github.com/go-playground/validator/v10"
+)
 
 type Config struct {
 	DB     DB     `yaml:"db"`
@@ -9,8 +13,18 @@ type Config struct {
 	Server Server `yaml:"server"`
 }
 
+type RateLimiter struct {
+	Enabled bool          `yaml:"enabled"`
+	Rate    int           `yaml:"rate"`
+	Burst   int           `yaml:"burst"`
+	Expires time.Duration `yaml:"expires"`
+}
 type Server struct {
-	Port string `yaml:port`
+	Port        string      `yaml:port`
+	SecretKey   string      `yaml:"secret_key" validate:"required"`
+	Logger      bool        `yaml:"logger" validate:"required"`
+	RateLimiter RateLimiter `yaml:"rate-limiter"`
+	Addr        string      `yaml:"addr"`
 }
 
 type DB struct {
