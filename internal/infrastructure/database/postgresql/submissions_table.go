@@ -33,3 +33,14 @@ func (c submissionsTable) GetSubmissionsByFilter(ctx context.Context, userId uin
 	query.Find(&submissions)
 	return submissions, nil
 }
+func (c submissionsTable) GetSubmissionsCount(ctx context.Context, userId uint, questionId uint, submissionFilter string, finalFilter bool) (int, error) {
+	var count int64
+	var query *gorm.DB
+	if submissionFilter == "mine" && userId != 0 {
+		query = c.db.Model(&entity.Submission{}).Where("question_id = ?", questionId).Where("user_id = ?", userId).Where("is_final = ?", finalFilter)
+	} else {
+		query = c.db.Model(&entity.Submission{}).Where("question_id = ?", questionId).Where("is_final = ?", finalFilter)
+	}
+	query.Count(&count)
+	return int(count), nil
+}

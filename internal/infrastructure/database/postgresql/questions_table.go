@@ -32,3 +32,15 @@ func (c questionsTable) GetQuestionByFilter(ctx context.Context, searchFilter st
 	query.Find(&questions)
 	return questions, nil
 }
+
+func (c questionsTable) GetQuestionsCount(ctx context.Context, searchFilter string, questionFilter string, userId uint) (int, error) {
+	var count int64
+	var query *gorm.DB
+	if questionFilter == "mine" && userId != 0 {
+		query = c.db.Where("title ILIKE ?", "%"+searchFilter+"%").Where("user_id = ?", userId)
+	} else {
+		query = c.db.Where("title ILIKE ?", "%"+searchFilter+"%")
+	}
+	query.Model(&entity.Question{}).Count(&count)
+	return int(count), nil
+}

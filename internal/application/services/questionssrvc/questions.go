@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
-	"github.com/SUT-technology/judgino/internal/domain/repository"
 	"github.com/SUT-technology/judgino/internal/domain/entity"
+	"github.com/SUT-technology/judgino/internal/domain/repository"
 )
 
 type QuestionsSrvc struct {
@@ -53,9 +53,14 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 		}
 	}
 
+	questionsCount, err := c.QuestionsCount(ctx, questionsDto)
+	if err != nil {
+		return dto.QuestionsResponse{}, err
+	}
+
 	resp := dto.QuestionsResponse{
 		Questions:  questionsData,
-		TotalPages: 10,
+		TotalPages: questionsCount/10 + 1,
 		CurrentPage: int(questionsDto.PageParam),
 	}
 
@@ -88,3 +93,26 @@ func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.Qu
 	}, nil
 }
 
+
+func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.QuestionRequest) (int, error) {
+
+	var (
+		count int
+		err  error
+	)
+
+	queryFuncFindQuestions := func(r *repository.Repo) error {
+		count, err = r.Tables.Questions.GetQuestionsCount(ctx, questionsDto.SearchValue, questionsDto.QuestionValue, questionsDto.UserId)
+		if err != nil {
+			return fmt.Errorf("failed to get questions count: %w", err)
+		}
+		return nil
+	}
+
+	err = c.db.Query(ctx, queryFuncFindQuestions)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}

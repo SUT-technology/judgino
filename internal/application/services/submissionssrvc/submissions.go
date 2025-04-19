@@ -96,11 +96,38 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 		}
 	}
 
+	submissionsCount, err := c.SubmissionsCount(ctx, submissionDto)
+	if err != nil {
+		return dto.SubmissionsResponse{}, err
+	}
+
 	resp := dto.SubmissionsResponse{
 		Submissions: submissionsData,
-		TotalPages:  10,
+		TotalPages:  submissionsCount/10 + 1,
 		QuestionId:  submissionDto.QuestionId,
 		CurrentPage: int(submissionDto.PageParam),
 	}
 	return resp, nil
+}
+
+func (c SubmissionService) SubmissionsCount(ctx context.Context, submissionDto dto.SubmissionRequest) (int, error) {
+	var (
+		submissionsCount int
+		err              error
+	)
+
+	queryFuncFindSubmissionsCount := func(r *repository.Repo) error {
+		submissionsCount, err = r.Tables.Submissions.GetSubmissionsCount(ctx, submissionDto.UserId, uint(submissionDto.QuestionId), submissionDto.SubmissionValue, submissionDto.FinalValue == "final")
+		if err != nil {
+			return fmt.Errorf("failed to get submissions count: %w", err)
+		}
+		return nil
+	}
+
+	err = c.db.Query(ctx, queryFuncFindSubmissionsCount)
+	if err != nil {
+		return 0, err
+	}
+
+	return submissionsCount, nil
 }

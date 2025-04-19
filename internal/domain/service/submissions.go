@@ -8,4 +8,5 @@ import (
 
 type SubmissionService interface {
 	GetSubmissions(ctx context.Context, submissionDto dto.SubmissionRequest) (dto.SubmissionsResponse, error)
+	SubmissionsCount(ctx context.Context, submissionDto dto.SubmissionRequest) (int, error)
 }
