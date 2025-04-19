@@ -18,7 +18,7 @@ func NewUserSrvc(db repository.Pool) UserService {
 	}
 }
 
-func (c UserService) GetUser(ctx context.Context, userId uint) (*entity.User, error) {
+func (c UserService) GetUserName(ctx context.Context, userId uint) (string, error) {
 	var (
 		user *entity.User
 		err  error
@@ -33,7 +33,7 @@ func (c UserService) GetUser(ctx context.Context, userId uint) (*entity.User, er
 	}
 	err = c.db.Query(ctx, queryFuncFindUser)
 	if err != nil {	
-		return nil, err
+		return "", err
 	}
-	return user, nil
+	return user.FirstName, nil
 }

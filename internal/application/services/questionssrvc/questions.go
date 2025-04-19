@@ -19,11 +19,17 @@ func NewQuestionsSrvc(db repository.Pool) QuestionsSrvc {
 	}
 }
 
-func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionRequest) ([]*entity.Question, error) {
+func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionRequest) (dto.QuestionsResponse, error) {
 	var (
 		questions []*entity.Question
 		err  error
 	)
+	if questionsDto.PageAction == "next" && questionsDto.PageParam < 10 {
+		questionsDto.PageParam++
+	}
+	if questionsDto.PageAction == "prev" && questionsDto.PageParam > 1 {
+		questionsDto.PageParam--
+	}
 
 	queryFuncFindQuestions := func(r *repository.Repo) error {
 		questions, err = r.Tables.Questions.GetQuestionByFilter(ctx, questionsDto.SearchValue, questionsDto.QuestionValue, questionsDto.SortValue, int(questionsDto.PageParam), questionsDto.UserId)
@@ -35,12 +41,29 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 
 	err = c.db.Query(ctx, queryFuncFindQuestions)
 	if err != nil {
-		return nil, err
+		return dto.QuestionsResponse{}, err
 	}
-	return questions, nil
+	// Create the data to pass to the template
+	questionsData := make([]dto.Question, len(questions))
+	for i, question := range questions {
+		questionsData[i] = dto.Question{
+			Title:         question.Title,
+			PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
+			Deadline: 	question.Deadline.Format("2006-01-02 15:04:05"),
+		}
+	}
+
+	resp := dto.QuestionsResponse{
+		Questions:  questionsData,
+		TotalPages: 10,
+		CurrentPage: int(questionsDto.PageParam),
+	}
+
+
+	return resp, nil
 }
 
-func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (*entity.Question, error) {
+func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.Question, error) {
 	var (
 		question *entity.Question
 		err  error
@@ -56,29 +79,12 @@ func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (*entit
 
 	err = c.db.Query(ctx, queryFuncFindQuestion)
 	if err != nil {
-		return nil, err
+		return dto.Question{}, err
 	}
-	return question, nil
+	return dto.Question{
+		Title:         question.Title,
+		PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
+		Deadline: 	question.Deadline.Format("2006-01-02 15:04:05"),
+	}, nil
 }
 
-func (c QuestionsSrvc) GetSubmissions(ctx context.Context, submissionDto dto.SubmissionRequest) ([]*entity.Submission, error) {
-	var (
-		submissions []*entity.Submission
-		err  error
-	)
-	
-
-	queryFuncFindSubmissions := func(r *repository.Repo) error {
-		submissions, err = r.Tables.Submissions.GetSubmissionsByFilter(ctx, submissionDto.UserId, submissionDto.QuestionId, submissionDto.SubmissonValue, submissionDto.FinalValue, submissionDto.PageParam)
-		if err != nil {
-			return fmt.Errorf("failed to get submissions: %w", err)
-		}
-		return nil
-	}
-
-	err = c.db.Query(ctx, queryFuncFindSubmissions)
-	if err != nil {
-		return nil, err
-	}
-	return submissions, nil
-}

@@ -71,140 +71,67 @@
                 <h1 class="text-4xl text-center font-fedra mb-5">لیست ارسال‌ها</h1>
 
 
-        <div class="mb-4">
-            <select id="submissionFilter" class="p-2 w-1/4 rounded-md border">
-                <option value="all">تمام ارسال‌ها</option>
-                <option value="mine">ارسال‌های من</option>
-            </select>
-            <select id="finalFilter" class="p-2 w-1/4 rounded-md border">
-                <option value="all">تمام ارسال‌ها</option>
-                <option value="final">ارسال‌های نهایی</option>
-            </select>
-        </div>
+    
+                <form id="filter" action="/submissions/{{.QuestionId}}" method="POST">
+                    <div class="mb-4">
+                        <select id="submissionFilter" name="submissionFilter" class="p-2 w-1/4 rounded-md border">
+                            <option value="all" selected disabled hidden>ارسال‌ها</option>
+                            <option value="all">تمام ارسال‌ها</option>
+                            <option value="mine">ارسال‌های من</option>
+                        </select>
+                        <select id="finalFilter" name="finalFilter" class="p-2 w-1/4 rounded-md border">
+                            <option value="all" selected disabled hidden>نهایی</option>
+                            <option value="all">تمام ارسال‌ها</option>
+                            <option value="final">ارسال‌های نهایی</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" onclick="submitBothForms(event)" class="p-2 bg-gray-500 text-white rounded-md">ارسال</button>
+                </form>
 
 
-        <div class="overflow-x-auto w-3/4 mx-auto bg-base--gray rounded-xl table-con bg-opacity-75">
-            <table class="table-auto w-full text-center border-collapse">
-                <thead>
-                    <tr>
-                        <th class="2">نام سوال</th>
-                        <th class="2">پاسخ‌دهنده</th>
-                        <th class="2">وضعیت</th>
-                        <th class="2">زمان ارسال</th>
-                        <th class="2">نوع ارسال</th>
-                    </tr>
-                </thead>
-                <tbody id="submissions-list">
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    {{range .submissions}}
-                        <th class="2">{{.question_title}}</th>
-                        <th class="2">{{.user_name}}</th>
-                        <th class="2">{{.status}}</th>
-                        <th class="2">{{.date}}</th>
-                        <th class="2">{{.type}}</th>
-                    {{end}}
-                </tbody>
-        
-            </table>
-        </div>
+                <div class="overflow-x-auto w-3/4 mx-auto bg-base--gray rounded-xl table-con bg-opacity-75">
+                    <table class="table-auto w-full text-center border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="2">نام سوال</th>
+                                <th class="2">پاسخ‌دهنده</th>
+                                <th class="2">وضعیت</th>
+                                <th class="2">زمان ارسال</th>
+                                <th class="2">نوع ارسال</th>
+                            </tr>
+                        </thead>
+                        <tbody id="submissions-list">
+                            {{range .Submissions}}
+                            <tr>
+                                <th class="2">{{.QuestionTitle}}</th>
+                                <th class="2">{{.UserName}}</th>
+                                <th class="2">{{.Status}}</th>
+                                <th class="2">{{.Date}}</th>
+                                <th class="2">{{.Type}}</th>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                
+                    </table>
+                </div>
 
-        <div class="flex justify-center items-center mt-4">
-            <button id="prevPage" class="p-2 bg-gray-500 text-white rounded-md" disabled>قبلی</button>
-            <span id="pageInfo" class="mx-6">صفحه 1 از 1</span>
-            <button id="nextPage" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
-        </div>
+                <div class="flex justify-center items-center mt-4">
+                    <form id="page" action="/submissions/{{.QuestionId}}" method="POST" class="flex items-center">
+                        <button type="submit" name="page" value="prev" onclick="submitBothForms(event)" class="p-2 bg-gray-500 text-white rounded-md">قبلی</button>
+                        <span id="pageInfo" name="pageNumer" value="{{.CurrentPage}}" class="mx-6">صفحه {{.CurrentPage}} از {{.TotalPages}}</span>
+                        <button type="submit" name="page" value="next" onclick="submitBothForms(event)" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
+                    </form>
+                </div>
             </div>
         </section>
     </div>
 
     <script>
-        const question_id = 2; // TODO Replace with the actual question ID
-
-
-
-        // When the input or select options change, trigger a request to the backend
-        const submissionFilter = document.getElementById('submissionFilter');
-        const finalFilter = document.getElementById('finalFilter');
-
-
-        const   prevPageBtn = document.getElementById('prevPage');
-        const   nextPageBtn = document.getElementById('nextPage');
-        const   pageInfo = document.getElementById('pageInfo');
-
-        let currentPage = 1;  // Track the current page
-        let totalPages = 5;   // Total pages, needs to be set after the first request
-        pageInfo.textContent = `صفحه ${currentPage} از ${totalPages}`;
-
-
-
-        // When input or select options change, trigger a request to the backend
-        submissionFilter.addEventListener('change', handlePaginationChange);
-        finalFilter.addEventListener('change', handlePaginationChange);
-
-        // "Previous" button click
-        prevPageBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                handlePaginationChange();
-            }
-        });
-
-        // "Next" button click
-        nextPageBtn.addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                currentPage++;
-                handlePaginationChange();
-            }
-        });
-
-
-        // Function to handle the request to the backend with current page and filter values
-        function handlePaginationChange() {
-            const submissionValue = submissionFilter.value;
-            const finalValue = finalFilter.value;
-
-            const queryString = `submissionValue=${submissionValue}&finalValue=${finalValue}&page=${currentPage}`;
-
-            // Send the data to the backend
-            fetch(`/questions/${question_id}/submissions?${queryString}`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data); // Handle the response
-                    updateSubmissionsList(data);
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        function updateSubmissionsList(data) {
-            const submissionsList = document.getElementById('submissions-list');
-            submissionsList.innerHTML = '';
-
-            data.submissions.forEach(submission => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="2">${submission.question_title}</td>
-                    <td class="2">${submission.user_name}</td>
-                    <td class="2">${submission.status}</td>
-                    <td class="2">${new Date(submission.date).toLocaleDateString()}</td>
-                    <td class="2">${submission.type}</td>
-                `;
-                submissionsList.appendChild(row);
-            });
-
-            // Update the pagination info
-            totalPages = data.totalPages;  // Update the total pages from the response
-            pageInfo.textContent = `صفحه ${currentPage} از ${totalPages}`;
-
-            // Disable/enable pagination buttons
-            prevPageBtn.disabled = currentPage === 1;
-            nextPageBtn.disabled = currentPage === totalPages;
-            handlePaginationChange();
+        function submitBothForms(event) {
+          event.preventDefault(); // Prevents the default form submission
+          document.getElementById("filter").submit(); // Submit the first form
+          document.getElementById("page").submit(); // Submit the second form
         }
     </script>
     <script src="/static/js/main.js"></script>

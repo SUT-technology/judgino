@@ -67,154 +67,63 @@
             
                 <h1 class="text-4xl text-center font-fedra mb-5">لیست سوالات</h1>
 
-        <!-- Filter Input -->
-        <div class="mb-4">
-            <input type="text" id="searchFilter" placeholder="جستجوی سوالات..." class="p-2 w-full rounded-md border mb-4">
-            <select id="questionFilter" class="p-2 w-1/4 rounded-md border">
-                <option value="all">تمام سوالات</option>
-                <option value="mine">سوالات من</option>
-            </select>
-            <select id="sortFilter" class="p-2 w-1/4 rounded-md border">
-                <option value="publish_date">به ترتیب تاریخ انتشار</option>
-                <option value="deadline">به ترتیب مهلت</option>
-            </select>
-        </div>
+                <form id="filter" action="/questions" method="POST">
+                    <div class="mb-4">
+                        <input type="text" id="searchFilter" name="searchFilter" placeholder="جستجوی سوالات..." class="p-2 w-full rounded-md border mb-4">
+                        <select id="questionFilter" name="questionFilter" class="p-2 w-1/4 rounded-md border">
+                            <option value="all" selected disabled hidden>سوالات</option>
+                            <option value="all">تمام سوالات</option>
+                            <option value="mine">سوالات من</option>
+                        </select>
+                        <select id="sortFilter" name="sortFilter" class="p-2 w-1/4 rounded-md border">
+                            <option value="publish_date" selected disabled hidden>ترتیب</option>
+                            <option value="publish_date">به ترتیب تاریخ انتشار</option>
+                            <option value="deadline">به ترتیب مهلت</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" onclick="submitBothForms(event)" class="p-2 bg-gray-500 text-white rounded-md">ارسال</button>
+                </form>
+                
 
-        <div class="overflow-x-auto w-3/4 mx-auto bg-base--gray rounded-xl table-con bg-opacity-75">
-            <table class="table-auto w-full text-center border-collapse">
-                <thead>
-                    <tr>
-                        <th class="2">عنوان</th>
-                        <th class="2">تاریخ انتشار</th>
-                        <th class="2">مهلت</th>
-                    </tr>
-                </thead>
-                <tbody id="questions-list">
-                    {{range .Questions}}
-                        <tr>
-                            <td class="2">{{.Title}}</td>
-                            <td class="2">{{.PublishDate}}</td>
-                            <td class="2">{{.Deadline}}</td>
-                        </tr>
-                    {{end}}
-                </tbody>
-            </table>
-        </div>
-        <div class="flex justify-center items-center mt-4">
-            <button id="prevPage" class="p-2 bg-gray-500 text-white rounded-md">قبلی</button>
-            <span id="pageInfo" class="mx-6"></span>
-            <button id="nextPage" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
-        </div>
+                <div class="overflow-x-auto w-3/4 mx-auto bg-base--gray rounded-xl table-con bg-opacity-75">
+                    <table class="table-auto w-full text-center border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="2">عنوان</th>
+                                <th class="2">تاریخ انتشار</th>
+                                <th class="2">مهلت</th>
+                            </tr>
+                        </thead>
+                        <tbody id="questions-list">
+                            {{range .Questions}}
+                                <tr>
+                                    <td class="2">{{.Title}}</td>
+                                    <td class="2">{{.PublishDate}}</td>
+                                    <td class="2">{{.Deadline}}</td>
+                                </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex justify-center items-center mt-4">
+                    <form id="page" action="/questions" method="POST" class="flex items-center">
+                        <button type="submit" name="page" value="prev" onclick="submitBothForms(event)" class="p-2 bg-gray-500 text-white rounded-md">قبلی</button>
+                        <span id="pageInfo" name="pageNumer" value="{{.CurrentPage}}" class="mx-6">صفحه {{.CurrentPage}} از {{.TotalPages}}</span>
+                        <button type="submit" name="page" value="next" onclick="submitBothForms(event)" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
+                    </form>
+                </div>
             
             </div>
         </section>
     </div>
-
     <script>
-        // When the input or select options change, trigger a request to the backend
-        const searchFilter = document.getElementById('searchFilter');
-        const questionFilter = document.getElementById('questionFilter');
-        const sortFilter = document.getElementById('sortFilter');
-
-
-        const   prevPageBtn = document.getElementById('prevPage');
-        const   nextPageBtn = document.getElementById('nextPage');
-        const   pageInfo = document.getElementById('pageInfo');
-
-        let currentPage = 1;  // Track the current page
-        let totalPages = 5;   // Total pages, needs to be set after the first request
-        pageInfo.textContent = `صفحه ${currentPage} از ${totalPages}`;
-
-
-
-        // When input or select options change, trigger a request to the backend
-        searchFilter.addEventListener('input', handlePaginationChange);
-        questionFilter.addEventListener('change', handlePaginationChange);
-        sortFilter.addEventListener('change', handlePaginationChange);
-
-        // "Previous" button click
-        prevPageBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                handlePaginationChange();
-            }
-        });
-
-        // "Next" button click
-        nextPageBtn.addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                currentPage++;
-                handlePaginationChange();
-            }
-        });
-
-        searchFilter.addEventListener('input', () => {
-            const searchValue = searchFilter.value;
-            const questionValue = questionFilter.value;
-            const sortValue = sortFilter.value;
-
-            // Send data to the backend via GET request
-            const queryString = `searchValue=${searchValue}&questionValue=${questionValue}&sortValue=${sortValue}&page=${currentPage}`;
-            fetch(`/questions?${queryString}`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data); // Handle the response
-                    updateQuestionsList(data);
-            })
-            .catch(error => console.error('Error:', error));
-        });
-
-
-        // Function to handle the request to the backend with current page and filter values
-        function handlePaginationChange() {
-            const searchValue = searchFilter.value;
-            const questionValue = questionFilter.value;
-            const sortValue = sortFilter.value;
-
-            const queryString = `searchValue=${searchValue}&questionValue=${questionValue}&sortValue=${sortValue}&page=${currentPage}`;
-
-            // Send the data to the backend
-            fetch(`/questions?${queryString}`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data); // Handle the response
-                    updateQuestionsList(data);
-                })
-                .catch(error => console.error('Error:', error));
+        function submitBothForms(event) {
+          event.preventDefault(); // Prevents the default form submission
+          document.getElementById("filter").submit(); // Submit the first form
+          document.getElementById("page").submit(); // Submit the second form
         }
-
-        // Function to update the questions list and pagination information
-        function updateQuestionsList(data) {
-            const questionsList = document.getElementById('questions-list');
-            questionsList.innerHTML = ''; // Clear existing questions
-
-            data.questions.forEach(question => {
-                const publishDate = new Date(question.publish_date);
-                const deadlineDate = new Date(question.deadline);
-
-                // Check if the dates are valid
-                const validPublishDate = !isNaN(publishDate) ? publishDate.toLocaleDateString() : 'Invalid Date';
-                const validDeadlineDate = !isNaN(deadlineDate) ? deadlineDate.toLocaleDateString() : 'Invalid Date';
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="2">${question.title}</td>
-                    <td class="2">${validPublishDate}</td>
-                    <td class="2">${validDeadlineDate}</td>
-                `;
-                questionsList.appendChild(row);
-            });
-
-            // Update the pagination info
-            totalPages = data.totalPages;  // Update the total pages from the response
-            pageInfo.textContent = `صفحه ${currentPage} از ${totalPages}`;
-
-            // Disable/enable pagination buttons
-            prevPageBtn.disabled = currentPage === 1;
-            nextPageBtn.disabled = currentPage === totalPages;
-            handlePaginationChange();
-        }
-    </script>
+      </script>
     <script src="/static/js/main.js"></script>
 </body>
 

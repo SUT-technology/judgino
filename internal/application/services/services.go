@@ -3,6 +3,7 @@ package services
 import (
 	"github.com/SUT-technology/judgino/internal/application/services/authsrvc"
 	"github.com/SUT-technology/judgino/internal/application/services/questionssrvc"
+	"github.com/SUT-technology/judgino/internal/application/services/submissionssrvc"
 	"github.com/SUT-technology/judgino/internal/application/services/usersrvc"
 	"github.com/SUT-technology/judgino/internal/domain/repository"
 	"github.com/SUT-technology/judgino/internal/domain/service"
@@ -13,5 +14,6 @@ func New(db repository.Pool) service.Service {
 		AuthSrvc: authsrvc.NewAuthSrvc(db),
 		QuestionsSrvc: questionssrvc.NewQuestionsSrvc(db),
 		UserSrvc: usersrvc.NewUserSrvc(db),
+		SubmissionSrvc: submissionssrvc.NewSubmissionSrvc(db),
 	}
 }
