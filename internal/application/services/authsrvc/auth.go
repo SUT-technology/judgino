@@ -41,3 +41,22 @@ func (c AuthSrvc) Login(ctx context.Context, loginDto dto.LoginDTO) (string, err
 	}
 	return user.FirstName, nil
 }
+func (c AuthSrvc) GetUser(ctx context.Context, userId uint) (*entity.User, error) {
+	var (
+		user *entity.User
+		err  error
+	)
+
+	queryFuncFindUser := func(r *repository.Repo) error {
+		user, err = r.Tables.Users.GetUserById(ctx, userId)
+		if err != nil {
+			return fmt.Errorf("find customer by id: %w", err)
+		}
+		return nil
+	}
+	err = c.db.Query(ctx, queryFuncFindUser)
+	if err != nil {	
+		return nil, err
+	}
+	return user, nil
+}

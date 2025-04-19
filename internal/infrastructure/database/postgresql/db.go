@@ -25,5 +25,6 @@ func New(db *gorm.DB) repository.Tables {
 	return repository.Tables{
 		Users: newUsersTable(db),
 		Questions: newQuestionsTable(db),
+		Submissions: newSubmissionsTable(db),
 	}
 }

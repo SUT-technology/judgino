@@ -90,11 +90,12 @@
                     </tr>
                 </thead>
                 <tbody id="questions-list">
-                    {{range .questions}}
-                        <li>{{.Title}} - {{.PublishDate}} - {{.Deadline}}</li>
-                        <th class="2">{{.Title}}</th>
-                        <th class="2">{{.PublishDate}}</th>
-                        <th class="2">{{.Deadline}}</th>
+                    {{range .Questions}}
+                        <tr>
+                            <td class="2">{{.Title}}</td>
+                            <td class="2">{{.PublishDate}}</td>
+                            <td class="2">{{.Deadline}}</td>
+                        </tr>
                     {{end}}
                 </tbody>
             </table>
@@ -188,11 +189,18 @@
             questionsList.innerHTML = ''; // Clear existing questions
 
             data.questions.forEach(question => {
+                const publishDate = new Date(question.publish_date);
+                const deadlineDate = new Date(question.deadline);
+
+                // Check if the dates are valid
+                const validPublishDate = !isNaN(publishDate) ? publishDate.toLocaleDateString() : 'Invalid Date';
+                const validDeadlineDate = !isNaN(deadlineDate) ? deadlineDate.toLocaleDateString() : 'Invalid Date';
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="2">${question.title}</td>
-                    <td class="2">${new Date(question.publish_date).toLocaleDateString()}</td>
-                    <td class="2">${new Date(question.deadline).toLocaleDateString()}</td>
+                    <td class="2">${validPublishDate}</td>
+                    <td class="2">${validDeadlineDate}</td>
                 `;
                 questionsList.appendChild(row);
             });
@@ -206,93 +214,6 @@
             nextPageBtn.disabled = currentPage === totalPages;
             handlePaginationChange();
         }
-
-
-        // Number of questions per page
-        // const questionsPerPage = 5;
-        // let currentPage = 1;
-        // let questionsData = [];
-
-        // // Fetch questions from the backend API
-        // fetch('YOUR_BACKEND_API_URL/questions')
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         questionsData = data;
-        //         renderQuestions();
-
-        //         // Filter functionality
-        //         const filterInput = document.getElementById('filterInput');
-        //         filterInput.addEventListener('input', () => {
-        //             renderQuestions();
-        //         });
-
-        //         // Sort functionality
-        //         const questionSort = document.getElementById('questionSort');
-        //         questionSort.addEventListener('change', () => {
-        //             renderQuestions();
-        //         });
-
-        //         // Pagination buttons
-        //         const prevPageBtn = document.getElementById('prevPage');
-        //         const nextPageBtn = document.getElementById('nextPage');
-        //         const pageInfo = document.getElementById('pageInfo');
-
-        //         prevPageBtn.addEventListener('click', () => {
-        //             if (currentPage > 1) {
-        //                 currentPage--;
-        //                 renderQuestions();
-        //             }
-        //         });
-
-        //         nextPageBtn.addEventListener('click', () => {
-        //             if (currentPage < Math.ceil(questionsData.length / questionsPerPage)) {
-        //                 currentPage++;
-        //                 renderQuestions();
-        //             }
-        //         });
-
-        //         function renderQuestions() {
-        //             const filterText = filterInput.value.toLowerCase();
-        //             const sortValue = questionSort.value;
-
-        //             // Filter and sort questions
-        //             let filteredQuestions = questionsData.filter(question =>
-        //                 question.title.toLowerCase().includes(filterText) ||
-        //                 new Date(question.publish_date).toLocaleDateString().toLowerCase().includes(filterText) ||
-        //                 new Date(question.deadline).toLocaleDateString().toLowerCase().includes(filterText)
-        //             );
-
-        //             if (sortValue === 'date') {
-        //                 filteredQuestions.sort((a, b) => new Date(a.publish_date) - new Date(b.publish_date));
-        //             } else if (sortValue === 'deadline') {
-        //                 filteredQuestions.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
-        //             }
-
-        //             // Paginate questions
-        //             const startIdx = (currentPage - 1) * questionsPerPage;
-        //             const paginatedQuestions = filteredQuestions.slice(startIdx, startIdx + questionsPerPage);
-
-        //             const questionsList = document.getElementById('questions-list');
-        //             questionsList.innerHTML = '';
-        //             paginatedQuestions.forEach(question => {
-        //                 const row = document.createElement('tr');
-        //                 row.innerHTML = `
-        //                     <td class="2">${question.title}</td>
-        //                     <td class="2">${new Date(question.publish_date).toLocaleDateString()}</td>
-        //                     <td class="2">${new Date(question.deadline).toLocaleDateString()}</td>
-        //                 `;
-        //                 questionsList.appendChild(row);
-        //             });
-
-        //             // Update pagination info
-        //             pageInfo.textContent = `صفحه ${currentPage} از ${Math.ceil(filteredQuestions.length / questionsPerPage)}`;
-
-        //             // Disable/enable pagination buttons
-        //             prevPageBtn.disabled = currentPage === 1;
-        //             nextPageBtn.disabled = currentPage === Math.ceil(filteredQuestions.length / questionsPerPage);
-        //         }
-        //     })
-        //     .catch(error => console.error('Error fetching questions:', error));
     </script>
     <script src="/static/js/main.js"></script>
 </body>

@@ -19,7 +19,7 @@
 
 <body>
 
-    header>
+    <header>
         <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
                     class="fi fi-sr-bars-staggered text-2xl"></i></button>
         <div id="backdrop-menu" onclick="handlemenu()"
@@ -72,18 +72,13 @@
 
 
         <div class="mb-4">
-            <input type="text" id="filterInput" placeholder="جستجوی ارسال‌ها..." class="p-2 w-full rounded-md border mb-4">
-            <select id="questionFilter" class="p-2 w-1/4 rounded-md border">
+            <select id="submissionFilter" class="p-2 w-1/4 rounded-md border">
                 <option value="all">تمام ارسال‌ها</option>
                 <option value="mine">ارسال‌های من</option>
             </select>
-            <select id="questionFilter" class="p-2 w-1/4 rounded-md border">
+            <select id="finalFilter" class="p-2 w-1/4 rounded-md border">
                 <option value="all">تمام ارسال‌ها</option>
-                <option value="mine">ارسال‌های نهایی</option>
-            </select>
-            <select id="questionFilter" class="p-2 w-1/4 rounded-md border">
-                <option value="all">تمام سوالات</option>
-                <!-- questions to be add -->
+                <option value="final">ارسال‌های نهایی</option>
             </select>
         </div>
 
@@ -99,7 +94,7 @@
                         <th class="2">نوع ارسال</th>
                     </tr>
                 </thead>
-                <tbody id="questions-list">
+                <tbody id="submissions-list">
                     <tr>
                         <th class="2">سو</th>
                         <th class="2">ممد</th>
@@ -107,48 +102,13 @@
                         <th class="2">امروز</th>
                         <th class="2">نهایی</th>
                     </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
+                    {{range .submissions}}
+                        <th class="2">{{.question_title}}</th>
+                        <th class="2">{{.user_name}}</th>
+                        <th class="2">{{.status}}</th>
+                        <th class="2">{{.date}}</th>
+                        <th class="2">{{.type}}</th>
+                    {{end}}
                 </tbody>
         
             </table>
@@ -164,91 +124,88 @@
     </div>
 
     <script>
-        // Number of questions per page
-        const questionsPerPage = 5;
-        let currentPage = 1;
-        let questionsData = [];
+        const question_id = 2; // TODO Replace with the actual question ID
 
-        // Fetch questions from the backend API
-        fetch('YOUR_BACKEND_API_URL/questions')
-            .then(response => response.json())
-            .then(data => {
-                questionsData = data;
-                renderQuestions();
 
-                // Filter functionality
-                const filterInput = document.getElementById('filterInput');
-                filterInput.addEventListener('input', () => {
-                    renderQuestions();
-                });
 
-                // Sort functionality
-                const questionSort = document.getElementById('questionSort');
-                questionSort.addEventListener('change', () => {
-                    renderQuestions();
-                });
+        // When the input or select options change, trigger a request to the backend
+        const submissionFilter = document.getElementById('submissionFilter');
+        const finalFilter = document.getElementById('finalFilter');
 
-                // Pagination buttons
-                const prevPageBtn = document.getElementById('prevPage');
-                const nextPageBtn = document.getElementById('nextPage');
-                const pageInfo = document.getElementById('pageInfo');
 
-                prevPageBtn.addEventListener('click', () => {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        renderQuestions();
-                    }
-                });
+        const   prevPageBtn = document.getElementById('prevPage');
+        const   nextPageBtn = document.getElementById('nextPage');
+        const   pageInfo = document.getElementById('pageInfo');
 
-                nextPageBtn.addEventListener('click', () => {
-                    if (currentPage < Math.ceil(questionsData.length / questionsPerPage)) {
-                        currentPage++;
-                        renderQuestions();
-                    }
-                });
+        let currentPage = 1;  // Track the current page
+        let totalPages = 5;   // Total pages, needs to be set after the first request
+        pageInfo.textContent = `صفحه ${currentPage} از ${totalPages}`;
 
-                function renderQuestions() {
-                    const filterText = filterInput.value.toLowerCase();
-                    const sortValue = questionSort.value;
 
-                    // Filter and sort questions
-                    let filteredQuestions = questionsData.filter(question =>
-                        question.title.toLowerCase().includes(filterText) ||
-                        new Date(question.publish_date).toLocaleDateString().toLowerCase().includes(filterText) ||
-                        new Date(question.deadline).toLocaleDateString().toLowerCase().includes(filterText)
-                    );
 
-                    if (sortValue === 'date') {
-                        filteredQuestions.sort((a, b) => new Date(a.publish_date) - new Date(b.publish_date));
-                    } else if (sortValue === 'deadline') {
-                        filteredQuestions.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
-                    }
+        // When input or select options change, trigger a request to the backend
+        submissionFilter.addEventListener('change', handlePaginationChange);
+        finalFilter.addEventListener('change', handlePaginationChange);
 
-                    // Paginate questions
-                    const startIdx = (currentPage - 1) * questionsPerPage;
-                    const paginatedQuestions = filteredQuestions.slice(startIdx, startIdx + questionsPerPage);
+        // "Previous" button click
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                handlePaginationChange();
+            }
+        });
 
-                    const questionsList = document.getElementById('questions-list');
-                    questionsList.innerHTML = '';
-                    paginatedQuestions.forEach(question => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td class="2">${question.title}</td>
-                            <td class="2">${new Date(question.publish_date).toLocaleDateString()}</td>
-                            <td class="2">${new Date(question.deadline).toLocaleDateString()}</td>
-                        `;
-                        questionsList.appendChild(row);
-                    });
+        // "Next" button click
+        nextPageBtn.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                handlePaginationChange();
+            }
+        });
 
-                    // Update pagination info
-                    pageInfo.textContent = `صفحه ${currentPage} از ${Math.ceil(filteredQuestions.length / questionsPerPage)}`;
 
-                    // Disable/enable pagination buttons
-                    prevPageBtn.disabled = currentPage === 1;
-                    nextPageBtn.disabled = currentPage === Math.ceil(filteredQuestions.length / questionsPerPage);
-                }
-            })
-            .catch(error => console.error('Error fetching questions:', error));
+        // Function to handle the request to the backend with current page and filter values
+        function handlePaginationChange() {
+            const submissionValue = submissionFilter.value;
+            const finalValue = finalFilter.value;
+
+            const queryString = `submissionValue=${submissionValue}&finalValue=${finalValue}&page=${currentPage}`;
+
+            // Send the data to the backend
+            fetch(`/questions/${question_id}/submissions?${queryString}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Handle the response
+                    updateSubmissionsList(data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function updateSubmissionsList(data) {
+            const submissionsList = document.getElementById('submissions-list');
+            submissionsList.innerHTML = '';
+
+            data.submissions.forEach(submission => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="2">${submission.question_title}</td>
+                    <td class="2">${submission.user_name}</td>
+                    <td class="2">${submission.status}</td>
+                    <td class="2">${new Date(submission.date).toLocaleDateString()}</td>
+                    <td class="2">${submission.type}</td>
+                `;
+                submissionsList.appendChild(row);
+            });
+
+            // Update the pagination info
+            totalPages = data.totalPages;  // Update the total pages from the response
+            pageInfo.textContent = `صفحه ${currentPage} از ${totalPages}`;
+
+            // Disable/enable pagination buttons
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages;
+            handlePaginationChange();
+        }
     </script>
     <script src="/static/js/main.js"></script>
 </body>

@@ -8,5 +8,7 @@ import (
 )
 
 type QuestionsService interface {
-	GetDate(ctx context.Context, questionsDto dto.QuestionsDto) ([]*entity.Question, error)
+	GetQuestions(ctx context.Context, questionsDto dto.QuestionsDto) ([]*entity.Question, error)
+	GetQuestion(ctx context.Context, questionId uint) (*entity.Question, error)
+	GetSubmissions(ctx context.Context, submissionDto dto.SubmissionsDto) ([]*entity.Submission, error)
 }
