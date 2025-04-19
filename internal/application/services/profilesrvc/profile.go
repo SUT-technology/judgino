@@ -77,7 +77,7 @@ func (c PrflSrvc) GetProfileById(ctx context.Context, ProfileDTO dto.ProfileDTO)
 	return resp, nil
 }
 
-func (c PrflSrvc) ChangeRole(ctx context.Context, UpdateUserDTO dto.UpdateUserDTO) (*entity.User, error) {
+func (c PrflSrvc) ChangeRole(ctx context.Context, UpdateUserDTO dto.ChangeRoleDTO) (*entity.User, error) {
 
 	var (
 		user *entity.User
@@ -85,7 +85,7 @@ func (c PrflSrvc) ChangeRole(ctx context.Context, UpdateUserDTO dto.UpdateUserDT
 	)
 
 	queryFuncUpdateUser := func(r *repository.Repo) error {
-		user, err = r.Tables.Users.FindUserAndUpdate(ctx,UpdateUserDTO)
+		user, err = r.Tables.Users.FindUserAndChangeRole(ctx,UpdateUserDTO)
 		if err != nil {
 			return fmt.Errorf("find customer by id: %w", err)
 		}

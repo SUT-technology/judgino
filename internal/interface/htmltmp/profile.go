@@ -32,7 +32,7 @@ func NewProfileHndlr(g *Group, srvc service.Service) ProfileHndlr {
 
 func (h *ProfileHndlr) HandleChangeRole(w http.ResponseWriter, r *http.Request) {
 
-	var data dto.UpdateUserDTO
+	var data dto.ChangeRoleDTO
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		http.Error(w, "invalid body", http.StatusBadRequest)

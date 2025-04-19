@@ -22,7 +22,7 @@ func (c usersTable) GetUserById(ctx context.Context, id uint) (*entity.User, err
 	return &user, nil
 }
 
-func (c usersTable) FindUserAndUpdate(ctx context.Context, data dto.UpdateUserDTO) (*entity.User, error) {
+func (c usersTable) FindUserAndChangeRole(ctx context.Context, data dto.ChangeRoleDTO) (*entity.User, error) {
 	var user entity.User
 
 	if err := c.db.WithContext(ctx).First(&user, data.ID).Error; err != nil {

@@ -9,5 +9,5 @@ import (
 
 type ProfileService interface {
 	GetProfileById(ctx context.Context, profileDto dto.ProfileDTO) (*dto.ProfileResponeDTO, error)
-	ChangeRole(ctx context.Context,updateUserDTO dto.UpdateUserDTO) (*entity.User,error)
+	ChangeRole(ctx context.Context,updateUserDTO dto.ChangeRoleDTO) (*entity.User,error)
 }
