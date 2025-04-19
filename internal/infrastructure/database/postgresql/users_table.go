@@ -17,6 +17,6 @@ func newUsersTable(db *gorm.DB) usersTable {
 
 func (c usersTable) GetUserById(ctx context.Context, id uint) (*entity.User, error) {
 	var user entity.User
-	c.db.First(&user, 1)
+	c.db.First(&user, id)
 	return &user, nil
 }

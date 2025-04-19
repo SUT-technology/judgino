@@ -30,3 +30,4 @@ func (c AuthSrvc) Signup(ctx context.Context, currentUserId int64, signupRequest
 		Username:      signupRequest.Username,
 	}, nil
 }
+
