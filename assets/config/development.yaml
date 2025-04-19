@@ -1,5 +1,13 @@
 server:
   port: 8000
+  secret_key: judgino-technology
+  logger: true
+  addr: 0.0.0.0:8000
+  rate-limiter:
+    enabled: true
+    rate: 10
+    burst: 30
+    expires: 3m
 db:
   port: 5432
   db_name: judgino_db
