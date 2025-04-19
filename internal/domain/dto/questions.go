@@ -1,6 +1,6 @@
 package dto
 
-type QuestionsDto struct {
+type QuestionRequest struct {
 	UserId 	uint 
 	SearchValue string
 	QuestionValue string

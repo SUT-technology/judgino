@@ -19,7 +19,7 @@ func NewQuestionsSrvc(db repository.Pool) QuestionsSrvc {
 	}
 }
 
-func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionsDto) ([]*entity.Question, error) {
+func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionRequest) ([]*entity.Question, error) {
 	var (
 		questions []*entity.Question
 		err  error
@@ -61,7 +61,7 @@ func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (*entit
 	return question, nil
 }
 
-func (c QuestionsSrvc) GetSubmissions(ctx context.Context, submissionDto dto.SubmissionsDto) ([]*entity.Submission, error) {
+func (c QuestionsSrvc) GetSubmissions(ctx context.Context, submissionDto dto.SubmissionRequest) ([]*entity.Submission, error) {
 	var (
 		submissions []*entity.Submission
 		err  error

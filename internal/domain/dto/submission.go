@@ -1,6 +1,6 @@
 package dto
 
-type SubmissionsDto struct {
+type SubmissionRequest struct {
 	UserId 	uint 
 	QuestionId uint
 	SubmissonValue string

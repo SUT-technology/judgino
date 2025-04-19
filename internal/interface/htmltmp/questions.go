@@ -63,7 +63,7 @@ func (q *QuestionsHndlr) ShowQuestions(w http.ResponseWriter, r *http.Request) {
 	// sortValue := "deadline"
 	// pageParam := 1
 	
-	questionsDto := dto.QuestionsDto{
+	questionsDto := dto.QuestionRequest{
 		UserId:       uint(userId),
 		SearchValue:  searchValue,
 		QuestionValue: questionValue,
@@ -142,7 +142,7 @@ func (q *QuestionsHndlr) ShowSubmissions(w http.ResponseWriter, r *http.Request)
 	finalValue := r.URL.Query().Get("finalValue")
 	pageParam, _ := strconv.Atoi(r.URL.Query().Get("page"))
 
-	submissionsDto := dto.SubmissionsDto{
+	submissionsDto := dto.SubmissionRequest{
 		UserId:         uint(userId),
 		QuestionId:     uint(questionID),
 		SubmissonValue: submissonValue,
@@ -165,7 +165,7 @@ func (q *QuestionsHndlr) ShowSubmissions(w http.ResponseWriter, r *http.Request)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		ut, err := q.Services.AuthSrvc.GetUser(r.Context(), submission.UserID)
+		ut, err := q.Services.UserSrvc.GetUser(r.Context(), submission.UserID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
