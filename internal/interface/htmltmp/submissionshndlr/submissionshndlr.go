@@ -1,7 +1,6 @@
 package submissionshndlr
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/SUT-technology/judgino/internal/domain/service"
 	"github.com/SUT-technology/judgino/internal/interface/htmltmp/serde"
 	"github.com/SUT-technology/judgino/pkg/slogger"
+	"github.com/SUT-technology/judgino/internal/domain/model"
 	"github.com/labstack/echo/v4"
 )
 
@@ -22,8 +22,6 @@ func New(g *echo.Group, srvc service.Service) SubmissionsHndlr {
 	}
 	g.GET("/{question_id}", handler.ShowSubmissions)
 	g.GET("/:question_id", handler.ShowSubmissions)
-	g.POST("/{question_id}", handler.ShowSubmissionsWithFilter)
-	g.POST("/:question_id", handler.ShowSubmissionsWithFilter)
 
 
 	return handler
@@ -33,18 +31,17 @@ func New(g *echo.Group, srvc service.Service) SubmissionsHndlr {
 func (q *SubmissionsHndlr) ShowSubmissions(c echo.Context) error {
 	questionID := c.Param("question_id")
 	questionIDInt, _ := strconv.Atoi(questionID)
-	
-	submissionDto := dto.SubmissionRequest{
-		UserId:       uint(serde.GetCurrentUser(c).UserId),
-		IsAdmin: serde.GetCurrentUser(c).IsAdmin,
-		QuestionId:    questionIDInt,
-		SubmissionValue: "all",
-		FinalValue: "final",
-		PageParam: 1,
-		PageAction: "",
-	}
+
 	ctx := c.Request().Context()
-	resp, err := q.Services.SubmissionSrvc.GetSubmissions(ctx, submissionDto)
+
+	req, err := serde.BindRequestBody[dto.SubmissionRequest](c)
+	if err != nil {
+		slogger.Debug(ctx, "bad request", slogger.Err("error", err))
+		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
+	}
+	
+	
+	resp, err := q.Services.SubmissionSrvc.GetSubmissions(ctx, req, uint(serde.GetCurrentUser(c).UserId), serde.GetCurrentUser(c).IsAdmin, questionIDInt)
 	if err != nil {
 		slogger.Debug(ctx, "showSubmissions", slogger.Err("error", err))
 		// TODO: handle error
@@ -52,29 +49,5 @@ func (q *SubmissionsHndlr) ShowSubmissions(c echo.Context) error {
 	}
 
 
-	return c.Render(http.StatusOK, "submissions.html", resp)
-}
-
-func (q *SubmissionsHndlr) ShowSubmissionsWithFilter(c echo.Context) error {
-	userId := serde.GetCurrentUser(c).UserId
-
-	ctx := c.Request().Context()
-
-	var submissionDto dto.SubmissionRequest
-	if err := c.Bind(&submissionDto); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "Unable to bind form data")
-	}
-	submissionDto.UserId = uint(userId)
-	submissionDto.IsAdmin = serde.GetCurrentUser(c).IsAdmin
-	questionID := c.Param("question_id")
-	questionIDInt, _ := strconv.Atoi(questionID)
-	submissionDto.QuestionId = questionIDInt
-
-	fmt.Printf("submissionDto: %+v\n", submissionDto)
-	
-	resp, err := q.Services.SubmissionSrvc.GetSubmissions(ctx, submissionDto)
-	if err != nil {
-		slogger.Debug(ctx, "showSubmissions", slogger.Err("error", err))
-	}
 	return c.Render(http.StatusOK, "submissions.html", resp)
 }

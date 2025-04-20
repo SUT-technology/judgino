@@ -7,6 +7,6 @@ import (
 )
 
 type SubmissionService interface {
-	GetSubmissions(ctx context.Context, submissionDto dto.SubmissionRequest) (dto.SubmissionsResponse, error)
-	SubmissionsCount(ctx context.Context, submissionDto dto.SubmissionRequest) (int, error)
+	GetSubmissions(ctx context.Context, submissionDto dto.SubmissionRequest, userId uint, isAdmin bool, questionId int) (dto.SubmissionsResponse, error)
+	SubmissionsCount(ctx context.Context, submissionDto dto.SubmissionRequest, userId uint, questionId int) (int, error)
 }

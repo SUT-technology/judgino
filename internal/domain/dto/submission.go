@@ -1,13 +1,10 @@
 package dto
 
 type SubmissionRequest struct {
-	UserId 	uint 
-	IsAdmin bool
-	QuestionId int
-	SubmissionValue string `form:"submissionFilter"`
-	FinalValue string `form:"finalFilter"`
-	PageParam uint `form:"pageInfo"`
-	PageAction string `form:"page"`
+	SubmissionValue string `json:"submissionFilter" query:"submissionFilter"`
+	FinalValue string `json:"finalFilter" query:"finalFilter"`
+	PageParam uint `json:"pageInfo" query:"pageInfo"`
+	PageAction string `json:"page" query:"page"`
 }
 
 type Submission struct {

@@ -20,17 +20,28 @@ func NewSubmissionSrvc(db repository.Pool) SubmissionService {
 }
 
 
-func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto.SubmissionRequest) (dto.SubmissionsResponse, error) {
+func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto.SubmissionRequest, userId uint, isAdmin bool, questionId int) (dto.SubmissionsResponse, error) {
 	var (
 		submissions []*entity.Submission
 		err  error
 	)
-	if submissionDto.SubmissionValue == "all" && !submissionDto.IsAdmin {
+
+	if submissionDto.SubmissionValue == "" {
+		submissionDto.SubmissionValue = "mine"
+	}
+	if submissionDto.FinalValue == "" {
+		submissionDto.FinalValue = "all"
+	}
+	if submissionDto.PageParam == 0 {
+		submissionDto.PageParam = 1
+	}
+
+	if submissionDto.SubmissionValue == "all" && !isAdmin {
 		//Todo handle erro
 		return dto.SubmissionsResponse{Error: err}, fmt.Errorf("user is not admin and submission value is all")
 	}
 
-	submissionsCount, err := c.SubmissionsCount(ctx, submissionDto)
+	submissionsCount, err := c.SubmissionsCount(ctx, submissionDto, userId, questionId)
 	if err != nil {
 		return dto.SubmissionsResponse{Error: err}, err
 	}
@@ -49,7 +60,7 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 	
 
 	queryFuncFindSubmissions := func(r *repository.Repo) error {
-		submissions, err = r.Tables.Submissions.GetSubmissionsByFilter(ctx, submissionDto.UserId, uint(submissionDto.QuestionId), submissionDto.SubmissionValue, submissionDto.FinalValue == "final", submissionDto.PageParam)
+		submissions, err = r.Tables.Submissions.GetSubmissionsByFilter(ctx, userId, uint(questionId), submissionDto.SubmissionValue, submissionDto.FinalValue == "final", submissionDto.PageParam)
 		if err != nil {
 			return fmt.Errorf("failed to get submissions: %w", err)
 		}
@@ -89,7 +100,7 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 		if err != nil {
 			return dto.SubmissionsResponse{}, err
 		}
-		fmt.Println(submission.UserID)
+		
 
 		var typ string
 		if submission.IsFinal {
@@ -106,7 +117,6 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 		}
 	}
 
-	submissionsCount, err = c.SubmissionsCount(ctx, submissionDto)
 	if err != nil {
 		return dto.SubmissionsResponse{Error: err}, err
 	}
@@ -115,7 +125,7 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 	resp := dto.SubmissionsResponse{
 		Submissions: submissionsData,
 		TotalPages:  totalPages,
-		QuestionId:  submissionDto.QuestionId,
+		QuestionId:  questionId,
 		CurrentPage: int(submissionDto.PageParam),
 		SubmissionFilter: submissionDto.SubmissionValue,
 		FinalFilter: submissionDto.FinalValue,
@@ -124,14 +134,14 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 	return resp, nil
 }
 
-func (c SubmissionService) SubmissionsCount(ctx context.Context, submissionDto dto.SubmissionRequest) (int, error) {
+func (c SubmissionService) SubmissionsCount(ctx context.Context, submissionDto dto.SubmissionRequest, userId uint, questionId int) (int, error) {
 	var (
 		submissionsCount int
 		err              error
 	)
 
 	queryFuncFindSubmissionsCount := func(r *repository.Repo) error {
-		submissionsCount, err = r.Tables.Submissions.GetSubmissionsCount(ctx, submissionDto.UserId, uint(submissionDto.QuestionId), submissionDto.SubmissionValue, submissionDto.FinalValue == "final")
+		submissionsCount, err = r.Tables.Submissions.GetSubmissionsCount(ctx, userId, uint(questionId), submissionDto.SubmissionValue, submissionDto.FinalValue == "final")
 		if err != nil {
 			return fmt.Errorf("failed to get submissions count: %w", err)
 		}
