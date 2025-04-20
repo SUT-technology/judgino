@@ -9,6 +9,11 @@ import (
 )
 
 func register(e *echo.Echo, srvc service.Service, m *middlewares) {
+	// Create groups with middleware
+	// swaggerGroup := NewGroup("/swagger", middlewares.loggingMiddleware, mux
+
+	prof := e.Group("/profile", m.JWTMiddleware)
+	profhndlr.New(prof, srvc)
 
 	auth := e.Group("/auth", m.JWTMiddleware)
 	// Todo change middleware
