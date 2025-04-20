@@ -1,4 +1,4 @@
-package htmltmp
+package profhndlr
 
 import (
 	"html/template"

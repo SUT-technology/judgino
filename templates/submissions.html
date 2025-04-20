@@ -19,7 +19,7 @@
 
 <body>
 
-    header>
+    <header>
         <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
                     class="fi fi-sr-bars-staggered text-2xl"></i></button>
         <div id="backdrop-menu" onclick="handlemenu()"
@@ -36,13 +36,13 @@
                         سوال ها
                     </a>
                 </li>
-                <li class="mb-3 bg-gray-38 rounded-lg">
+                <li class="mb-3">
                     <a href="#">
                         <i class="fi fi-rr-edit"></i>
                         سوال جدید
                     </a>
                 </li>
-                <li class="mb-3">
+                <li class="mb-3 bg-gray-38 rounded-lg">
                     <a href="#">
                         <i class="fi fi-rr-checkbox"></i>
                         ارسال ها
@@ -50,13 +50,13 @@
                 </li>
                 </li>
                 <li class="mb-3">
-                    <a href="/pages/player/scores.html">
+                    <a>
                         <i class="fi fi-rr-user"></i>
                         پروفایل
                     </a>
                 </li>
                 <li class="mb-3">
-                    <a href="/pages/player/questions.html">
+                    <a>
                         <i class="fi fi-rr-user-pen"></i>
                         ویرایش پروفایل
                     </a>
@@ -67,189 +67,66 @@
 
     <div class="lg:w-10/12 p-3 mr-auto mt-6">
         <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
-            <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
-                <h1 class="text-4xl text-center font-fedra mb-5">لیست ارسال‌ها</h1>
-
-
-        <div class="mb-4">
-            <input type="text" id="filterInput" placeholder="جستجوی ارسال‌ها..." class="p-2 w-full rounded-md border mb-4">
-            <select id="questionFilter" class="p-2 w-1/4 rounded-md border">
-                <option value="all">تمام ارسال‌ها</option>
-                <option value="mine">ارسال‌های من</option>
-            </select>
-            <select id="questionFilter" class="p-2 w-1/4 rounded-md border">
-                <option value="all">تمام ارسال‌ها</option>
-                <option value="mine">ارسال‌های نهایی</option>
-            </select>
-            <select id="questionFilter" class="p-2 w-1/4 rounded-md border">
-                <option value="all">تمام سوالات</option>
-                <!-- questions to be add -->
-            </select>
-        </div>
-
-
-        <div class="overflow-x-auto w-3/4 mx-auto bg-base--gray rounded-xl table-con bg-opacity-75">
-            <table class="table-auto w-full text-center border-collapse">
-                <thead>
-                    <tr>
-                        <th class="2">نام سوال</th>
-                        <th class="2">پاسخ‌دهنده</th>
-                        <th class="2">وضعیت</th>
-                        <th class="2">زمان ارسال</th>
-                        <th class="2">نوع ارسال</th>
-                    </tr>
-                </thead>
-                <tbody id="questions-list">
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                    <tr>
-                        <th class="2">سو</th>
-                        <th class="2">ممد</th>
-                        <th class="2">پذیرفته‌شده</th>
-                        <th class="2">امروز</th>
-                        <th class="2">نهایی</th>
-                    </tr>
-                </tbody>
-        
-            </table>
-        </div>
-
-        <div class="flex justify-center items-center mt-4">
-            <button id="prevPage" class="p-2 bg-gray-500 text-white rounded-md" disabled>قبلی</button>
-            <span id="pageInfo" class="mx-6">صفحه 1 از 1</span>
-            <button id="nextPage" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
-        </div>
-            </div>
+            
+            <form id="filter" action="/submissions/{{.QuestionId}}" method="GET">
+                <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
+                    <h1 class="text-4xl text-center font-fedra mb-5">لیست ارسال‌ها</h1>
+    
+    
+    
+                    <div class="mb-4">
+                        <select id="submissionFilter" name="submissionFilter" class="p-2 w-1/4 rounded-md border">
+                            <option value="all" {{if eq .SubmissionFilter "all"}} selected {{end}}>تمام ارسال‌ها</option>
+                            <option value="mine" {{if eq .SubmissionFilter "mine"}} selected {{end}}>ارسال‌های من</option>
+                        </select>
+                        <select id="finalFilter" name="finalFilter" class="p-2 w-1/4 rounded-md border">
+                            <option value="all" {{if eq .FinalFilter "all"}} selected {{end}}>تمام ارسال‌ها</option>
+                            <option value="final" {{if eq .FinalFilter "final"}} selected {{end}}>ارسال‌های نهایی</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" onclick="submitBothForms(event)" class="p-2 bg-gray-500 text-white rounded-md">ارسال</button>
+    
+    
+                    <div class="overflow-x-auto w-3/4 mx-auto bg-base--gray rounded-xl table-con bg-opacity-75">
+                        <table class="table-auto w-full text-center border-collapse">
+                            <thead>
+                                <tr>
+                                    <th class="2">نام سوال</th>
+                                    <th class="2">پاسخ‌دهنده</th>
+                                    <th class="2">وضعیت</th>
+                                    <th class="2">زمان ارسال</th>
+                                    <th class="2">نوع ارسال</th>
+                                </tr>
+                            </thead>
+                            <tbody id="submissions-list">
+                                {{range .Submissions}}
+                                <tr>
+                                    <th class="2">{{.QuestionTitle}}</th>
+                                    <th class="2">{{.UserName}}</th>
+                                    <th class="2">{{.Status}}</th>
+                                    <th class="2">{{.Date}}</th>
+                                    <th class="2">{{.Type}}</th>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                    
+                        </table>
+                    </div>
+    
+                    <div class="flex justify-center items-center mt-4">
+                        <input type="hidden" id="pageInfo" name="pageInfo" value="{{.CurrentPage}}">
+                        <button type="submit" name="page" value="prev" class="p-2 bg-gray-500 text-white rounded-md">قبلی</button>
+                    
+                        <span class="mx-6">صفحه {{.CurrentPage}} از {{.TotalPages}}</span>
+                    
+                        <button type="submit" name="page" value="next" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
+                    </div>
+                </div>
+            </form>
         </section>
     </div>
 
-    <script>
-        // Number of questions per page
-        const questionsPerPage = 5;
-        let currentPage = 1;
-        let questionsData = [];
-
-        // Fetch questions from the backend API
-        fetch('YOUR_BACKEND_API_URL/questions')
-            .then(response => response.json())
-            .then(data => {
-                questionsData = data;
-                renderQuestions();
-
-                // Filter functionality
-                const filterInput = document.getElementById('filterInput');
-                filterInput.addEventListener('input', () => {
-                    renderQuestions();
-                });
-
-                // Sort functionality
-                const questionSort = document.getElementById('questionSort');
-                questionSort.addEventListener('change', () => {
-                    renderQuestions();
-                });
-
-                // Pagination buttons
-                const prevPageBtn = document.getElementById('prevPage');
-                const nextPageBtn = document.getElementById('nextPage');
-                const pageInfo = document.getElementById('pageInfo');
-
-                prevPageBtn.addEventListener('click', () => {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        renderQuestions();
-                    }
-                });
-
-                nextPageBtn.addEventListener('click', () => {
-                    if (currentPage < Math.ceil(questionsData.length / questionsPerPage)) {
-                        currentPage++;
-                        renderQuestions();
-                    }
-                });
-
-                function renderQuestions() {
-                    const filterText = filterInput.value.toLowerCase();
-                    const sortValue = questionSort.value;
-
-                    // Filter and sort questions
-                    let filteredQuestions = questionsData.filter(question =>
-                        question.title.toLowerCase().includes(filterText) ||
-                        new Date(question.publish_date).toLocaleDateString().toLowerCase().includes(filterText) ||
-                        new Date(question.deadline).toLocaleDateString().toLowerCase().includes(filterText)
-                    );
-
-                    if (sortValue === 'date') {
-                        filteredQuestions.sort((a, b) => new Date(a.publish_date) - new Date(b.publish_date));
-                    } else if (sortValue === 'deadline') {
-                        filteredQuestions.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
-                    }
-
-                    // Paginate questions
-                    const startIdx = (currentPage - 1) * questionsPerPage;
-                    const paginatedQuestions = filteredQuestions.slice(startIdx, startIdx + questionsPerPage);
-
-                    const questionsList = document.getElementById('questions-list');
-                    questionsList.innerHTML = '';
-                    paginatedQuestions.forEach(question => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td class="2">${question.title}</td>
-                            <td class="2">${new Date(question.publish_date).toLocaleDateString()}</td>
-                            <td class="2">${new Date(question.deadline).toLocaleDateString()}</td>
-                        `;
-                        questionsList.appendChild(row);
-                    });
-
-                    // Update pagination info
-                    pageInfo.textContent = `صفحه ${currentPage} از ${Math.ceil(filteredQuestions.length / questionsPerPage)}`;
-
-                    // Disable/enable pagination buttons
-                    prevPageBtn.disabled = currentPage === 1;
-                    nextPageBtn.disabled = currentPage === Math.ceil(filteredQuestions.length / questionsPerPage);
-                }
-            })
-            .catch(error => console.error('Error fetching questions:', error));
-    </script>
     <script src="/static/js/main.js"></script>
 </body>
 
