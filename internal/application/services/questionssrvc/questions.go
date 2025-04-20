@@ -19,15 +19,28 @@ func NewQuestionsSrvc(db repository.Pool) QuestionsSrvc {
 	}
 }
 
-func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionRequest) (dto.QuestionsResponse, error) {
+func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionRequest, userId uint) (dto.QuestionsResponse, error) {
 	var (
 		questions []*entity.Question
 		err  error
 	)
-	questionsCount, err := c.QuestionsCount(ctx, questionsDto)
-	if err != nil {
-		return dto.QuestionsResponse{}, err
+	
+
+	if questionsDto.QuestionValue == "" {
+		questionsDto.QuestionValue = "all"
 	}
+	if questionsDto.SortValue == "" {
+		questionsDto.SortValue = "deadline"
+	}
+	if questionsDto.PageParam == 0 {
+		questionsDto.PageParam = 1
+	}
+
+	questionsCount, err := c.QuestionsCount(ctx, questionsDto, userId)
+	if err != nil {
+		return dto.QuestionsResponse{Error: err}, err
+	}
+
 	totalPages := questionsCount / 10 + 1
 	if questionsDto.PageAction == "next" && questionsDto.PageParam < (totalPages) {
 		questionsDto.PageParam++
@@ -40,7 +53,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 	}
 
 	queryFuncFindQuestions := func(r *repository.Repo) error {
-		questions, err = r.Tables.Questions.GetQuestionByFilter(ctx, questionsDto.SearchFilter, questionsDto.QuestionValue, questionsDto.SortValue, int(questionsDto.PageParam), questionsDto.UserId)
+		questions, err = r.Tables.Questions.GetQuestionByFilter(ctx, questionsDto.SearchFilter, questionsDto.QuestionValue, questionsDto.SortValue, int(questionsDto.PageParam), userId)
 		if err != nil {
 			return fmt.Errorf("failed to get questions: %w", err)
 		}
@@ -49,7 +62,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 
 	err = c.db.Query(ctx, queryFuncFindQuestions)
 	if err != nil {
-		return dto.QuestionsResponse{}, err
+		return dto.QuestionsResponse{Error: err}, err
 	}
 	// Create the data to pass to the template
 	questionsData := make([]dto.Question, len(questions))
@@ -59,12 +72,9 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 			PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
 			Deadline: 	question.Deadline.Format("2006-01-02 15:04:05"),
 		}
+		
 	}
 
-	questionsCount, err = c.QuestionsCount(ctx, questionsDto)
-	if err != nil {
-		return dto.QuestionsResponse{}, err
-	}
 	totalPages = questionsCount / 10 + 1
 
 	resp := dto.QuestionsResponse{
@@ -74,7 +84,9 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 		SearchFilter: questionsDto.SearchFilter,
 		QuestionFilter: questionsDto.QuestionValue,
 		SortFilter: questionsDto.SortValue,
+		Error: nil,
 	}
+	fmt.Println(resp.CurrentPage)
 
 
 	return resp, nil
@@ -106,7 +118,7 @@ func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.Qu
 }
 
 
-func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.QuestionRequest) (int, error) {
+func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.QuestionRequest, userId uint) (int, error) {
 
 	var (
 		count int
@@ -114,7 +126,7 @@ func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.Ques
 	)
 
 	queryFuncFindQuestions := func(r *repository.Repo) error {
-		count, err = r.Tables.Questions.GetQuestionsCount(ctx, questionsDto.SearchFilter, questionsDto.QuestionValue, questionsDto.UserId)
+		count, err = r.Tables.Questions.GetQuestionsCount(ctx, questionsDto.SearchFilter, questionsDto.QuestionValue, userId)
 		if err != nil {
 			return fmt.Errorf("failed to get questions count: %w", err)
 		}

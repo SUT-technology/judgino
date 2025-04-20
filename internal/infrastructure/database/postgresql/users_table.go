@@ -33,6 +33,6 @@ func (c usersTable) FindUserAndChangeRole(ctx context.Context, data dto.ChangeRo
 		return nil, err
 	}
 
-	c.db.First(&user, id)
+	c.db.First(&user, data.ID)
 	return &user, nil
 }

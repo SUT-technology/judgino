@@ -7,7 +7,7 @@ import (
 )
 
 type QuestionsService interface {
-	GetQuestions(ctx context.Context, questionsDto dto.QuestionRequest) (dto.QuestionsResponse, error)
+	GetQuestions(ctx context.Context, questionsDto dto.QuestionRequest, userId uint) (dto.QuestionsResponse, error)
 	GetQuestion(ctx context.Context, questionId uint) (dto.Question, error)
-	QuestionsCount(ctx context.Context, questionsDto dto.QuestionRequest) (int, error)
+	QuestionsCount(ctx context.Context, questionsDto dto.QuestionRequest, userId uint) (int, error)
 }

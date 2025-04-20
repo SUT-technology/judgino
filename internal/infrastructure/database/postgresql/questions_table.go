@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/SUT-technology/judgino/internal/domain/entity"
 	"gorm.io/gorm"
@@ -30,6 +31,7 @@ func (c questionsTable) GetQuestionByFilter(ctx context.Context, searchFilter st
 		query = c.db.Where("title ILIKE ?", "%"+searchFilter+"%").Order(sortFilter).Offset(10 * (pageParam - 1) - 1).Limit(10)
 	}
 	query.Find(&questions)
+	fmt.Println(questions)
 	return questions, nil
 }
 

@@ -1,12 +1,11 @@
 package dto
 
 type QuestionRequest struct {
-	UserId 	uint 
-	SearchFilter string `form:"SearchFilter"`
-	QuestionValue string `form:"questionFilter"`
-	SortValue string `form:"sortFilter"`
-	PageParam int `form:"pageInfo"`
-	PageAction string `form:"page"`
+	SearchFilter string `json:"SearchFilter" query:"SearchFilter"`
+	QuestionValue string `json:"questionFilter" query:"questionFilter"`
+	SortValue string `json:"sortFilter" query:"sortFilter"`
+	PageParam int `json:"pageInfo" query:"pageInfo"`
+	PageAction string `json:"page" query:"page"`
 }
 type Question struct {
 	Title string `json:"title"`
@@ -20,4 +19,5 @@ type QuestionsResponse struct {
 	SearchFilter string `json:"SearchFilter"`
 	QuestionFilter string `json:"questionFilter"`
 	SortFilter string `json:"sortFilter"`
+	Error error `json:Error`
 }

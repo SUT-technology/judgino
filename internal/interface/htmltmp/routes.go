@@ -5,6 +5,8 @@ import (
 	"github.com/SUT-technology/judgino/internal/interface/htmltmp/authhdnlr"
 	"github.com/SUT-technology/judgino/internal/interface/htmltmp/questionshndlr"
 	"github.com/SUT-technology/judgino/internal/interface/htmltmp/submissionshndlr"
+	"github.com/SUT-technology/judgino/internal/interface/htmltmp/profhndlr"
+
 	"github.com/labstack/echo/v4"
 )
 

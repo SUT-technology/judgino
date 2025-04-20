@@ -27,12 +27,12 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 	)
 	if submissionDto.SubmissionValue == "all" && !submissionDto.IsAdmin {
 		//Todo handle erro
-		return dto.SubmissionsResponse{}, fmt.Errorf("user is not admin and submission value is all")
+		return dto.SubmissionsResponse{Error: err}, fmt.Errorf("user is not admin and submission value is all")
 	}
 
 	submissionsCount, err := c.SubmissionsCount(ctx, submissionDto)
 	if err != nil {
-		return dto.SubmissionsResponse{}, err
+		return dto.SubmissionsResponse{Error: err}, err
 	}
 	totalPages := submissionsCount / 10 + 1
 
@@ -59,7 +59,7 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 	err = c.db.Query(ctx, queryFuncFindSubmissions)
 	if err != nil {
 		// Todo fix error
-		return dto.SubmissionsResponse{}, err
+		return dto.SubmissionsResponse{Error: err}, err
 	}
 
 	// Create the data to pass to the template
@@ -79,7 +79,7 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 		}
 		var un string
 		err = c.db.Query(ctx, func(r *repository.Repo) error {
-			user, err := r.Tables.Users.GetUserById(ctx, submission.UserID)
+			user, err := r.Tables.Users.GetUserById(ctx, int64(submission.UserID))
 			if err != nil {
 				return fmt.Errorf("failed to get user by id: %w", err)
 			}
@@ -108,7 +108,7 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 
 	submissionsCount, err = c.SubmissionsCount(ctx, submissionDto)
 	if err != nil {
-		return dto.SubmissionsResponse{}, err
+		return dto.SubmissionsResponse{Error: err}, err
 	}
 	totalPages = submissionsCount / 10 + 1
 
@@ -119,6 +119,7 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 		CurrentPage: int(submissionDto.PageParam),
 		SubmissionFilter: submissionDto.SubmissionValue,
 		FinalFilter: submissionDto.FinalValue,
+		Error: nil,
 	}
 	return resp, nil
 }

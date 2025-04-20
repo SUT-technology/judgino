@@ -25,7 +25,7 @@ func (c UserService) GetUserName(ctx context.Context, userId uint) (string, erro
 	)
 
 	queryFuncFindUser := func(r *repository.Repo) error {
-		user, err = r.Tables.Users.GetUserById(ctx, userId)
+		user, err = r.Tables.Users.GetUserById(ctx, int64(userId))
 		if err != nil {
 			return fmt.Errorf("find customer by id: %w", err)
 		}

@@ -24,4 +24,5 @@ type SubmissionsResponse struct {
 	CurrentPage int `json:"CurrentPage"`
 	SubmissionFilter string `json:"SubmissionFilter"`
 	FinalFilter string `json:"FinalFilter"`
+	Error error `json:Error`
 }
