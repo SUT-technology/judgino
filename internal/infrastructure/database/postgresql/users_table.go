@@ -16,13 +16,13 @@ func newUsersTable(db *gorm.DB) usersTable {
 	return usersTable{db: db}
 }
 
-func (c usersTable) GetUserById(ctx context.Context, id uint) (*entity.User, error) {
+func (c usersTable) GetUserById(ctx context.Context, id int64) (*entity.User, error) {
 	var user entity.User
 	c.db.First(&user, id)
 	return &user, nil
 }
 
-func (c usersTable) FindUserAndChangeRole(ctx context.Context, data dto.ChangeRoleDTO) (*entity.User, error) {
+func (c usersTable) FindUserAndChangeRole(ctx context.Context, data dto.ChangeRoleRequest) (*entity.User, error) {
 	var user entity.User
 
 	if err := c.db.WithContext(ctx).First(&user, data.ID).Error; err != nil {

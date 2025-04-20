@@ -1,4 +1,4 @@
-package authsrvc
+package profilesrvc
 
 import (
 	"context"
@@ -19,17 +19,16 @@ func NewPrflSrvc(db repository.Pool) PrflSrvc {
 	}
 }
 
-func (c PrflSrvc) GetProfileById(ctx context.Context, ProfileDTO dto.ProfileDTO) (*dto.ProfileResponeDTO, error) {
+func (c PrflSrvc) GetProfileById(ctx context.Context,currentUserId int64, ProfileRequest dto.ProfileRequest) (*dto.ProfileRespone, error) {
 
 	var (
-		resp *dto.ProfileResponeDTO
 		user *entity.User
 		currentUser *entity.User
 		err  error
 	)
 
 	queryFuncFindUser := func(r *repository.Repo) error {
-		user, err = r.Tables.Users.GetUserById(ctx, ProfileDTO.UserId)
+		user, err = r.Tables.Users.GetUserById(ctx, ProfileRequest.UserId)
 		if err != nil {
 			return fmt.Errorf("find user by id: %w", err)
 		}
@@ -61,9 +60,9 @@ func (c PrflSrvc) GetProfileById(ctx context.Context, ProfileDTO dto.ProfileDTO)
 		p=100*int(user.SolvedQuestionsCount/user.SubmissionsCount)
 	}
 
-	resp = &dto.ProfileResponeDTO {
-		UserId: ProfileDTO.UserId,    
-		CurrentUserId: currentUser.ID,         
+	return &dto.ProfileRespone {
+		UserId: ProfileRequest.UserId,    
+		CurrentUserId: int64(currentUser.ID),         
 		Username: user.Username,
 		Phone: user.Phone,
 		Email: user.Email,
@@ -73,19 +72,18 @@ func (c PrflSrvc) GetProfileById(ctx context.Context, ProfileDTO dto.ProfileDTO)
 		Total: user.SubmissionsCount,
 		SolvedPercentage:  p,
 		IsCurrentUserAdmin: currentUser.Role=="admin",
-	}
-	return resp, nil
+	}, nil
 }
 
-func (c PrflSrvc) ChangeRole(ctx context.Context, UpdateUserDTO dto.ChangeRoleDTO) (*entity.User, error) {
+func (c PrflSrvc) ChangeRole(ctx context.Context, ChangeRoleRequest dto.ChangeRoleRequest) (*dto.ChangeRoleResponse, error) {
 
 	var (
-		user *entity.User
+		// user *entity.User
 		err  error
 	)
 
 	queryFuncUpdateUser := func(r *repository.Repo) error {
-		user, err = r.Tables.Users.FindUserAndChangeRole(ctx,UpdateUserDTO)
+		_, err = r.Tables.Users.FindUserAndChangeRole(ctx,ChangeRoleRequest)
 		if err != nil {
 			return fmt.Errorf("find customer by id: %w", err)
 		}
@@ -97,5 +95,5 @@ func (c PrflSrvc) ChangeRole(ctx context.Context, UpdateUserDTO dto.ChangeRoleDT
 	if err != nil {
 		return nil, err
 	}
-	return user, nil
+	return &dto.ChangeRoleResponse{}, nil
 }
