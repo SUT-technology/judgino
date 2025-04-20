@@ -17,5 +17,5 @@ type ChangeRoleRequest struct {
 }
 
 type ChangeRoleResponse struct {
-	err model.UserMessage
+	Error model.UserMessage
 }

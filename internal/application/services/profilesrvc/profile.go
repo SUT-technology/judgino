@@ -19,7 +19,7 @@ func NewPrflSrvc(db repository.Pool) PrflSrvc {
 	}
 }
 
-func (c PrflSrvc) GetProfileById(ctx context.Context,currentUserId int64, ProfileRequest dto.ProfileRequest) (*dto.ProfileRespone, error) {
+func (c PrflSrvc) GetProfileById(ctx context.Context,currentUserId int64, userId int64) (*dto.ProfileRespone, error) {
 
 	var (
 		user *entity.User
@@ -28,7 +28,7 @@ func (c PrflSrvc) GetProfileById(ctx context.Context,currentUserId int64, Profil
 	)
 
 	queryFuncFindUser := func(r *repository.Repo) error {
-		user, err = r.Tables.Users.GetUserById(ctx, ProfileRequest.UserId)
+		user, err = r.Tables.Users.GetUserById(ctx, userId)
 		if err != nil {
 			return fmt.Errorf("find user by id: %w", err)
 		}
@@ -41,7 +41,7 @@ func (c PrflSrvc) GetProfileById(ctx context.Context,currentUserId int64, Profil
 	
 
 	queryFuncFindCurrentUser := func(r *repository.Repo) error {
-		currentUser, err = r.Tables.Users.GetUserById(ctx, 1)
+		currentUser, err = r.Tables.Users.GetUserById(ctx, currentUserId)
 		if err != nil {
 			return fmt.Errorf("find current user by id: %w", err)
 		}
@@ -61,7 +61,7 @@ func (c PrflSrvc) GetProfileById(ctx context.Context,currentUserId int64, Profil
 	}
 
 	return &dto.ProfileRespone {
-		UserId: ProfileRequest.UserId,    
+		UserId: userId,    
 		CurrentUserId: int64(currentUser.ID),         
 		Username: user.Username,
 		Phone: user.Phone,

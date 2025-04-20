@@ -2,10 +2,6 @@ package dto
 
 import "github.com/SUT-technology/judgino/internal/domain/model"
 
-type ProfileRequest struct {
-	UserId int64 `json:"userId" validate:"required"`
-}
-
 type ProfileRespone struct {
 	UserId    int64
 	CurrentUserId int64
@@ -18,5 +14,5 @@ type ProfileRespone struct {
 	Total int64
 	SolvedPercentage int
 	IsCurrentUserAdmin bool
-	err model.UserMessage
+	Error model.UserMessage
 }

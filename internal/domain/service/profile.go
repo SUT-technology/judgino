@@ -7,6 +7,6 @@ import (
 )
 
 type ProfileService interface {
-	GetProfileById(ctx context.Context,currentUserId int64, profileDto dto.ProfileRequest) (*dto.ProfileRespone, error)
+	GetProfileById(ctx context.Context,currentUserId int64, userId int64) (*dto.ProfileRespone, error)
 	ChangeRole(ctx context.Context,updateUserDTO dto.ChangeRoleRequest) (*dto.ChangeRoleResponse,error)
 }

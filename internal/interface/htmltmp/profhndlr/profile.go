@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"log/slog"
 	"strconv"
-	"fmt"
 
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
@@ -63,9 +62,6 @@ func (h ProfileHndlr) HandleProfile(c echo.Context)error {
 	userID64 , _ := strconv.ParseUint(id,10,64)
 	userId:=int64(userID64)
 
-	req:=dto.ProfileRequest{
-		UserId: userId,
-	}
 	
 	var currentUserId int64
 	currentUser := serde.GetCurrentUser(c)
@@ -75,14 +71,12 @@ func (h ProfileHndlr) HandleProfile(c echo.Context)error {
 	} else {
 		currentUserId = currentUser.UserId
 	}
+	slogger.Debug(ctx, "received request", slog.Any("request", userId))
 
-	slogger.Debug(ctx, "received request", slog.Any("request", req))
-
-	resp,err:=h.Services.PrflSrvc.GetProfileById(ctx,currentUserId,req)
-	fmt.Println(resp)
+	resp,err:=h.Services.PrflSrvc.GetProfileById(ctx,currentUserId,userId)
 	if err != nil {
 		slogger.Debug(ctx, "profile", slogger.Err("error", err))
-		return c.Render(http.StatusBadRequest, "test.html", dto.SignupResponse{Error: model.InternalMessage})
+		return c.Render(http.StatusBadRequest, "test.html", dto.ProfileRespone{Error: model.InternalMessage})
 	}
 
 	tmpl := template.Must(template.New("profile.html").Funcs(template.FuncMap{
