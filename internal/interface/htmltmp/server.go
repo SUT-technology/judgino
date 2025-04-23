@@ -3,10 +3,12 @@ package htmltmp
 import (
 	"context"
 	"errors"
+	"fmt"
 	"html/template"
 	"io"
 	"log/slog"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/SUT-technology/judgino/internal/domain/service"
@@ -28,6 +30,7 @@ func NewServer(srvc service.Service, cfg config.Server) *Server {
 	e.Debug = true
 	e.HideBanner = true
 	e.HidePort = true
+	e.Static("/static", "static")
 	e.Validator = &Validator{validator: validator.New()}
 
 	closer := func() {
@@ -82,7 +85,14 @@ type Validator struct {
 
 func (v *Validator) Validate(i interface{}) error {
 	if err := v.validator.Struct(i); err != nil {
-		return errors.New("validate failed")
+		if ve, ok := err.(validator.ValidationErrors); ok {
+			var errMsgs []string
+			for _, fieldErr := range ve {
+				errMsgs = append(errMsgs, fmt.Sprintf("%s failed on '%s'", fieldErr.Field(), fieldErr.Tag()))
+			}
+			return errors.New(strings.Join(errMsgs, ", "))
+		}
+		return errors.New("validation failed with unknown error")
 	}
 	return nil
 }

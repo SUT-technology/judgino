@@ -1,6 +1,6 @@
 server:
   port: 8000
-  secret_key: judgino-technology
+  secret_key: judginotechnology
   logger: true
   addr: 0.0.0.0:8000
   rate-limiter:

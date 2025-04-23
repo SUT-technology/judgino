@@ -21,8 +21,9 @@ func New(g *echo.Group, srvc service.Service) AuthHndlr {
 		Services: srvc,
 	}
 
-	g.GET("/login", handler.Login)
-	g.GET("/signup", handler.Signup)
+	g.GET("", handler.LoginPage)
+	g.POST("/signup", handler.Signup)
+	g.POST("/login", handler.Login)
 
 	return handler
 }
@@ -34,7 +35,7 @@ func (h AuthHndlr) Login(c echo.Context) error {
 	req, err := serde.BindRequestBody[dto.LoginRequest](c)
 	if err != nil {
 		slogger.Debug(ctx, "bad request", slogger.Err("error", err))
-		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
+		return c.Render(http.StatusBadRequest, "login.html", dto.AuthResponse{Error: model.BadRequestMessage})
 	}
 
 	slogger.Debug(ctx, "received request", slog.Any("request", req))
@@ -42,10 +43,12 @@ func (h AuthHndlr) Login(c echo.Context) error {
 	resp, err := h.Services.AuthSrvc.Login(ctx, req)
 	if err != nil {
 		slogger.Debug(ctx, "login ", slogger.Err("error", err))
-		return serde.Response(c, http.StatusInternalServerError, model.InternalMessage, nil)
+		return c.Render(http.StatusBadRequest, "login.html", resp)
 	}
 
-	return serde.Response(c, http.StatusOK, model.OKMessage, resp)
+	serde.SetTokenCookie(c, resp.Token)
+
+	return c.Redirect(http.StatusMovedPermanently, "/questions")
 
 }
 
@@ -56,26 +59,24 @@ func (h *AuthHndlr) Signup(c echo.Context) error {
 	req, err := serde.BindRequestBody[dto.SignupRequest](c)
 	if err != nil {
 		slogger.Debug(ctx, "bad request", slogger.Err("error", err))
-		return c.Render(http.StatusBadRequest, "test.html", dto.SignupResponse{Error: model.BadRequestMessage})
-	}
-
-	var currentUserId int64
-	currentUser := serde.GetCurrentUser(c)
-	if currentUser == nil {
-		//example:  GET user id from path
-		currentUserId = 2 // TEST
-	} else {
-		currentUserId = currentUser.UserId
+		return c.Render(http.StatusBadRequest, "login.html", dto.AuthResponse{Error: model.BadRequestMessage})
 	}
 
 	slogger.Debug(ctx, "received request", slog.Any("request", req))
 
-	resp, err := h.Services.AuthSrvc.Signup(ctx, currentUserId, req)
+	resp, err := h.Services.AuthSrvc.Signup(ctx, req)
 	if err != nil {
 		slogger.Debug(ctx, "signup", slogger.Err("error", err))
-		return c.Render(http.StatusBadRequest, "test.html", dto.SignupResponse{Error: model.InternalMessage})
+		return c.Render(http.StatusBadRequest, "test.html", resp)
 	}
 
-	return c.Render(http.StatusOK, "test.html", resp)
+	serde.SetTokenCookie(c, resp.Token)
 
+	return c.Redirect(http.StatusMovedPermanently, "/questions")
+}
+
+func (h AuthHndlr) LoginPage(c echo.Context) error {
+
+	// ctx := c.Request().Context()
+	return c.Render(http.StatusOK, "login.html", dto.AuthResponse{})
 }
