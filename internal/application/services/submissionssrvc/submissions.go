@@ -27,7 +27,7 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 	)
 
 	if submissionDto.SubmissionValue == "" {
-		submissionDto.SubmissionValue = "mine"
+		submissionDto.SubmissionValue = "all"
 	}
 	if submissionDto.FinalValue == "" {
 		submissionDto.FinalValue = "all"

@@ -8,7 +8,8 @@ type QuestionRequest struct {
 	PageAction    string `json:"page" query:"page"`
 }
 type Question struct {
-	Title       string `json:"title"`
+	QuestionId uint `json:question_id`
+	Title string `json:"title"`
 	PublishDate string `json:"publish_date"`
 	Deadline    string `json:"deadline"`
 	Body        string `json:"deadline"`

@@ -26,9 +26,18 @@ func (c submissionsTable) GetSubmissionsByFilter(ctx context.Context, userId uin
 	var submissions []*entity.Submission
 	var query *gorm.DB
 	if submissionFilter == "mine" && userId != 0 {
-		query = c.db.Where("question_id = ?", questionId).Where("user_id = ?", userId).Where("is_final = ?", finalFilter).Order("submit_time").Offset(10*(int(pageParam)-1) - 1).Limit(10)
+
+		if finalFilter {
+			query = c.db.Where("question_id = ?", questionId).Where("user_id = ?", userId).Where("is_final = ?", true).Order("submit_time").Offset(10*(int(pageParam)-1) - 1).Limit(10)
+		} else {
+			query = c.db.Where("question_id = ?", questionId).Where("user_id = ?", userId).Order("submit_time").Offset(10*(int(pageParam)-1) - 1).Limit(10)
+		}
 	} else {
-		query = c.db.Where("question_id = ?", questionId).Where("is_final = ?", finalFilter).Order("submit_time").Offset(10*(int(pageParam)-1) - 1).Limit(10)
+		if finalFilter {
+			query = c.db.Where("question_id = ?", questionId).Where("is_final = ?", true).Order("submit_time").Offset(10*(int(pageParam)-1) - 1).Limit(10)
+		} else {
+			query = c.db.Where("question_id = ?", questionId).Order("submit_time").Offset(10*(int(pageParam)-1) - 1).Limit(10)
+		}
 	}
 	query.Find(&submissions)
 	return submissions, nil
