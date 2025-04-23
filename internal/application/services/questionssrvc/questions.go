@@ -30,7 +30,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 		questionsDto.QuestionValue = "all"
 	}
 	if questionsDto.SortValue == "" {
-		questionsDto.SortValue = "deadline"
+		questionsDto.SortValue = "publish_date"
 	}
 	if questionsDto.PageParam == 0 {
 		questionsDto.PageParam = 1
@@ -68,6 +68,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 	questionsData := make([]dto.Question, len(questions))
 	for i, question := range questions {
 		questionsData[i] = dto.Question{
+			QuestionId: question.ID,
 			Title:         question.Title,
 			PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
 			Deadline: 	question.Deadline.Format("2006-01-02 15:04:05"),
