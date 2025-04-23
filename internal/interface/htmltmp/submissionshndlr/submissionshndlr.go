@@ -1,6 +1,7 @@
 package submissionshndlr
 
 import (
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -20,6 +21,8 @@ func New(g *echo.Group, srvc service.Service) SubmissionsHndlr {
 	handler := SubmissionsHndlr{
 		Services: srvc,
 	}
+	g.POST("/:question_id/submit", handler.Submit)
+	// g.POST("/{question_id}/submit", handler.Submit)
 	g.GET("/{question_id}", handler.ShowSubmissions)
 	g.GET("/:question_id", handler.ShowSubmissions)
 
@@ -46,4 +49,27 @@ func (q *SubmissionsHndlr) ShowSubmissions(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "submissions.html", resp)
+}
+
+func (q *SubmissionsHndlr) Submit(c echo.Context) error {
+	slog.Info("question: ", "test")
+	questionID := c.Param("question_id")
+	slog.Info("question_id", questionID)
+	questionIDInt, _ := strconv.Atoi(questionID)
+
+	ctx := c.Request().Context()
+
+	req, err := serde.BindRequestBody[dto.SubmitRequest](c)
+	if err != nil {
+		slogger.Debug(ctx, "bad request", slogger.Err("error", err))
+		return c.Redirect(http.StatusFound, c.Request().Referer())
+	}
+
+	err = q.Services.SubmissionSrvc.SubmitQuestion(ctx, req, serde.GetCurrentUser(c).UserId, questionIDInt)
+	if err != nil {
+		slogger.Debug(ctx, "showSubmissions", slogger.Err("error", err))
+		return c.Redirect(http.StatusFound, c.Request().Referer())
+	}
+
+	return c.Redirect(http.StatusMovedPermanently, "/submissions/"+questionID)
 }

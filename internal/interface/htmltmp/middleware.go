@@ -2,7 +2,6 @@ package htmltmp
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -47,7 +46,6 @@ func (m *middlewares) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		// Store claims in context
 
-		slog.Info(fmt.Sprintf("claims: %v", claims))
 		c.Set("user_id", claims.UserID)
 		c.Set("is_admin", claims.IsAdmin)
 

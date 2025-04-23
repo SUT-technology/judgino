@@ -3,10 +3,11 @@ package submissionssrvc
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
-	"github.com/SUT-technology/judgino/internal/domain/repository"
 	"github.com/SUT-technology/judgino/internal/domain/entity"
+	"github.com/SUT-technology/judgino/internal/domain/repository"
 )
 
 type SubmissionService struct {
@@ -19,11 +20,10 @@ func NewSubmissionSrvc(db repository.Pool) SubmissionService {
 	}
 }
 
-
 func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto.SubmissionRequest, userId uint, isAdmin bool, questionId int) (dto.SubmissionsResponse, error) {
 	var (
 		submissions []*entity.Submission
-		err  error
+		err         error
 	)
 
 	if submissionDto.SubmissionValue == "" {
@@ -45,7 +45,7 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 	if err != nil {
 		return dto.SubmissionsResponse{Error: err}, err
 	}
-	totalPages := submissionsCount / 10 + 1
+	totalPages := submissionsCount/10 + 1
 
 	if submissionDto.PageAction == "next" && submissionDto.PageParam < uint(totalPages) {
 		submissionDto.PageParam++
@@ -57,7 +57,6 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 	if submissionDto.PageParam > uint(totalPages) {
 		submissionDto.PageParam = uint(totalPages)
 	}
-	
 
 	queryFuncFindSubmissions := func(r *repository.Repo) error {
 		submissions, err = r.Tables.Submissions.GetSubmissionsByFilter(ctx, userId, uint(questionId), submissionDto.SubmissionValue, submissionDto.FinalValue == "final", submissionDto.PageParam)
@@ -100,7 +99,6 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 		if err != nil {
 			return dto.SubmissionsResponse{}, err
 		}
-		
 
 		var typ string
 		if submission.IsFinal {
@@ -110,26 +108,26 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 		}
 		submissionsData[i] = dto.Submission{
 			QuestionTitle: qt,
-			UserName:     un,
-			Status:       submission.Status,
-			Date:         submission.SubmitTime.Format("2006-01-02 15:04:05"),
-			Type:         typ,
+			UserName:      un,
+			Status:        submission.Status,
+			Date:          submission.SubmitTime.Format("2006-01-02 15:04:05"),
+			Type:          typ,
 		}
 	}
 
 	if err != nil {
 		return dto.SubmissionsResponse{Error: err}, err
 	}
-	totalPages = submissionsCount / 10 + 1
+	totalPages = submissionsCount/10 + 1
 
 	resp := dto.SubmissionsResponse{
-		Submissions: submissionsData,
-		TotalPages:  totalPages,
-		QuestionId:  questionId,
-		CurrentPage: int(submissionDto.PageParam),
+		Submissions:      submissionsData,
+		TotalPages:       totalPages,
+		QuestionId:       questionId,
+		CurrentPage:      int(submissionDto.PageParam),
 		SubmissionFilter: submissionDto.SubmissionValue,
-		FinalFilter: submissionDto.FinalValue,
-		Error: nil,
+		FinalFilter:      submissionDto.FinalValue,
+		Error:            nil,
 	}
 	return resp, nil
 }
@@ -154,4 +152,29 @@ func (c SubmissionService) SubmissionsCount(ctx context.Context, submissionDto d
 	}
 
 	return submissionsCount, nil
+}
+
+func (c SubmissionService) SubmitQuestion(ctx context.Context, submitDto dto.SubmitRequest, userId int64, questionId int) error {
+
+	submission := entity.Submission{
+		SubmitURL:  submitDto.SubmitUrl,
+		IsFinal:    false,
+		QuestionID: uint(questionId),
+		UserID:     uint(userId),
+		Status:     2,
+		SubmitTime: time.Now(),
+	}
+	queryFuncFindUser := func(r *repository.Repo) error {
+		err := r.Tables.Submissions.CreateSubmission(ctx, submission)
+		if err != nil {
+			return fmt.Errorf("create user: %w", err)
+		}
+		return nil
+	}
+	err := c.db.Query(ctx, queryFuncFindUser)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
