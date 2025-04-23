@@ -31,7 +31,7 @@ func (m *middlewares) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		// Get token from cookies
 		cookie, err := c.Cookie("token")
 		if err != nil {
-			return echo.NewHTTPError(http.StatusUnauthorized, "Missing or invalid token")
+			return c.Render(http.StatusBadRequest, "login.html", nil)
 		}
 
 		// Parse JWT
@@ -41,7 +41,7 @@ func (m *middlewares) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return []byte(m.cfg.SecretKey), nil
 		})
 		if err != nil || !token.Valid {
-			return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
+			return c.Render(http.StatusBadRequest, "login.html", nil)
 		}
 
 		// Store claims in context

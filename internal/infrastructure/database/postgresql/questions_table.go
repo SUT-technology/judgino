@@ -26,9 +26,9 @@ func (c questionsTable) GetQuestionByFilter(ctx context.Context, searchFilter st
 	var questions []*entity.Question
 	var query *gorm.DB
 	if questionFilter == "mine" && userId != 0 {
-		query = c.db.Where("title ILIKE ?", "%"+searchFilter+"%").Where("user_id = ?", userId).Order(sortFilter).Offset(10 * (pageParam - 1) - 1).Limit(10)
+		query = c.db.Where("title ILIKE ?", "%"+searchFilter+"%").Where("user_id = ?", userId).Order(sortFilter).Offset(10*(pageParam-1) - 1).Limit(10)
 	} else {
-		query = c.db.Where("title ILIKE ?", "%"+searchFilter+"%").Order(sortFilter).Offset(10 * (pageParam - 1) - 1).Limit(10)
+		query = c.db.Where("title ILIKE ?", "%"+searchFilter+"%").Order(sortFilter).Offset(10*(pageParam-1) - 1).Limit(10)
 	}
 	query.Find(&questions)
 	fmt.Println(questions)
@@ -45,4 +45,13 @@ func (c questionsTable) GetQuestionsCount(ctx context.Context, searchFilter stri
 	}
 	query.Model(&entity.Question{}).Count(&count)
 	return int(count), nil
+}
+
+func (c questionsTable) PublishQuestion(ctx context.Context, questionId uint) error {
+	if err := c.db.Model(&entity.Question{}).Where("id = ?", questionId).Update("status", "published").Error; err != nil {
+		return err
+	}
+
+	return nil
+
 }

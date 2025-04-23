@@ -1,7 +1,6 @@
 package submissionshndlr
 
 import (
-	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -52,9 +51,7 @@ func (q *SubmissionsHndlr) ShowSubmissions(c echo.Context) error {
 }
 
 func (q *SubmissionsHndlr) Submit(c echo.Context) error {
-	slog.Info("question: ", "test")
 	questionID := c.Param("question_id")
-	slog.Info("question_id", questionID)
 	questionIDInt, _ := strconv.Atoi(questionID)
 
 	ctx := c.Request().Context()

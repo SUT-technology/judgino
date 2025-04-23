@@ -23,6 +23,6 @@ func register(e *echo.Echo, srvc service.Service, m *middlewares) {
 	submissions := e.Group("/submissions", m.JWTMiddleware)
 
 	authhdnlr.New(auth, srvc)
-	questionshndlr.New(questions, srvc)
+	questionshndlr.New(questions, srvc, m.JWTMiddleware)
 	submissionshndlr.New(submissions, srvc)
 }

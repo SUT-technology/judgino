@@ -7,7 +7,8 @@ import (
 )
 
 type QuestionRepository interface {
-	GetQuestionById(ctx context.Context, id uint)(*entity.Question , error)
+	GetQuestionById(ctx context.Context, id uint) (*entity.Question, error)
 	GetQuestionByFilter(ctx context.Context, searchFilter string, questionFilter string, sortFilter string, pageParam int, userId uint) ([]*entity.Question, error)
 	GetQuestionsCount(ctx context.Context, searchFilter string, questionFilter string, userId uint) (int, error)
+	PublishQuestion(ctx context.Context, questionId uint) error
 }
