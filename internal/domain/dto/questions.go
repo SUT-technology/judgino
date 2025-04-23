@@ -11,6 +11,7 @@ type Question struct {
 	Title       string `json:"title"`
 	PublishDate string `json:"publish_date"`
 	Deadline    string `json:"deadline"`
+	Body        string `json:"deadline"`
 }
 type QuestionsResponse struct {
 	Questions      []Question `json:"Questions"`
@@ -25,3 +26,4 @@ type QuestionsResponse struct {
 type PublishResponse struct {
 	Msg string
 }
+

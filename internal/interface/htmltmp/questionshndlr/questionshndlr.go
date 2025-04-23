@@ -23,6 +23,7 @@ func New(g *echo.Group, srvc service.Service, m echo.MiddlewareFunc) QuestionsHn
 
 	g.GET("/", handler.ShowQuestions)
 	g.GET("", handler.ShowQuestions)
+	g.GET("/:question_id", handler.ShowQuestion)
 
 	g.POST("/published/:question_id", handler.PublishQuestion, m)
 
@@ -71,4 +72,19 @@ func (q *QuestionsHndlr) PublishQuestion(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "questions.html", nil)
+}
+
+func (q *QuestionsHndlr) ShowQuestion(c echo.Context) error {
+	questionID := c.Param("question_id")
+	questionIDInt, _ := strconv.Atoi(questionID)
+	ctx := c.Request().Context()
+
+	resp, err := q.Services.QuestionsSrvc.GetQuestion(ctx, uint(questionIDInt))
+	if err != nil {
+		slogger.Debug(ctx, "showQuestion", slogger.Err("error", err))
+		// TODO: handle error
+		return c.Render(http.StatusBadRequest, "question.html", nil)
+	}
+
+	return c.Render(http.StatusOK, "question.html", resp)
 }

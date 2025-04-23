@@ -90,7 +90,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 	return resp, nil
 }
 
-func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.Question, error) {
+func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (*entity.Question, error) {
 	var (
 		question *entity.Question
 		err      error
@@ -106,13 +106,9 @@ func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.Qu
 
 	err = c.db.Query(ctx, queryFuncFindQuestion)
 	if err != nil {
-		return dto.Question{}, err
+		return nil, err
 	}
-	return dto.Question{
-		Title:       question.Title,
-		PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
-		Deadline:    question.Deadline.Format("2006-01-02 15:04:05"),
-	}, nil
+	return question, nil
 }
 
 func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.QuestionRequest, userId uint) (int, error) {
