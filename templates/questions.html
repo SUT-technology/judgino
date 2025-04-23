@@ -95,7 +95,7 @@
                             <tbody id="questions-list">
                                 {{range .Questions}}
                                     <tr>
-                                        <td class="2">{{.Title}}</td>
+                                        <td class="2"><a href="/questions/{{.QuestionId}}">{{.Title}}</a></td>
                                         <td class="2">{{.PublishDate}}</td>
                                         <td class="2">{{.Deadline}}</td>
                                     </tr>
