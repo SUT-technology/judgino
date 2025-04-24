@@ -23,8 +23,8 @@ func Run() error {
 
 	var configPath string
 	flag.StringVar(&configPath, "cfg", "assets/config/development.yaml", "Configuration File")
-	flag.StringVar(&username, "u", "", "Admin's username")
-	flag.StringVar(&password, "p", "", "Admin's password")
+	flag.StringVar(&username, "username", "", "Admin's username")
+	flag.StringVar(&password, "password", "", "Admin's password")
 	flag.Parse()
 
 	if username == "" || password == "" {
@@ -261,8 +261,8 @@ func newUsersTable(db *gorm.DB) usersTable {
 type User struct {
     ID                   uint   `gorm:"primaryKey"`
     FirstName            string `gorm:"size:255;not null"`
-    Email                string `gorm:"size:255;unique"`
-    Phone                string `gorm:"size:11;not null;unique"`
+    Email                *string `gorm:"size:255;unique"`
+    Phone                *string `gorm:"size:11;unique"`
     Username             string  `gorm:"not null;unique"`
     Password             string `gorm:"size:255"`
     Role                 string `gorm:"size:255;not null"`
@@ -273,9 +273,7 @@ type User struct {
 func (c usersTable) CreateAdmin(ctx context.Context, username string, password string) (User, error) {
     var user User
 
-    // Check if the user with the given username already exists
     if err := c.db.Where("username = ?", username).First(&user).Error; err == nil {
-        // User exists, update their role
         user.Role = "admin"
         if err := c.db.Save(&user).Error; err != nil {
             return User{}, fmt.Errorf("updating user role: %w", err)
@@ -283,11 +281,12 @@ func (c usersTable) CreateAdmin(ctx context.Context, username string, password s
         return user, nil
     }
 
-    // If the user doesn't exist, create a new one
     newUser := User{
         Username: username,
         Password: password, // Make sure to hash the password before saving in production
         Role:     "admin",
+		Email: nil,
+		Phone: nil,
     }
 
     if err := c.db.Create(&newUser).Error; err != nil {
