@@ -36,3 +36,14 @@ func (c usersTable) FindUserAndChangeRole(ctx context.Context, data dto.ChangeRo
 	c.db.First(&user, data.ID)
 	return &user, nil
 }
+
+func (c usersTable) FindAndUpdateUser(ctx context.Context,userId int64, data entity.User) error {
+
+	var user entity.User
+	c.db.First(&user, userId)
+
+	if err := c.db.WithContext(ctx).Model(&user).Updates(data).Error; err != nil {
+		return err
+	}
+	return nil
+}

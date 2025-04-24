@@ -25,6 +25,7 @@ func NewServer(srvc service.Service, cfg config.Server) *Server {
 	var dfrs []func()
 
 	e := echo.New()
+	e.Static("/static" , "static")
 	e.Debug = true
 	e.HideBanner = true
 	e.HidePort = true

@@ -6,6 +6,7 @@ import (
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
 	"github.com/SUT-technology/judgino/internal/domain/entity"
+	"github.com/SUT-technology/judgino/internal/domain/model"
 	"github.com/SUT-technology/judgino/internal/domain/repository"
 )
 
@@ -19,7 +20,77 @@ func NewQuestionsSrvc(db repository.Pool) QuestionsSrvc {
 	}
 }
 
-func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionRequest, userId uint) (dto.QuestionsResponse, error) {
+func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto.CreateQuestionRequest, currentUserId int64) (dto.CreateQuestionResponse,error) {
+	
+	var response dto.CreateQuestionResponse 
+
+	if createQuestionDto.Title == "" {
+		response.Title = model.UserMessage("title not found")
+		response.Error = true
+	}
+
+	if createQuestionDto.Body == "" {
+		response.Body = model.UserMessage("body not found")
+		response.Error = true
+	}
+
+	if createQuestionDto.TimeLimit == 0 {
+		response.Body = model.UserMessage("time limit not found")
+		response.Error = true
+	}
+
+	if createQuestionDto.MemoryLimit == 0 {
+		response.Body = model.UserMessage("memory limit not found")
+		response.Error = true
+	}
+
+	if createQuestionDto.InputURL == "" {
+		response.Body = model.UserMessage("input not found")
+		response.Error = true
+	}
+
+	if createQuestionDto.OutputURL == "" {
+		response.Body = model.UserMessage("output not found")
+		response.Error = true
+	}
+
+	if response.Error {
+		response.Status = "error creating question"
+		return response,nil
+	}
+
+	
+
+	createQuestionDto.UserID = currentUserId
+
+	queryFuncCreateQuestion := func(r *repository.Repo) error {
+		err:=r.Tables.Questions.CreateQuestion(ctx,createQuestionDto)
+		if err != nil {
+			return err
+		}
+		user,err:=r.Tables.Users.GetUserById(ctx,currentUserId)
+		if err != nil {
+			return err
+		}
+		count:= user.CreatedQuestionsCount+1
+		err=r.Tables.Users.FindAndUpdateUser(ctx,currentUserId,entity.User{CreatedQuestionsCount: count})
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err := c.db.Query(ctx,queryFuncCreateQuestion)
+	if err != nil {
+		fmt.Errorf("%v",err.Error())
+	}
+	return dto.CreateQuestionResponse{Status: model.UserMessage("question created successfully")},nil
+
+	
+		
+}
+
+func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionSummeryRequest, userId uint) (dto.QuestionsSummeryResponse, error) {
 	var (
 		questions []*entity.Question
 		err  error
@@ -38,7 +109,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 
 	questionsCount, err := c.QuestionsCount(ctx, questionsDto, userId)
 	if err != nil {
-		return dto.QuestionsResponse{Error: err}, err
+		return dto.QuestionsSummeryResponse{Error: err}, err
 	}
 
 	totalPages := questionsCount / 10 + 1
@@ -62,12 +133,12 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 
 	err = c.db.Query(ctx, queryFuncFindQuestions)
 	if err != nil {
-		return dto.QuestionsResponse{Error: err}, err
+		return dto.QuestionsSummeryResponse{Error: err}, err
 	}
 	// Create the data to pass to the template
-	questionsData := make([]dto.Question, len(questions))
+	questionsData := make([]dto.QuestionSummery, len(questions))
 	for i, question := range questions {
-		questionsData[i] = dto.Question{
+		questionsData[i] = dto.QuestionSummery{
 			Title:         question.Title,
 			PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
 			Deadline: 	question.Deadline.Format("2006-01-02 15:04:05"),
@@ -77,7 +148,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 
 	totalPages = questionsCount / 10 + 1
 
-	resp := dto.QuestionsResponse{
+	resp := dto.QuestionsSummeryResponse{
 		Questions:  questionsData,
 		TotalPages: totalPages,
 		CurrentPage: (questionsDto.PageParam),
@@ -92,7 +163,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 	return resp, nil
 }
 
-func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.Question, error) {
+func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.QuestionSummery, error) {
 	var (
 		question *entity.Question
 		err  error
@@ -108,9 +179,9 @@ func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.Qu
 
 	err = c.db.Query(ctx, queryFuncFindQuestion)
 	if err != nil {
-		return dto.Question{}, err
+		return dto.QuestionSummery{}, err
 	}
-	return dto.Question{
+	return dto.QuestionSummery{
 		Title:         question.Title,
 		PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
 		Deadline: 	question.Deadline.Format("2006-01-02 15:04:05"),
@@ -118,7 +189,7 @@ func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.Qu
 }
 
 
-func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.QuestionRequest, userId uint) (int, error) {
+func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.QuestionSummeryRequest, userId uint) (int, error) {
 
 	var (
 		count int

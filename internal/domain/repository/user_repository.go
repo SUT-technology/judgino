@@ -10,4 +10,5 @@ import (
 type UserRepository interface {
 	GetUserById(ctx context.Context, id int64)(*entity.User , error)
 	FindUserAndChangeRole(ctx context.Context,data dto.ChangeRoleRequest) (*entity.User,error)
+	FindAndUpdateUser(ctx context.Context,userId int64,user entity.User) error
 }
