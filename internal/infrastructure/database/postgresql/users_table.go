@@ -37,12 +37,25 @@ func (c usersTable) FindUserAndChangeRole(ctx context.Context, data dto.ChangeRo
 	return &user, nil
 }
 
+
 func (c usersTable) FindAndUpdateUser(ctx context.Context,userId int64, data entity.User) error {
 
 	var user entity.User
 	c.db.First(&user, userId)
 
 	if err := c.db.WithContext(ctx).Model(&user).Updates(data).Error; err != nil {
+
+func (c usersTable) GetUserByUsername(ctx context.Context, username string) (*entity.User, error) {
+	var user entity.User
+	if err := c.db.Where("username = ?", username).First(&user).Error; err != nil {
+		return nil, err // User not found
+	}
+
+	return &user, nil
+}
+func (c usersTable) CreateUser(ctx context.Context, user entity.User) error {
+	if err := c.db.Create(&user).Error; err != nil {
+
 		return err
 	}
 	return nil

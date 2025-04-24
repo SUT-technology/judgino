@@ -8,11 +8,12 @@ import (
 	"github.com/SUT-technology/judgino/internal/application/services/usersrvc"
 	"github.com/SUT-technology/judgino/internal/domain/repository"
 	"github.com/SUT-technology/judgino/internal/domain/service"
+	"github.com/SUT-technology/judgino/internal/interface/config"
 )
 
-func New(db repository.Pool) service.Service {
+func New(db repository.Pool, cfg config.Config) service.Service {
 	return service.Service{
-		AuthSrvc:       auth.NewAuthSrvc(db),
+		AuthSrvc:       auth.NewAuthSrvc(db, cfg.Server.SecretKey),
 		PrflSrvc:       prof.NewPrflSrvc(db),
 		QuestionsSrvc:  questionssrvc.NewQuestionsSrvc(db),
 		UserSrvc:       usersrvc.NewUserSrvc(db),

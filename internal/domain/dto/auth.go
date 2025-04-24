@@ -3,20 +3,20 @@ package dto
 import "github.com/SUT-technology/judgino/internal/domain/model"
 
 type LoginRequest struct {
-	Username string `json:"username" validate:"required"`
-	Password string `json:"password" validate:"required"`
+	Username string `form:"username" validate:"required"`
+	Password string `form:"password" validate:"required"`
 }
 
-type LoginResponse struct {
+type AuthResponse struct {
 	Token string
+	Error model.UserMessage
 }
 
 type SignupRequest struct {
-	Username string `query:"username" validate:"required"`
-}
-
-type SignupResponse struct {
-	CurrentUserId int64
-	Error         model.UserMessage
-	Username      string
+	FirstName string `form:"first_name" validate:"required"`
+	LastName  string `form:"last_name" validate:"required"`
+	Phone     string `form:"phone" validate:"required"`
+	Email     string `form:"email"`
+	Password  string `form:"password" validate:"required"`
+	Username  string `form:"username" validate:"required"`
 }

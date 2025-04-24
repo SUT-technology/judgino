@@ -1,8 +1,8 @@
 package serde
 
 import (
-	"fmt"
-	"log/slog"
+	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -13,13 +13,12 @@ type UserDataDto struct {
 }
 
 func GetCurrentUser(c echo.Context) *UserDataDto {
-	userId, ok := c.Get("userId").(int64)
-	slog.Info(fmt.Sprintf("new user id: %v", userId))
+	userId, ok := c.Get("user_id").(int64)
 	if !ok {
 		return nil
 	}
 
-	isAdmin, ok := c.Get("isAdmin").(bool)
+	isAdmin, ok := c.Get("is_admin").(bool)
 	if !ok {
 		return nil
 	}
@@ -29,4 +28,14 @@ func GetCurrentUser(c echo.Context) *UserDataDto {
 		IsAdmin: isAdmin,
 	}
 
+}
+
+func SetTokenCookie(c echo.Context, token string) {
+	cookie := new(http.Cookie)
+	cookie.Name = "token"
+	cookie.Value = token
+	cookie.Expires = time.Now().Add(72 * time.Hour) // Expiration time
+	cookie.HttpOnly = true                          // Prevent JavaScript access
+	cookie.Path = "/"
+	c.SetCookie(cookie)
 }

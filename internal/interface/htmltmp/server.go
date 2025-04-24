@@ -3,10 +3,12 @@ package htmltmp
 import (
 	"context"
 	"errors"
+	"fmt"
 	"html/template"
 	"io"
 	"log/slog"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/SUT-technology/judgino/internal/domain/service"
@@ -29,6 +31,7 @@ func NewServer(srvc service.Service, cfg config.Server) *Server {
 	e.Debug = true
 	e.HideBanner = true
 	e.HidePort = true
+	e.Static("/static", "static")
 	e.Validator = &Validator{validator: validator.New()}
 	e.Static("/static", "static")
 
@@ -84,7 +87,14 @@ type Validator struct {
 
 func (v *Validator) Validate(i interface{}) error {
 	if err := v.validator.Struct(i); err != nil {
-		return errors.New("validate failed")
+		if ve, ok := err.(validator.ValidationErrors); ok {
+			var errMsgs []string
+			for _, fieldErr := range ve {
+				errMsgs = append(errMsgs, fmt.Sprintf("%s failed on '%s'", fieldErr.Field(), fieldErr.Tag()))
+			}
+			return errors.New(strings.Join(errMsgs, ", "))
+		}
+		return errors.New("validation failed with unknown error")
 	}
 	return nil
 }
@@ -94,5 +104,9 @@ type TemplateRenderer struct {
 }
 
 func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates.ExecuteTemplate(w, name, data)
+	err := t.templates.ExecuteTemplate(w, name, data)
+	if err != nil {
+		slog.Error("template error", err)
+	}
+	return err
 }

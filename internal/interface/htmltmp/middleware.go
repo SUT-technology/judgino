@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/SUT-technology/judgino/internal/domain/model"
@@ -11,6 +12,7 @@ import (
 	"github.com/SUT-technology/judgino/internal/interface/htmltmp/serde"
 	"github.com/SUT-technology/judgino/pkg/reqid"
 	"github.com/SUT-technology/judgino/pkg/slogger"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/time/rate"
@@ -26,13 +28,30 @@ func newMiddlewares(cfg config.Server) *middlewares {
 
 func (m *middlewares) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		// Get token from cookies
+		cookie, err := c.Cookie("token")
+		if err != nil {
+			return c.Render(http.StatusBadRequest, "login.html", nil)
+		}
 
-		c.Set("userId", int64(1))
-		c.Set("isAdmin", true)
+		// Parse JWT
+		tokenStr := strings.TrimSpace(cookie.Value)
+		claims := &model.JWTClaims{}
+		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
+			return []byte(m.cfg.SecretKey), nil
+		})
+		if err != nil || !token.Valid {
+			return c.Render(http.StatusBadRequest, "login.html", nil)
+		}
+
+		// Store claims in context
+
+		c.Set("user_id", claims.UserID)
+		c.Set("is_admin", claims.IsAdmin)
+
 		return next(c)
 	}
 }
-
 func (m *middlewares) CurrentUserMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 

@@ -1,17 +1,17 @@
 package profhndlr
 
 import (
+	"fmt"
 	"html/template"
-	"net/http"
 	"log/slog"
+	"net/http"
 	"strconv"
 
-
 	"github.com/SUT-technology/judgino/internal/domain/dto"
-	"github.com/SUT-technology/judgino/internal/domain/service"
-	"github.com/SUT-technology/judgino/pkg/slogger"
-	"github.com/SUT-technology/judgino/internal/interface/htmltmp/serde"
 	"github.com/SUT-technology/judgino/internal/domain/model"
+	"github.com/SUT-technology/judgino/internal/domain/service"
+	"github.com/SUT-technology/judgino/internal/interface/htmltmp/serde"
+	"github.com/SUT-technology/judgino/pkg/slogger"
 	"github.com/labstack/echo/v4"
 )
 
@@ -27,13 +27,10 @@ func New(g *echo.Group, srvc service.Service) ProfileHndlr {
 	g.GET("/:id", handler.HandleProfile)
 	g.POST("/change-role", handler.HandleChangeRole)
 
-
-
 	return handler
 }
 
-
-func (h ProfileHndlr) HandleChangeRole(c echo.Context) error{
+func (h ProfileHndlr) HandleChangeRole(c echo.Context) error {
 
 	ctx := c.Request().Context()
 
@@ -54,26 +51,22 @@ func (h ProfileHndlr) HandleChangeRole(c echo.Context) error{
 	return serde.Response(c, http.StatusOK, model.OKMessage, resp)
 }
 
-
-func (h ProfileHndlr) HandleProfile(c echo.Context)error {
+func (h ProfileHndlr) HandleProfile(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	id := c.Param("id")
-	userID64 , _ := strconv.ParseUint(id,10,64)
-	userId:=int64(userID64)
+	slog.Info(fmt.Sprintf("test user id: %v", c.Get("user_id")))
 
-	
+	id := c.Param("id")
+	userID64, _ := strconv.ParseUint(id, 10, 64)
+	userId := int64(userID64)
+
 	var currentUserId int64
 	currentUser := serde.GetCurrentUser(c)
-	if currentUser == nil {
-		//example:  GET user id from path
-		currentUserId = 1 // TEST
-	} else {
-		currentUserId = currentUser.UserId
-	}
+	currentUserId = currentUser.UserId
+
 	slogger.Debug(ctx, "received request", slog.Any("request", userId))
 
-	resp,err:=h.Services.PrflSrvc.GetProfileById(ctx,currentUserId,userId)
+	resp, err := h.Services.PrflSrvc.GetProfileById(ctx, currentUserId, userId)
 	if err != nil {
 		slogger.Debug(ctx, "profile", slogger.Err("error", err))
 		return c.Render(http.StatusBadRequest, "test.html", dto.ProfileRespone{Error: model.InternalMessage})
@@ -86,6 +79,6 @@ func (h ProfileHndlr) HandleProfile(c echo.Context)error {
 		"equi": func(a, b uint) bool {
 			return a == b
 		},
-	}).ParseFiles("D:/GOprojects/practice/judgino/templates/profile.html"))
+	}).ParseFiles("profile.html"))
 	return c.Render(http.StatusOK, tmpl.Name(), resp)
 }
