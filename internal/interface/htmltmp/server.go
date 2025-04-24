@@ -30,6 +30,7 @@ func NewServer(srvc service.Service, cfg config.Server) *Server {
 	e.HideBanner = true
 	e.HidePort = true
 	e.Validator = &Validator{validator: validator.New()}
+	e.Static("/static", "static")
 
 	closer := func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

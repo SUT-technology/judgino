@@ -14,7 +14,7 @@ type QuestionSummeryRequest struct {
 	PageAction    string `json:"page" query:"page"`
 }
 type QuestionSummery struct {
-	Title       string `json:"title"`
+	Title string `json:"title"`
 	PublishDate string `json:"publish_date"`
 	Deadline    string `json:"deadline"`
 }
