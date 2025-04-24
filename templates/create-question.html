@@ -62,32 +62,52 @@
     <div class="lg:w-10/12 p-3 mr-auto mt-6">
         <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
             <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
-                <div
-                    class="inp-con">
+                <div class="inp-con">
+                    {{if .title}}
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-red-700" placeholder="عنوان" py-3/>
+                    {{else}}
                     <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="عنوان" py-3/>
+                    {{end}}
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
                 <br>
+                {{if .Body}}
+                <div 
+                    id="textEditor"
+                    contenteditable="true"
+                    spellcheck="false"
+                    class="mt-6 w-full min-h-[200px] p-4 bg-gray-800 rounded-lg border border-red-700 whitespace-pre-wrap overflow-y-auto focus:outline-none"
+                >متن سوال را وارد کنید:</div>
+                {{else}}
                 <div 
                     id="textEditor"
                     contenteditable="true"
                     spellcheck="false"
                     class="mt-6 w-full min-h-[200px] p-4 bg-gray-800 rounded-lg border border-gray-700 whitespace-pre-wrap overflow-y-auto focus:outline-none"
                 >متن سوال را وارد کنید:</div>
+                {{end}}
                 <br>
                 <br>
                 <div class="flex w-full">
                 <div
                     class="inp-con">
+                    {{if .MemoryLimit}}
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-red-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
+                    {{else}}
                     <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
+                    {{end}}
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
                 <div class="divider divider-horizontal"></div>
                 <div
                     class="inp-con">
+                    {{if .MemoryLimit}}
                     <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
+                    {{else}}
+                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
+                    {{end}}
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
@@ -137,6 +157,62 @@
         
         </section>
     </div>
+    <script>
+        document.querySelector('button').addEventListener('click', async () => {
+            const title = document.querySelector('input[placeholder="عنوان"]').value;
+            const body = document.getElementById('textEditor').innerText.trim();
+            const timeLimit = parseInt(document.querySelector('input[placeholder="محدودیت زمانی (ثانیه)"]').value);
+            const memoryLimit = parseInt(document.querySelector('input[placeholder="محدودیت حافظه (مگابایت)"]').value);
+            const inputURL = document.querySelector('input[placeholder="ورودی:"]').value;
+            const outputURL = document.querySelector('input[placeholder="خروجی:"]').value;
+        
+            const days = parseInt(document.getElementById('daysSlider').value);
+            const hours = parseInt(document.getElementById('hoursSlider').value);
+            const minutes = parseInt(document.getElementById('minutesSlider').value);
+        
+            // Construct deadline from now + sliders
+            const now = new Date();
+            const deadline = new Date(now);
+            deadline.setDate(now.getDate() + days);
+            deadline.setHours(now.getHours() + hours);
+            deadline.setMinutes(now.getMinutes() + minutes);
+        
+            const data = {
+                UserID: 1, // replace with actual user ID
+                Status: "draft", // or "published", etc.
+                Title: title,
+                Body: body,
+                TimeLimit: timeLimit,
+                MemoryLimit: memoryLimit,
+                InputURL: inputURL,
+                Deadline: deadline.toISOString(),
+                OutputURL: outputURL
+            };
+        
+            try {
+                const response = await fetch("http://localhost:8000/create", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+        
+                if (response.ok) {
+                    const result = await response.json();
+                    alert("سوال با موفقیت ثبت شد!");
+                    console.log(result);
+                } else {
+                    alert("خطا در ارسال سوال");
+                    console.error(await response.text());
+                }
+            } catch (error) {
+                console.error("Network error:", error);
+                alert("خطای شبکه!");
+            }
+        });
+        </script>
+        
     <script src="/static/js/slider.js"></script>
     <script src="/static/js/forms.js"></script>
     <script src="/static/js/main.js"></script>

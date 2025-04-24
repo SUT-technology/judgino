@@ -47,6 +47,13 @@ func (c questionsTable) GetQuestionsCount(ctx context.Context, searchFilter stri
 	return int(count), nil
 }
 
+
+func (c questionsTable) CreateQuestion(ctx context.Context,question *entity.Question)error {
+	if  err:=c.db.Create(&question).Error; err!=nil {
+		return err
+	}
+	return nil
+}
 func (c questionsTable) PublishQuestion(ctx context.Context, questionId uint) error {
 	if err := c.db.Model(&entity.Question{}).Where("id = ?", questionId).Update("status", "published").Error; err != nil {
 		return err
@@ -55,3 +62,4 @@ func (c questionsTable) PublishQuestion(ctx context.Context, questionId uint) er
 	return nil
 
 }
+

@@ -23,14 +23,34 @@ func New(g *echo.Group, srvc service.Service, m echo.MiddlewareFunc) QuestionsHn
 
 	g.GET("/", handler.ShowQuestions)
 	g.GET("", handler.ShowQuestions)
+	g.POST("/create",handler.createQuestions)
 	g.GET("/:question_id", handler.ShowQuestion)
-
 	g.POST("/published/:question_id", handler.PublishQuestion, m)
 
-	// g.POST("/", handler.ShowQuestionsByFilter)
-	// g.POST("", handler.ShowQuestionsByFilter)
-
 	return handler
+}
+
+
+func (q *QuestionsHndlr) createQuestions(c echo.Context) error {
+
+	userId := serde.GetCurrentUser(c).UserId
+	
+	ctx := c.Request().Context()
+
+	req, err := serde.BindRequestBody[dto.CreateQuestionRequest](c)
+	if err != nil {
+		slogger.Debug(ctx, "bad request", slogger.Err("error", err))
+		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
+	}
+
+
+	resp, err := q.Services.QuestionsSrvc.CreateQuestion(ctx, req,userId)
+	if err != nil {
+		slogger.Debug(ctx, "create_question", slogger.Err("error", err))
+		// TODO: handle error
+		return c.Render(http.StatusBadRequest, "create-question", resp)
+	}
+	return c.Redirect(http.StatusSeeOther, "/questions")	
 }
 
 func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
@@ -39,7 +59,7 @@ func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	req, err := serde.BindRequestBody[dto.QuestionRequest](c)
+	req, err := serde.BindRequestBody[dto.QuestionSummeryRequest](c)
 	if err != nil {
 		slogger.Debug(ctx, "bad request", slogger.Err("error", err))
 		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
@@ -49,7 +69,7 @@ func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 	if err != nil {
 		slogger.Debug(ctx, "showQuestions", slogger.Err("error", err))
 		// TODO: handle error
-		return c.Render(http.StatusBadRequest, "questions.html", dto.QuestionsResponse{Error: err})
+		return c.Render(http.StatusBadRequest, "questions.html", dto.QuestionsSummeryResponse{Error: err})
 	}
 
 	return c.Render(http.StatusOK, "questions.html", resp)
