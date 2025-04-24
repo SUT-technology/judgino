@@ -44,6 +44,7 @@ type CreateQuestionResponse struct {
 	Error bool
 	Status model.UserMessage
 	questionId int64
+	UserID  int64
 	Title   bool
 	Body bool
 	TimeLimit bool

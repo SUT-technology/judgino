@@ -99,10 +99,7 @@ func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto
 	if err != nil {
 		fmt.Errorf("%v",err.Error())
 	}
-	return dto.CreateQuestionResponse{Status: model.UserMessage("question created successfully")},nil
-
-	
-		
+	return dto.CreateQuestionResponse{Status: model.UserMessage("question created successfully"),UserID: currentUserId},nil
 }
 
 func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionSummeryRequest, userId uint) (dto.QuestionsSummeryResponse, error) {
@@ -152,7 +149,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 	// Create the data to pass to the template
 	questionsData := make([]dto.QuestionSummery, len(questions))
 	for i, question := range questions {
-		questionsData[i] = dto.Question{
+		questionsData[i] = dto.QuestionSummery{
 			Title:         question.Title,
 			PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
 			Deadline:    question.Deadline.Format("2006-01-02 15:04:05"),

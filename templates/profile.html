@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پروفایل</title>
-    <link rel="stylesheet" href="static/css/lib/daisyui.min.css">
-    <script src="static/js/lib/tailwind.min.js"></script>
-    <script src="static/js/config.js"></script>
-    <link rel='stylesheet' href='static/css/lib/uicons-regular-rounded.css'>
-    <link rel='stylesheet' href='static/css/lib/uicons-solid-rounded.css'>
-    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="/static/css/lib/daisyui.min.css">
+    <script src="/static/js/lib/tailwind.min.js"></script>
+    <script src="/static/js/config.js"></script>
+    <link rel='stylesheet' href='/static/css/lib/uicons-regular-rounded.css'>
+    <link rel='stylesheet' href='/static/css/lib/uicons-solid-rounded.css'>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body>
@@ -45,14 +45,14 @@
             </li>
             {{if eq .CurrentUserId .UserId}}
             <li class="mb-3 bg-gray-38 rounded-lg">
-                <a">
+                <a>
                     <i class="fi fi-rr-user"></i>
                     پروفایل
                 </a>
             </li>
             {{end}}
             <li class="mb-3">
-                <a">
+                <a>
                     <i class="fi fi-rr-user-pen"></i>
                     ویرایش پروفایل
                 </a>
@@ -80,9 +80,9 @@
                     <span class="text-gray-200">{{.Email}}</span>
                 </div>
                 {{if .IsCurrentUserAdmin}}
-                <fieldset class="fieldset">
-                    <span class="text-gray-400 font-medium">نقش:</span>
-                    <select class="select" id="role-select">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400 font-medium mr-2">نقش:</span>
+                    <select class="select text-left" dir="ltr" id="role-select">
                       <option selected>{{.Role}}</option>
                       {{if eq .Role "admin"}}
                       <option>user</option>
@@ -90,7 +90,7 @@
                       <option>admin</option>
                       {{end}}
                     </select>
-                </fieldset>
+                  </div>
                 {{else}}
                 <div class="flex justify-between">
                     <span class="text-gray-400 font-medium">نقش:</span>
@@ -159,7 +159,6 @@
         });
     });
   </script>
-<!-- <script src="/static/js/bridge.js"></script> -->
 <script src="/static/js/main.js"></script>
 </body>
 </html>

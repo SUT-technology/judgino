@@ -14,15 +14,15 @@ func register(e *echo.Echo, srvc service.Service, m *middlewares) {
 	// Create groups with middleware
 	// swaggerGroup := NewGroup("/swagger", middlewares.loggingMiddleware, mux
 
-	prof := e.Group("/profile", m.JWTMiddleware)
+	prof := e.Group("/profile")
 	profhndlr.New(prof, srvc)
 
 	auth := e.Group("/auth")
 	// Todo change middleware
-	questions := e.Group("/questions", m.JWTMiddleware)
+	questions := e.Group("/questions")
 	submissions := e.Group("/submissions", m.JWTMiddleware)
 
 	authhdnlr.New(auth, srvc)
-	questionshndlr.New(questions, srvc, m.JWTMiddleware)
+	questionshndlr.New(questions, srvc)
 	submissionshndlr.New(submissions, srvc)
 }

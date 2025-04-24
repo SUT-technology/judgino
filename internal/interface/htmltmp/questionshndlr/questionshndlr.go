@@ -16,22 +16,35 @@ type QuestionsHndlr struct {
 	Services service.Service
 }
 
-func New(g *echo.Group, srvc service.Service, m echo.MiddlewareFunc) QuestionsHndlr {
+func New(g *echo.Group, srvc service.Service) QuestionsHndlr {
 	handler := QuestionsHndlr{
 		Services: srvc,
 	}
 
 	g.GET("/", handler.ShowQuestions)
 	g.GET("", handler.ShowQuestions)
-	g.POST("/create",handler.createQuestions)
+	g.POST("/draft",handler.draftQuestion)
+	g.GET("/create",handler.createQuestion)
 	g.GET("/:question_id", handler.ShowQuestion)
-	g.POST("/published/:question_id", handler.PublishQuestion, m)
+	// g.POST("/published/:question_id", handler.PublishQuestion, m)
 
 	return handler
 }
 
+type data struct {
+	UserId int64
+}
 
-func (q *QuestionsHndlr) createQuestions(c echo.Context) error {
+func (q *QuestionsHndlr) createQuestion(c echo.Context) error {
+    slogger.Debug(c.Request().Context(), "Creating a new question...")
+    // UserId := serde.GetCurrentUser(c).UserId
+	UserId := int64(1)
+    return c.Render(http.StatusOK, "create-question.html", dto.CreateQuestionResponse{UserID: UserId})
+}
+
+
+
+func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 
 	userId := serde.GetCurrentUser(c).UserId
 	
@@ -48,7 +61,7 @@ func (q *QuestionsHndlr) createQuestions(c echo.Context) error {
 	if err != nil {
 		slogger.Debug(ctx, "create_question", slogger.Err("error", err))
 		// TODO: handle error
-		return c.Render(http.StatusBadRequest, "create-question", resp)
+		return c.Render(http.StatusBadRequest, "create-question.html", resp)
 	}
 	return c.Redirect(http.StatusSeeOther, "/questions")	
 }
