@@ -152,7 +152,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 	// Create the data to pass to the template
 	questionsData := make([]dto.QuestionSummery, len(questions))
 	for i, question := range questions {
-		questionsData[i] = dto.Question{
+		questionsData[i] = dto.QuestionSummery{
 			Title:         question.Title,
 			PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
 			Deadline:    question.Deadline.Format("2006-01-02 15:04:05"),
@@ -176,7 +176,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 	return resp, nil
 }
 
-func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (*entity.Question, error) {
+func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.QuestionSummery, error) {
 	var (
 		question *entity.Question
 		err      error
@@ -192,9 +192,15 @@ func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (*entit
 
 	err = c.db.Query(ctx, queryFuncFindQuestion)
 	if err != nil {
-		return nil, err
+		return dto.QuestionSummery{}, err
 	}
-	return question, nil
+	questionSum := dto.QuestionSummery{
+		Title: question.Title,
+		PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
+		Deadline: question.Deadline.Format("2006-01-02 15:04:05"),
+	}
+
+	return questionSum, nil
 }
 
 func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.QuestionSummeryRequest, userId uint) (int, error) {
