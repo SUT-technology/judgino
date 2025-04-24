@@ -43,11 +43,11 @@ func (q *QuestionsHndlr) createQuestions(c echo.Context) error {
 
 	resp, err := q.Services.QuestionsSrvc.CreateQuestion(ctx, req,userId)
 	if err != nil {
-		slogger.Debug(ctx, "showQuestions", slogger.Err("error", err))
+		slogger.Debug(ctx, "create_question", slogger.Err("error", err))
 		// TODO: handle error
 		return c.Render(http.StatusBadRequest, "create-question", resp)
 	}
-	
+	return c.Redirect(http.StatusSeeOther, "/questions")	
 }
 
 

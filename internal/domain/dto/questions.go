@@ -42,10 +42,11 @@ type CreateQuestionRequest struct {
 type CreateQuestionResponse struct {
 	Error bool
 	Status model.UserMessage
-	Title   model.UserMessage
-	Body model.UserMessage
-	TimeLimit model.UserMessage
-	MemoryLimit model.UserMessage
-	InputURL model.UserMessage
-	OutputURL model.UserMessage
+	questionId int64
+	Title   bool
+	Body bool
+	TimeLimit bool
+	MemoryLimit bool
+	InputURL bool
+	OutputURL bool
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SUT-technology/judgino/internal/domain/dto"
 	"github.com/SUT-technology/judgino/internal/domain/entity"
 	"gorm.io/gorm"
 )
@@ -48,9 +47,8 @@ func (c questionsTable) GetQuestionsCount(ctx context.Context, searchFilter stri
 	return int(count), nil
 }
 
-func (c questionsTable) CreateQuestion(ctx context.Context,CreateQuestionDto dto.CreateQuestionRequest) error {
-
-	if  err:=c.db.Create(&CreateQuestionDto).Error; err!=nil {
+func (c questionsTable) CreateQuestion(ctx context.Context,question *entity.Question)error {
+	if  err:=c.db.Create(&question).Error; err!=nil {
 		return err
 	}
 	return nil

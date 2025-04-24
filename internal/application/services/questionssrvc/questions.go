@@ -3,6 +3,7 @@ package questionssrvc
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
 	"github.com/SUT-technology/judgino/internal/domain/entity"
@@ -22,35 +23,39 @@ func NewQuestionsSrvc(db repository.Pool) QuestionsSrvc {
 
 func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto.CreateQuestionRequest, currentUserId int64) (dto.CreateQuestionResponse,error) {
 	
-	var response dto.CreateQuestionResponse 
+	var (
+		response dto.CreateQuestionResponse
+		question *entity.Question
+		err error
+	) 
 
 	if createQuestionDto.Title == "" {
-		response.Title = model.UserMessage("title not found")
+		response.Title = true
 		response.Error = true
 	}
 
 	if createQuestionDto.Body == "" {
-		response.Body = model.UserMessage("body not found")
+		response.Body = true
 		response.Error = true
 	}
 
 	if createQuestionDto.TimeLimit == 0 {
-		response.Body = model.UserMessage("time limit not found")
+		response.Body = true
 		response.Error = true
 	}
 
 	if createQuestionDto.MemoryLimit == 0 {
-		response.Body = model.UserMessage("memory limit not found")
+		response.Body = true
 		response.Error = true
 	}
 
 	if createQuestionDto.InputURL == "" {
-		response.Body = model.UserMessage("input not found")
+		response.Body = true
 		response.Error = true
 	}
 
 	if createQuestionDto.OutputURL == "" {
-		response.Body = model.UserMessage("output not found")
+		response.Body = true
 		response.Error = true
 	}
 
@@ -59,12 +64,22 @@ func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto
 		return response,nil
 	}
 
-	
-
 	createQuestionDto.UserID = currentUserId
 
+	question = &entity.Question{
+		UserID: uint(createQuestionDto.UserID),
+		Status: "draft",
+		Title: createQuestionDto.Title,
+		Body: createQuestionDto.Body,
+		TimeLimit: createQuestionDto.TimeLimit,
+		MemoryLimit: createQuestionDto.MemoryLimit,
+		InputURL: createQuestionDto.InputURL,
+		OutputURL: createQuestionDto.OutputURL,
+		Deadline: time.Now().Add(time.Duration(createQuestionDto.Deadline.Day())).Add(time.Duration(createQuestionDto.Deadline.Hour())).Add(time.Duration(createQuestionDto.Deadline.Hour())),
+	}
+
 	queryFuncCreateQuestion := func(r *repository.Repo) error {
-		err:=r.Tables.Questions.CreateQuestion(ctx,createQuestionDto)
+		err=r.Tables.Questions.CreateQuestion(ctx,question)
 		if err != nil {
 			return err
 		}
@@ -80,7 +95,7 @@ func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto
 		return nil
 	}
 
-	err := c.db.Query(ctx,queryFuncCreateQuestion)
+	err = c.db.Query(ctx,queryFuncCreateQuestion)
 	if err != nil {
 		fmt.Errorf("%v",err.Error())
 	}
