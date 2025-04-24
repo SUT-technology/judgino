@@ -78,7 +78,6 @@ func (c PrflSrvc) GetProfileById(ctx context.Context,currentUserId int64, userId
 func (c PrflSrvc) ChangeRole(ctx context.Context, ChangeRoleRequest dto.ChangeRoleRequest) (*dto.ChangeRoleResponse, error) {
 
 	var (
-		// user *entity.User
 		err  error
 	)
 

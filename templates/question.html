@@ -45,13 +45,13 @@
                 </li>
                 </li>
                 <li class="mb-3">
-                    <a">
+                    <a href="#">
                         <i class="fi fi-rr-user"></i>
                         پروفایل
                     </a>
                 </li>
                 <li class="mb-3">
-                    <a">
+                    <a href="#">
                         <i class="fi fi-rr-user-pen"></i>
                         ویرایش پروفایل
                     </a>
@@ -64,27 +64,28 @@
         <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
             <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
                 <!-- <div class="bg-gray-20 bg-opacity-45 backdrop-blur-2xl p-3 mx-auto w-4/5 mt-10 h-[90vh] rounded-3xl shadow-lg"> -->
-                <h1 class="text-4xl text-center font-fedra mb-5">نام سوال</h1>
+                <h1 class="text-4xl text-center font-fedra mb-5">{{.Title}}</h1>
 
                 <!-- Question Details -->
                 <div class="mb-4">
                     <p><strong>تاریخ ارسال:</strong> امروز<span id="senderDate"></span></p>
                 </div>
                 <div class="flex justify-between">
-                    <p><strong>محدودیت زمان:</strong><span id="timeLimit"> ۴ ثانیه</span></p>
-                    <p><strong>محدودیت حافظه:</strong><span id="memoryLimit"> ۲ مگابایت</span></p>
-                    <p><strong>مهلت ارسال:</strong><span id="deadline"> فردا</span></p>
+                    <p><strong>محدودیت زمان:</strong><span id="timeLimit"> {{.TimeLimit}} ثانیه</span></p>
+                    <p><strong>محدودیت حافظه:</strong><span id="memoryLimit"> {{.MemoryLimit}}</span></p>
+                    <p><strong>مهلت ارسال:</strong><span id="deadline" data-time="{{.Deadline}}" class="dir-ltr"> 
+                        <span id="second"></span>:
+                        <span id="minute"></span>:
+                        <span id="hour"></span>:
+                        <span id="day"></span>
+                    </span></p>
                 </div>
 
                 <!-- Horizontal line before the question body -->
                 <hr class="my-4">
 
                 <div id="questionBody">
-                    <!--
-                    question will be here
-                    -->
-                    tst
-                    tst
+                    {{.Body}}
                 </div>
 
                 <!-- Horizontal line after the question body -->
@@ -94,7 +95,7 @@
                 <!-- File Upload for Answer Submission -->
                 <div class="mb-4">
                     <label for="answer" class="block text-sm font-medium text-gray-400">پاسخ خود را ارسال کنید:</label>
-                    <input type="file" id="answer" class="p-1 w-1/3 rounded-md border">
+                    <input type="file" id="answer" class="p-1 w-1/3 rounded-md border" name="answer">
                 </div>
 
                 <!-- Submit Button -->
@@ -112,40 +113,13 @@
     </div>
 
 
-    <script>
-        // Fetch question details from the backend API
-        fetch('YOUR_BACKEND_API_URL/questions')
-            .then(response => response.json())
-            .then(data => {
-                const question = data[0]; // Assuming we are working with a single question, adjust as needed
-
-                // Populate the form with the question details
-                document.getElementById('senderDate').textContent = new Date(question.sender_date).toLocaleDateString();
-                document.getElementById('publishDate').textContent = new Date(question.publish_date).toLocaleDateString();
-                document.getElementById('questionBody').innerHTML = question.body;
-                document.getElementById('timeLimit').textContent = question.time_limit + ' minutes';
-                document.getElementById('memoryLimit').textContent = question.memory_limit + ' MB';
-                document.getElementById('deadline').textContent = new Date(question.deadline).toLocaleDateString();
-            })
-            .catch(error => console.error('Error fetching question details:', error));
-
-        // Add event listeners for button actions (Submit Answer and View Submissions)
-        document.getElementById('submitAnswer').addEventListener('click', () => {
-            const answerFile = document.getElementById('answer').files[0];
-            if (answerFile) {
-                console.log('Answer File Submitted:', answerFile);
-                // Call API to submit the answer file
-            } else {
-                console.log('No file selected');
-            }
-        });
-
-        document.getElementById('viewSubmissions').addEventListener('click', () => {
-            // Redirect or open modal to view submissions
-            console.log('View Submissions clicked');
-        });
-    </script>
     <script src="/static/js/main.js"></script>
+
+    <script>
+        var countDownDate = new Date(document.getElementById("deadline").dataset.time);
+    </script>
+
+    <script src="/static/js/countdown.js"></script>
 
 </body>
 

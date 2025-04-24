@@ -33,7 +33,7 @@ func Run() error {
 
 	slog.Debug("initial db")
 
-	srvc := services.New(db)
+	srvc := services.New(db , c)
 
 	httpSrv := htmltmp.NewServer(srvc, c.Server)
 	defer func() {

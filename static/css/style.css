@@ -134,3 +134,7 @@ body {
 .table-con tr:nth-child(odd):hover{
   background-color: rgba(35, 33, 47, 0.957);
 } 
+
+.dir-ltr{
+  direction: ltr;
+}
