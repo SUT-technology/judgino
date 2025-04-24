@@ -2,7 +2,6 @@ package dto
 
 
 import (
-	"time"
 
 	"github.com/SUT-technology/judgino/internal/domain/model"
 )
@@ -36,22 +35,23 @@ type CreateQuestionRequest struct {
 	TimeLimit int64 `json:"TimeLimit"`
 	MemoryLimit int64 `json:"MemoryLimit"`
 	InputURL  string `json:"InputURL"`
-	Deadline  time.Time `json:"Deadline"`
+	Deadline  string `json:"Deadline"`
 	OutputURL string `json:"OutputURL"`
 }
 
 type CreateQuestionResponse struct {
-	Error bool
-	Status model.UserMessage
-	questionId int64
-	UserID  int64
-	Title   bool
-	Body bool
-	TimeLimit bool
-	MemoryLimit bool
-	InputURL bool
-	OutputURL bool
+	Error        bool
+	Status       model.UserMessage
+	QuestionID   int64
+	UserID       int64
+	Title        bool
+	Body         bool
+	TimeLimit    bool
+	MemoryLimit  bool
+	InputURL     bool
+	OutputURL    bool
 }
+
 
 type PublishResponse struct {
 	Msg string

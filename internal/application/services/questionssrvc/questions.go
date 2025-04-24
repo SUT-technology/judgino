@@ -21,86 +21,84 @@ func NewQuestionsSrvc(db repository.Pool) QuestionsSrvc {
 	}
 }
 
-func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto.CreateQuestionRequest, currentUserId int64) (dto.CreateQuestionResponse,error) {
-	
+func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto.CreateQuestionRequest, currentUserId int64) (dto.CreateQuestionResponse, error) {
 	var (
 		response dto.CreateQuestionResponse
 		question *entity.Question
-		err error
-	) 
+		err      error
+	)
 
 	if createQuestionDto.Title == "" {
 		response.Title = true
 		response.Error = true
 	}
-
 	if createQuestionDto.Body == "" {
 		response.Body = true
 		response.Error = true
 	}
-
 	if createQuestionDto.TimeLimit == 0 {
-		response.Body = true
+		response.TimeLimit = true
 		response.Error = true
 	}
-
 	if createQuestionDto.MemoryLimit == 0 {
-		response.Body = true
+		response.MemoryLimit = true
 		response.Error = true
 	}
-
 	if createQuestionDto.InputURL == "" {
-		response.Body = true
+		response.InputURL = true
 		response.Error = true
 	}
-
 	if createQuestionDto.OutputURL == "" {
-		response.Body = true
+		response.OutputURL = true
 		response.Error = true
 	}
 
 	if response.Error {
-		response.Status = "error creating question"
-		return response,nil
+		response.Status = model.UserMessage("error creating question")
+		return response, nil
 	}
 
-	createQuestionDto.UserID = currentUserId
+	time,_ := time.Parse("2025/23/03 12:12",createQuestionDto.Deadline)
 
+	createQuestionDto.UserID = currentUserId
 	question = &entity.Question{
-		UserID: uint(createQuestionDto.UserID),
-		Status: "draft",
-		Title: createQuestionDto.Title,
-		Body: createQuestionDto.Body,
-		TimeLimit: createQuestionDto.TimeLimit,
+		UserID:      uint(createQuestionDto.UserID),
+		Status:      "draft",
+		Title:       createQuestionDto.Title,
+		Body:        createQuestionDto.Body,
+		TimeLimit:   createQuestionDto.TimeLimit,
 		MemoryLimit: createQuestionDto.MemoryLimit,
-		InputURL: createQuestionDto.InputURL,
-		OutputURL: createQuestionDto.OutputURL,
-		Deadline: time.Now().Add(time.Duration(createQuestionDto.Deadline.Day())).Add(time.Duration(createQuestionDto.Deadline.Hour())).Add(time.Duration(createQuestionDto.Deadline.Hour())),
+		InputURL:    createQuestionDto.InputURL,
+		OutputURL:   createQuestionDto.OutputURL,
+		Deadline:    time,
 	}
 
 	queryFuncCreateQuestion := func(r *repository.Repo) error {
-		err=r.Tables.Questions.CreateQuestion(ctx,question)
+		err = r.Tables.Questions.CreateQuestion(ctx, question)
 		if err != nil {
 			return err
 		}
-		user,err:=r.Tables.Users.GetUserById(ctx,currentUserId)
+		user, err := r.Tables.Users.GetUserById(ctx, currentUserId)
 		if err != nil {
 			return err
 		}
-		count:= user.CreatedQuestionsCount+1
-		err=r.Tables.Users.FindAndUpdateUser(ctx,currentUserId,entity.User{CreatedQuestionsCount: count})
-		if err != nil {
-			return err
-		}
-		return nil
+		count := user.CreatedQuestionsCount + 1
+		err = r.Tables.Users.FindAndUpdateUser(ctx, currentUserId, entity.User{CreatedQuestionsCount: count})
+		return err
 	}
 
-	err = c.db.Query(ctx,queryFuncCreateQuestion)
+	err = c.db.Query(ctx, queryFuncCreateQuestion)
 	if err != nil {
-		fmt.Errorf("%v",err.Error())
+		return dto.CreateQuestionResponse{}, err
 	}
-	return dto.CreateQuestionResponse{Status: model.UserMessage("question created successfully"),UserID: currentUserId},nil
+
+	return dto.CreateQuestionResponse{
+		Status:     model.UserMessage("question created successfully"),
+		UserID:     currentUserId,
+		QuestionID: int64(question.ID),
+	}, nil
 }
+
 
 func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionSummeryRequest, userId uint) (dto.QuestionsSummeryResponse, error) {
 	var (

@@ -1,6 +1,7 @@
 package questionshndlr
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -39,15 +40,16 @@ func (q *QuestionsHndlr) createQuestion(c echo.Context) error {
     slogger.Debug(c.Request().Context(), "Creating a new question...")
     // UserId := serde.GetCurrentUser(c).UserId
 	UserId := int64(1)
-    return c.Render(http.StatusOK, "create-question.html", dto.CreateQuestionResponse{UserID: UserId})
+	data:=dto.CreateQuestionResponse{UserID: UserId}
+	fmt.Println(data.Title)
+    return c.Render(http.StatusOK, "create-question.html", data)
 }
 
 
 
 func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
-
-	userId := serde.GetCurrentUser(c).UserId
-	
+	// userId := serde.GetCurrentUser(c).UserId
+	userId := int64(1)
 	ctx := c.Request().Context()
 
 	req, err := serde.BindRequestBody[dto.CreateQuestionRequest](c)
@@ -56,15 +58,21 @@ func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
 	}
 
-
-	resp, err := q.Services.QuestionsSrvc.CreateQuestion(ctx, req,userId)
+	resp, err := q.Services.QuestionsSrvc.CreateQuestion(ctx, req, userId)
 	if err != nil {
-		slogger.Debug(ctx, "create_question", slogger.Err("error", err))
-		// TODO: handle error
+		slogger.Debug(ctx, "create_question_service_error", slogger.Err("error", err))
+		return c.Render(http.StatusInternalServerError, "create-question.html", resp)
+	}
+
+	fmt.Println(resp)
+
+	if resp.Error {
 		return c.Render(http.StatusBadRequest, "create-question.html", resp)
 	}
-	return c.Redirect(http.StatusSeeOther, "/questions")	
+
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/questions/%d", resp.QuestionID))
 }
+
 
 func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 

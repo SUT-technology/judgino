@@ -62,8 +62,8 @@
     <div class="lg:w-10/12 p-3 mr-auto mt-6">
         <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
             <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
-                <div class="inp-con">
-                    {{if .title}}
+                <div class="inp-con" id="title">
+                    {{if .Title}}
                     <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-red-700" placeholder="عنوان" py-3/>
                     {{else}}
                     <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="عنوان" py-3/>
@@ -91,8 +91,8 @@
                 <br>
                 <div class="flex w-full">
                 <div
-                    class="inp-con">
-                    {{if .MemoryLimit}}
+                    class="inp-con" id="timeLimit">
+                    {{if .TimeLimit}}
                     <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-red-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
                     {{else}}
                     <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
@@ -102,7 +102,7 @@
                 </div>
                 <div class="divider divider-horizontal"></div>
                 <div
-                    class="inp-con">
+                    class="inp-con" id="memoryLimit">
                     {{if .MemoryLimit}}
                     <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
                     {{else}}
@@ -115,15 +115,14 @@
                 <br>
                 <br>
                 <div class="flex w-full">
-                    <div
-                    class="inp-con">
+                    <div class="inp-con" id="input">
                     <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="ورودی:" py-3/>
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
                     <div class="divider divider-horizontal"></div>
                     <div
-                    class="inp-con">
+                    class="inp-con" id="output">
                     <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="خروجی:" py-3/>
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
@@ -149,7 +148,7 @@
                   </div>
                   <div>
                     <button 
-      class="mt-6 px-6 py-2 bg-gray-800 hover:bg-gray-900 text-white text-lg rounded-lg transition duration-200">
+      class="mt-6 px-6 py-2 bg-gray-800 hover:bg-gray-900 text-white text-lg rounded-lg transition duration-200" id="button">
       طرح سوال
     </button>
                 </div>
@@ -158,13 +157,13 @@
         </section>
     </div>
     <script>
-        document.querySelector('button').addEventListener('click', async () => {
-            const title = document.querySelector('input[placeholder="عنوان"]').value;
+        document.getElementById("button").addEventListener('click', async () => {
+            const title = document.getElementById('title').value;
             const body = document.getElementById('textEditor').innerText.trim();
-            const timeLimit = parseInt(document.querySelector('input[placeholder="محدودیت زمانی (ثانیه)"]').value);
-            const memoryLimit = parseInt(document.querySelector('input[placeholder="محدودیت حافظه (مگابایت)"]').value);
-            const inputURL = document.querySelector('input[placeholder="ورودی:"]').value;
-            const outputURL = document.querySelector('input[placeholder="خروجی:"]').value;
+            const timeLimit = parseInt(document.getElementById('timeLimit').value);
+            const memoryLimit = parseInt(document.getElementById('memoryLimit').value);
+            const inputURL = document.getElementById('input').value;
+            const outputURL = document.getElementById('output').value;
         
             const days = parseInt(document.getElementById('daysSlider').value);
             const hours = parseInt(document.getElementById('hoursSlider').value);
@@ -188,24 +187,20 @@
                 Deadline: deadline.toISOString(),
                 OutputURL: outputURL
             };
-        
             try {
-                const response = await fetch("http://localhost:8000/create", {
+                fetch(`/questions/draft`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify(data)
-                });
-        
-                if (response.ok) {
-                    const result = await response.json();
+                }).then(response => {
+                    if (response.ok) {
                     alert("سوال با موفقیت ثبت شد!");
-                    console.log(result);
                 } else {
                     alert("خطا در ارسال سوال");
-                    console.error(await response.text());
                 }
+            })  
             } catch (error) {
                 console.error("Network error:", error);
                 alert("خطای شبکه!");
