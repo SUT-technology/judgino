@@ -92,16 +92,18 @@
                 <hr class="my-4">
             
 
-                <!-- File Upload for Answer Submission -->
-                <div class="mb-4">
-                    <label for="answer" class="block text-sm font-medium text-gray-400">پاسخ خود را ارسال کنید:</label>
-                    <input type="file" id="answer" class="p-1 w-1/3 rounded-md border" name="answer">
-                </div>
+                <form action="/submissions/{{.QuestionId}}/submit" method="post" enctype="multipart/form-data"> 
+                    <!-- File Upload for Answer Submission -->
+                    <div class="mb-4">
+                        <label for="answer" class="block text-sm font-medium text-gray-400">پاسخ خود را ارسال کنید:</label>
+                        <input type="file" id="answer" class="p-1 w-1/3 rounded-md border" name="answer">
+                    </div>
 
-                <!-- Submit Button -->
-                <div class="mb-4">
-                    <button id="submitAnswer" class="p-2 w-1/3 bg-blue-500 text-white rounded-md">ارسال پاسخ</button>
-                </div>
+                    <!-- Submit Button -->
+                    <div class="mb-4">
+                        <button id="submitAnswer" class="p-2 w-1/3 bg-blue-500 text-white rounded-md">ارسال پاسخ</button>
+                    </div>
+                </form>
 
                 <!-- View Submissions Button -->
                 <div class="mb-4">

@@ -17,3 +17,5 @@ db:
 logger:
   level: debug
 env: dev
+code-runner:
+  api-key: test-api-key
