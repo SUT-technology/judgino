@@ -52,6 +52,7 @@ func RunGoCode(code string, input string, expectedOutput string, timeLimit int, 
 	FROM golang:1.23
 	WORKDIR /app
 	COPY . .
+	RUN go mod init code_runner
 	RUN go mod tidy
 	EXPOSE 8080
 	CMD ["go", "run", "main.go"]
@@ -69,6 +70,7 @@ func RunGoCode(code string, input string, expectedOutput string, timeLimit int, 
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
+		fmt.Println()
 		return "Compile error"
 	}
 	fmt.Println("Docker image built")
@@ -111,6 +113,23 @@ func RunGoCode(code string, input string, expectedOutput string, timeLimit int, 
 		cmd.Run()
 		return "Time limit exceeded"
 	}
+	// select {
+    // case err := <-done:
+    //     if err != nil {
+    //         fmt.Printf("Error running Docker container: %v\n", err)
+    //         fmt.Printf("Container stderr: %s\n", runErr.String())
+    //         return "Runtime error"
+    //     }
+    //     fmt.Printf("Container stdout: %s\n", runOut.String())
+    //     fmt.Printf("Container stderr: %s\n", runErr.String())
+    //     if strings.TrimSpace(runOut.String()) == expectedOutput {
+    //         return "OK"
+    //     }
+    //     return "Wrong output"
+    // case <-timer.C:
+    //     exec.Command("docker", "kill", "go_code_container").Run()
+    //     return "Time limit exceeded"
+    // }
 }
 
 // SendResultToServer sends the result of the code execution to the main server
@@ -202,10 +221,11 @@ func PollForCode() {
 
 func main() {
 	// Start the polling loop
-	// PollForCode()
-	fmt.Println(RunGoCode(`package main
-	import "fmt"
-	func main() {
-		fmt.Println("Hello, World!")
-		}`, "", "Hello, World!", 2, 128))
+	PollForCode()
+	// fmt.Println(RunGoCode(`package main
+	// import "fmt"
+	// func main() {
+	// 	time.Sleep(20 * time.Second)
+	// 	fmt.Println("Hello, World!")
+	// 	}`, "", "Hello, World!", 2, 128))
 }

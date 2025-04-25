@@ -200,8 +200,19 @@ func (c SubmissionService) SendSubmissions(ctx context.Context) (dto.SubmissionR
 	}
 	var submissionData = make([]dto.SubmissionRun, len(submissions))
 	for i, submission := range submissions {
-		input, _ := ioutil.ReadFile(submission.Question.InputURL)
-		output, _ := ioutil.ReadFile(submission.Question.OutputURL)
+		var qt *entity.Question
+		err = c.db.Query(ctx, func(r *repository.Repo) error {
+			qt, err = r.Tables.Questions.GetQuestionById(ctx, submission.QuestionID)
+			if err != nil {
+				return fmt.Errorf("failed to get question by id: %w", err)
+			}
+			return nil
+		})
+		if err != nil {
+			return dto.SubmissionRunResp{}, err
+		}
+		input, _ := ioutil.ReadFile(qt.InputURL)
+		output, _ := ioutil.ReadFile(qt.OutputURL)
 		code, _ := ioutil.ReadFile(submission.SubmitURL)
 		inputString := string(input)
 		outputString := string(output)
@@ -211,8 +222,8 @@ func (c SubmissionService) SendSubmissions(ctx context.Context) (dto.SubmissionR
 			Code: codeString,
 			Input: inputString,
 			ExpectedOutput: outputString,
-			TimeLimit: int(submission.Question.TimeLimit),
-			MemoryLimit: int(submission.Question.MemoryLimit),
+			TimeLimit: int(qt.TimeLimit),
+			MemoryLimit: int(qt.MemoryLimit),
 		}
 	}
 	return dto.SubmissionRunResp{

@@ -72,5 +72,11 @@ func (c submissionsTable) GetUnjudgedSubmissions (ctx context.Context) ([]*entit
 	var submissions []*entity.Submission
 	query := c.db.Where("status = ?", 1)
 	query.Find(&submissions)
+	for _, submission := range submissions {
+		submission.Status = 2
+		if err := c.db.Save(&submission).Error; err != nil {
+			return nil, err
+		}
+	}
 	return submissions, nil
 }

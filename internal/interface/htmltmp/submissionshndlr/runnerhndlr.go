@@ -1,6 +1,7 @@
 package submissionshndlr
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
@@ -33,9 +34,11 @@ func (q *RunnerHndlr) SendSubmissions(c echo.Context) error {
 		slogger.Debug(ctx, "showSubmissions", slogger.Err("error", err))
 		return c.Redirect(http.StatusFound, c.Request().Referer())
 	}
+	fmt.Printf("SendSubmissions resp: %+v", resp)
 
 	return c.JSON(http.StatusOK, resp)
 }
+
 
 func (q *RunnerHndlr) SubmitResultHandler(c echo.Context) error {
 	var result dto.SubmissionResult

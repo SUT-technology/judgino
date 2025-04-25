@@ -12,5 +12,5 @@ type SubmissionRepository interface {
 	GetSubmissionsCount(ctx context.Context, userId uint, questionId uint, submissionFilter string, finalFilter bool) (int, error)
 	CreateSubmission(ctx context.Context,  submission entity.Submission) error
 	UpdateSubmission(ctx context.Context, submission *entity.Submission) error
-	GetUnjudgedSubmissions (ctx context.Context) ([]*entity.Submission, error)
+	GetUnjudgedSubmissions(ctx context.Context) ([]*entity.Submission, error)
 }
