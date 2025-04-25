@@ -12,6 +12,53 @@ import (
 	"time"
 )
 
+func RunGoCode(code string, input string, expectedOutput string, timeLimit int, memoryLimit int) string {
+    // Create a temporary directory for the Go code
+    tempDir, err := ioutil.TempDir("", "go_code")
+    if err != nil {
+        return "Compile error"
+    }
+    defer os.RemoveAll(tempDir)
+
+    // Write the provided Go code into a temporary Go file
+    tempFile := tempDir + "/main.go"
+    err = os.WriteFile(tempFile, []byte(code), 0644)
+    if err != nil {
+        return "Compile error"
+    }
+
+    // Run the Go code using the `go run` command
+    cmd := exec.Command("go", "run", tempFile)
+    cmd.Stdin = strings.NewReader(input) // Pass the input to stdin
+
+    // Capture the output and error
+    var out, stderr bytes.Buffer
+    cmd.Stdout = &out
+    cmd.Stderr = &stderr
+
+    // Set a timeout for the execution
+    timer := time.NewTimer(time.Duration(timeLimit) * time.Second)
+
+    // Run the Go code
+    done := make(chan error)
+    go func() {
+        done <- cmd.Run()
+    }()
+
+    select {
+    case <-done:
+        // Check if the output matches the expected output
+        if out.String() == expectedOutput {
+            return "OK"
+        } else {
+            return "Wrong output"
+        }
+    case <-timer.C:
+        // Timeout, kill the process if time exceeds
+        cmd.Process.Kill()
+        return "Time limit exceeded"
+    }
+}
 type SubmissionRun struct {
 	ID 		   uint   `json:"id"`
 	Code           string `json:"code"`
@@ -28,108 +75,6 @@ type SubmissionRunResp struct {
 type SubmissionResult struct {
 	ID 		   uint   `json:"id"`
 	Status         int `json:"status"`
-}
-
-// RunGoCode runs the provided Go code and checks the output against the expected result
-func RunGoCode(code string, input string, expectedOutput string, timeLimit int, memoryLimit int) string {
-	// Create a temporary directory for the Go code
-	tempDir, err := ioutil.TempDir("", "go_code")
-	if err != nil {
-		return "Compile error"
-	}
-	defer os.RemoveAll(tempDir)
-
-	// Write the provided Go code into a temporary Go file
-	tempFile := tempDir + "/main.go"
-	err = os.WriteFile(tempFile, []byte(code), 0644)
-	if err != nil {
-		return "Compile error"
-	}
-
-	// Create a Dockerfile in the temporary directory to run the Go code
-	dockerfile := tempDir + "/Dockerfile"
-	dockerfileContent := fmt.Sprintf(`
-	FROM golang:1.23
-	WORKDIR /app
-	COPY . .
-	RUN go mod init code_runner
-	RUN go mod tidy
-	EXPOSE 8080
-	CMD ["go", "run", "main.go"]
-	`)
-	err = os.WriteFile(dockerfile, []byte(dockerfileContent), 0644)
-	if err != nil {
-		return "Compile error"
-	}
-	fmt.Println("Dockerfile created")
-
-	// Build the Docker image
-	cmd := exec.Command("docker", "build", "-t", "go_code_runner", tempDir)
-	var out, stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
-	err = cmd.Run()
-	if err != nil {
-		fmt.Println()
-		return "Compile error"
-	}
-	fmt.Println("Docker image built")
-
-	// Run the Docker container with the provided memory and time limits
-	runCmd := exec.Command(
-		"docker", "run", 
-		"--memory", fmt.Sprintf("%d", memoryLimit), // Set the memory limit
-		"--rm", 
-		"-i", 
-		"--name", "go_code_container", 
-		"go_code_runner", 
-		"--", "main.go",
-	)
-	runCmd.Stdin = strings.NewReader(input)
-	var runOut, runErr bytes.Buffer
-	runCmd.Stdout = &runOut
-	runCmd.Stderr = &runErr
-
-	// Set a timeout for the execution
-	timer := time.NewTimer(time.Duration(timeLimit) * time.Second)
-
-	// Run the Go code inside the container
-	done := make(chan error)
-	go func() {
-		done <- runCmd.Run()
-	}()
-
-	select {
-	case <-done:
-		// Check if the output matches the expected output
-		if runOut.String() == expectedOutput {
-			return "OK"
-		} else {
-			return "Wrong output"
-		}
-	case <-timer.C:
-		// Kill the container if time exceeds
-		cmd := exec.Command("docker", "kill", "go_code_container")
-		cmd.Run()
-		return "Time limit exceeded"
-	}
-	// select {
-    // case err := <-done:
-    //     if err != nil {
-    //         fmt.Printf("Error running Docker container: %v\n", err)
-    //         fmt.Printf("Container stderr: %s\n", runErr.String())
-    //         return "Runtime error"
-    //     }
-    //     fmt.Printf("Container stdout: %s\n", runOut.String())
-    //     fmt.Printf("Container stderr: %s\n", runErr.String())
-    //     if strings.TrimSpace(runOut.String()) == expectedOutput {
-    //         return "OK"
-    //     }
-    //     return "Wrong output"
-    // case <-timer.C:
-    //     exec.Command("docker", "kill", "go_code_container").Run()
-    //     return "Time limit exceeded"
-    // }
 }
 
 // SendResultToServer sends the result of the code execution to the main server
@@ -187,8 +132,8 @@ func PollForCode() {
 			fmt.Printf("Time Limit: %d\n", codeRequest.TimeLimit)
 			go func(codeRequest SubmissionRun) {
 				// Run the code with the provided input and expected output
-				// result := RunGoCode(codeRequest.Code, codeRequest.Input, codeRequest.ExpectedOutput, codeRequest.TimeLimit, codeRequest.MemoryLimit)
-				result := "OK"
+				result := RunGoCode(codeRequest.Code, codeRequest.Input, codeRequest.ExpectedOutput, codeRequest.TimeLimit, (codeRequest.MemoryLimit))
+				// result := "OK"
 				var status int
 				switch result {
 				case "OK":
@@ -221,11 +166,11 @@ func PollForCode() {
 
 func main() {
 	// Start the polling loop
-	PollForCode()
-	// fmt.Println(RunGoCode(`package main
-	// import "fmt"
-	// func main() {
-	// 	time.Sleep(20 * time.Second)
-	// 	fmt.Println("Hello, World!")
-	// 	}`, "", "Hello, World!", 2, 128))
+	// PollForCode()
+	fmt.Println(RunGoCode(`package main
+	import "fmt"
+	func main() {
+		time.Sleep(20 * time.Second)
+		fmt.Println(2)
+		}`, "", "2", 2, 128))
 }
