@@ -22,7 +22,10 @@ func register(e *echo.Echo, srvc service.Service, m *middlewares) {
 	questions := e.Group("/questions", m.JWTMiddleware)
 	submissions := e.Group("/submissions", m.JWTMiddleware)
 
+	runner := e.Group("/runner")
+
 	authhdnlr.New(auth, srvc)
 	questionshndlr.New(questions, srvc, m.JWTMiddleware)
 	submissionshndlr.New(submissions, srvc)
+	submissionshndlr.NewRunner(runner, srvc)
 }

@@ -15,9 +15,13 @@ type QuestionSummeryRequest struct{
 	PageAction    string `json:"page" query:"page"`
 }
 type QuestionSummery struct {
+	QuestionId int64 `json:"question_id"`
 	Title string `json:"title"`
 	PublishDate string `json:"publish_date"`
 	Deadline    string `json:"deadline"`
+	TimeLimit  int64 `json:"time_limit"`
+	MemoryLimit int64 `json:"memory_limit"`
+	Body string `json:"body"`
 }
 type QuestionsSummeryResponse struct {
 	Questions      []QuestionSummery `json:"Questions"`
