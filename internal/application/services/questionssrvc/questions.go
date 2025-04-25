@@ -153,9 +153,13 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 	questionsData := make([]dto.QuestionSummery, len(questions))
 	for i, question := range questions {
 		questionsData[i] = dto.QuestionSummery{
+			QuestionId:  int64(question.ID),
 			Title:         question.Title,
 			PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
 			Deadline:    question.Deadline.Format("2006-01-02 15:04:05"),
+			TimeLimit:  question.TimeLimit,
+			MemoryLimit: question.MemoryLimit,
+			Body: question.Body,
 		}
 
 	}
@@ -195,9 +199,13 @@ func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (dto.Qu
 		return dto.QuestionSummery{}, err
 	}
 	questionSum := dto.QuestionSummery{
+		QuestionId: int64(question.ID),
 		Title: question.Title,
 		PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
 		Deadline: question.Deadline.Format("2006-01-02 15:04:05"),
+		TimeLimit: question.TimeLimit,
+		MemoryLimit: question.MemoryLimit,
+		Body: question.Body,
 	}
 
 	return questionSum, nil
