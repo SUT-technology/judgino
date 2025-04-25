@@ -53,6 +53,7 @@ func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	req, err := serde.BindRequestBody[dto.CreateQuestionRequest](c)
+	// fmt.Printf("request: %v",req)
 	if err != nil {
 		slogger.Debug(ctx, "bad request", slogger.Err("error", err))
 		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
@@ -64,7 +65,7 @@ func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 		return c.Render(http.StatusInternalServerError, "create-question.html", resp)
 	}
 
-	fmt.Println(resp)
+	// fmt.Printf("response: %v",resp)
 
 	if resp.Error {
 		return c.Render(http.StatusBadRequest, "create-question.html", resp)

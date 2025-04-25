@@ -62,11 +62,11 @@
     <div class="lg:w-10/12 p-3 mr-auto mt-6">
         <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
             <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
-                <div class="inp-con" id="title">
+                <div class="inp-con">
                     {{if .Title}}
-                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-red-700" placeholder="عنوان" py-3/>
+                    <input type="text" id="title" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-red-700" placeholder="عنوان" py-3/>
                     {{else}}
-                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="عنوان" py-3/>
+                    <input type="text" id="title"data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="عنوان" py-3/>
                     {{end}}
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
@@ -91,22 +91,22 @@
                 <br>
                 <div class="flex w-full">
                 <div
-                    class="inp-con" id="timeLimit">
+                    class="inp-con">
                     {{if .TimeLimit}}
-                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-red-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
+                    <input type="text" id="timeLimit" data-validations="required" class="text-input h-12 text-lg px-4 bg-red-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
                     {{else}}
-                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
+                    <input type="text" id="timeLimit" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
                     {{end}}
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
                 <div class="divider divider-horizontal"></div>
                 <div
-                    class="inp-con" id="memoryLimit">
+                    class="inp-con">
                     {{if .MemoryLimit}}
-                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
+                    <input type="text" id="memoryLimit" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
                     {{else}}
-                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
+                    <input type="text" id="memoryLimit" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
                     {{end}}
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
@@ -115,15 +115,15 @@
                 <br>
                 <br>
                 <div class="flex w-full">
-                    <div class="inp-con" id="input">
-                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="ورودی:" py-3/>
+                    <div class="inp-con">
+                    <input type="text" id="input" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="ورودی:" py-3/>
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
                     <div class="divider divider-horizontal"></div>
                     <div
-                    class="inp-con" id="output">
-                    <input type="text" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="خروجی:" py-3/>
+                    class="inp-con">
+                    <input type="text" id="output" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="خروجی:" py-3/>
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
@@ -132,7 +132,7 @@
             <br>
             <br>  
             <div class="bg-gray-800 m-4 p-4 rounded-lg space-y-4">
-                    <label for="daysSlider" class="block mb-2 text-lg">📅 روز: <span id="daysValue">0</span></label>
+                    <label for="daysSlider" class="block mb-2 text-lg">📅 روز: <span id="daysValue">1</span></label>
                     <input id="daysSlider" type="range" min="1" max="365" value="0"
                       class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
                   </div>
@@ -187,8 +187,10 @@
                 Deadline: deadline.toISOString(),
                 OutputURL: outputURL
             };
+
+            console.log(data)
             try {
-                fetch(`/questions/draft`, {
+                fetch("/questions/draft", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"

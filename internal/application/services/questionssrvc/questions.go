@@ -36,7 +36,7 @@ func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto
 		response.Body = true
 		response.Error = true
 	}
-	if createQuestionDto.TimeLimit == 0 {
+	if createQuestionDto.TimeLimit == 0{
 		response.TimeLimit = true
 		response.Error = true
 	}
@@ -57,8 +57,10 @@ func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto
 		response.Status = model.UserMessage("error creating question")
 		return response, nil
 	}
-
-	time,_ := time.Parse("2025/23/03 12:12",createQuestionDto.Deadline)
+	time,err := time.Parse("2006-01-02T15:04:05.000Z",createQuestionDto.Deadline)
+	if err!= nil {
+		fmt.Errorf(err.Error())
+	}
 
 	createQuestionDto.UserID = currentUserId
 	question = &entity.Question{
