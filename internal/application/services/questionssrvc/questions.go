@@ -105,6 +105,7 @@ func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto
 func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.QuestionSummeryRequest, userId uint) (dto.QuestionsSummeryResponse, error) {
 	var (
 		questions []*entity.Question
+		currentUser *entity.User
 		err       error
 	)
 
@@ -139,6 +140,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 		if err != nil {
 			return fmt.Errorf("failed to get questions: %w", err)
 		}
+		currentUser, err = r.Tables.Users.GetUserById(ctx,int64(userId))
 		return nil
 	}
 
@@ -149,10 +151,36 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 	// Create the data to pass to the template
 	questionsData := make([]dto.QuestionSummery, len(questions))
 	for i, question := range questions {
+		
 		questionsData[i] = dto.QuestionSummery{
 			Title:         question.Title,
 			PublishDate: question.PublishDate.Format("2006-01-02 15:04:05"),
 			Deadline:    question.Deadline.Format("2006-01-02 15:04:05"),
+			QuestionId: int64(question.ID),
+			Status: question.Status,
+			IsCurrentUserAdmin: currentUser.IsAdmin(),
+		}
+		
+		if currentUser.IsAdmin() {
+			
+			var publisher *entity.User
+			
+			findPublisherQueryfunc:= func(r *repository.Repo) error {
+				publisher,err = r.Users.GetUserById(ctx,int64(question.UserID))
+				if err!= nil {
+					fmt.Errorf("failed to find the publisher: %w",err)
+				}
+				return nil
+			}
+
+			err = c.db.Query(ctx, findPublisherQueryfunc)
+			if err != nil {
+				return dto.QuestionsSummeryResponse{Error: err}, err
+			}
+
+			questionsData[i].Publisher = publisher.Username
+			questionsData[i].PublisherId = int64(publisher.ID)
+
 		}
 
 	}
@@ -166,6 +194,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 		SearchFilter: questionsDto.SearchFilter,
 		QuestionFilter: questionsDto.QuestionValue,
 		SortFilter:     questionsDto.SortValue,
+		IsCurrentUserAdmin: currentUser.IsAdmin(),
 		Error:          nil,
 	}
 	fmt.Println(resp.CurrentPage)

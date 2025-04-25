@@ -197,9 +197,8 @@
                     },
                     body: JSON.stringify(data)
                 }).then(response => {
-                    if (response.ok) {
-                    alert("سوال با موفقیت ثبت شد!");
-                } else {
+                    if (response.status!=303) {
+                
                     alert("خطا در ارسال سوال");
                 }
             })  

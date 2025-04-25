@@ -65,19 +65,21 @@ func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 		return c.Render(http.StatusInternalServerError, "create-question.html", resp)
 	}
 
-	// fmt.Printf("response: %v",resp)
 
 	if resp.Error {
 		return c.Render(http.StatusBadRequest, "create-question.html", resp)
 	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/questions/%d", resp.QuestionID))
+	fmt.Printf("question id: %v",resp.QuestionID)
+
+	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/questions/%v", resp.QuestionID))
 }
 
 
 func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 
-	userId := serde.GetCurrentUser(c).UserId
+	// userId := serde.GetCurrentUser(c).UserId
+	userId := 1
 
 	ctx := c.Request().Context()
 

@@ -88,16 +88,36 @@
                             <thead>
                                 <tr>
                                     <th class="2">عنوان</th>
+                                    {{if .IsCurrentUserAdmin}}
+                                    <th class="2">طراح</th>
+                                    {{end}}
                                     <th class="2">تاریخ انتشار</th>
                                     <th class="2">مهلت</th>
+                                    {{if .IsCurrentUserAdmin}}
+                                    <th class="2">وضعیت</th>
+                                    {{end}}
                                 </tr>
                             </thead>
                             <tbody id="questions-list">
                                 {{range .Questions}}
                                     <tr>
                                         <td class="2"><a href="/questions/{{.QuestionId}}">{{.Title}}</a></td>
+                                        {{if .IsCurrentUserAdmin}}
+                                        <td class="2"><a href="/profile/{{.PublisherId}}">{{.Publisher}}</a></td>
+                                        {{end}}
+                                        {{if eq .Status "published"}}
                                         <td class="2">{{.PublishDate}}</td>
+                                        {{else}}
+                                        <td class="2">-</td>
+                                        {{end}}
                                         <td class="2">{{.Deadline}}</td>
+                                        {{if .IsCurrentUserAdmin}}
+                                        {{if eq .Status "published"}}
+                                        <td class="2">{{.Status}}</td>
+                                        {{else}}
+                                        <td class="2"><a href="/questions/published/{{.QuestionId}}">{{.Status}}</td>
+                                        {{end}}
+                                        {{end}}
                                     </tr>
                                 {{end}}
                             </tbody>
