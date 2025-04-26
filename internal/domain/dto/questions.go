@@ -1,6 +1,5 @@
 package dto
 
-
 import (
 
 	"github.com/SUT-technology/judgino/internal/domain/model"
@@ -25,6 +24,7 @@ type QuestionSummery struct {
 }
 type QuestionsSummeryResponse struct {
 	Questions      []QuestionSummery `json:"Questions"`
+	CurrentUserId int64
 	TotalPages     int        		 `json:"TotalPages"`
 	CurrentPage    int        		 `json:"CurrentPage"`
 	SearchFilter   string     		 `json:"SearchFilter"`
@@ -57,6 +57,7 @@ type CreateQuestionResponse struct {
 	InputURL     bool
 	OutputURL    bool
 }
+
 
 
 type PublishResponse struct {

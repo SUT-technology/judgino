@@ -57,7 +57,6 @@ func (c usersTable) GetUserByUsername(ctx context.Context, username string) (*en
 
 	return &user, nil
 }
-
 func (c usersTable) CreateUser(ctx context.Context, user entity.User) error {
 	if err := c.db.Create(&user).Error; err != nil {
 

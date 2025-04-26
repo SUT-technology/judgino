@@ -2,7 +2,7 @@ package profhndlr
 
 import (
 	"fmt"
-	// "html/template"
+	"html/template"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -60,8 +60,9 @@ func (h ProfileHndlr) HandleProfile(c echo.Context) error {
 	userID64, _ := strconv.ParseUint(id, 10, 64)
 	userId := int64(userID64)
 
-	// currentUserId := serde.GetCurrentUser(c).UserId
-	currentUserId := int64(1)
+	var currentUserId int64
+	currentUser := serde.GetCurrentUser(c)
+	currentUserId = currentUser.UserId
 
 	slogger.Debug(ctx, "received request", slog.Any("request", userId))
 
@@ -70,5 +71,14 @@ func (h ProfileHndlr) HandleProfile(c echo.Context) error {
 		slogger.Debug(ctx, "profile", slogger.Err("error", err))
 		return c.Render(http.StatusBadRequest, "test.html", dto.ProfileRespone{Error: model.InternalMessage})
 	}
-	return c.Render(http.StatusOK, "profile.html", resp)
+
+	tmpl := template.Must(template.New("profile.html").Funcs(template.FuncMap{
+		"eqs": func(a, b string) bool {
+			return a == b
+		},
+		"equi": func(a, b uint) bool {
+			return a == b
+		},
+	}).ParseFiles("profile.html"))
+	return c.Render(http.StatusOK, tmpl.Name(), resp)
 }

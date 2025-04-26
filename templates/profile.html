@@ -25,19 +25,19 @@
         </div>
         <ul class="menu rounded-box mt-20">
             <li class="mb-3">
-                <a href="#">
+                <a href="/questions">
                     <i class="fi fi-rr-home"></i>
                     سوال ها
                 </a>
             </li>
             <li class="mb-3">
-                <a href="#">
+                <a href="/questions/create">
                     <i class="fi fi-rr-edit"></i>
                     سوال جدید
                 </a>
             </li>
             <li class="mb-3">
-                <a href="#">
+                <a href="/questions/Submissions">
                     <i class="fi fi-rr-checkbox"></i>
                     ارسال ها
                 </a>
@@ -45,18 +45,25 @@
             </li>
             {{if eq .CurrentUserId .UserId}}
             <li class="mb-3 bg-gray-38 rounded-lg">
-                <a>
+                <a">
+                    <i class="fi fi-rr-user"></i>
+                    پروفایل
+                </a>
+            </li>
+            {{else}}
+            <li class="mb-3">
+                <a href="/profile/{{.CurrentUserId}}">
                     <i class="fi fi-rr-user"></i>
                     پروفایل
                 </a>
             </li>
             {{end}}
-            <li class="mb-3">
+            <!-- <li class="mb-3">
                 <a>
                     <i class="fi fi-rr-user-pen"></i>
                     ویرایش پروفایل
                 </a>
-            </li>
+            </li> -->
         </ul>
     </nav>
 </header>
@@ -80,9 +87,9 @@
                     <span class="text-gray-200">{{.Email}}</span>
                 </div>
                 {{if .IsCurrentUserAdmin}}
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-400 font-medium mr-2">نقش:</span>
-                    <select class="select text-left" dir="ltr" id="role-select">
+                <fieldset class="fieldset">
+                    <span class="text-gray-400 font-medium">نقش:</span>
+                    <select class="select" id="role-select">
                       <option selected>{{.Role}}</option>
                       {{if eq .Role "admin"}}
                       <option>user</option>
@@ -90,7 +97,7 @@
                       <option>admin</option>
                       {{end}}
                     </select>
-                  </div>
+                </fieldset>
                 {{else}}
                 <div class="flex justify-between">
                     <span class="text-gray-400 font-medium">نقش:</span>
@@ -159,6 +166,7 @@
         });
     });
   </script>
+<!-- <script src="/static/js/bridge.js"></script> -->
 <script src="/static/js/main.js"></script>
 </body>
 </html>

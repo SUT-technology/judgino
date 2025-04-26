@@ -12,5 +12,5 @@ type QuestionsService interface {
 	GetQuestion(ctx context.Context, questionId uint) (*entity.Question, error)
 	QuestionsCount(ctx context.Context, questionsDto dto.QuestionSummeryRequest, userId uint) (int, error)
 	CreateQuestion(ctx context.Context, questionsDto dto.CreateQuestionRequest,currentUserId int64) (dto.CreateQuestionResponse, error)
-    PublishQuestion(ctx context.Context, questionId uint) error
+  	PublishQuestion(ctx context.Context, questionId uint) error
 }

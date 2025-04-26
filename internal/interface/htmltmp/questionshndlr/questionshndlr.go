@@ -21,20 +21,17 @@ func New(g *echo.Group, srvc service.Service) QuestionsHndlr {
 	handler := QuestionsHndlr{
 		Services: srvc,
 	}
-
 	g.GET("/", handler.ShowQuestions)
 	g.GET("", handler.ShowQuestions)
-	g.POST("/draft",handler.draftQuestion)
 	g.GET("/create",handler.createQuestion)
+	g.POST("/draft",handler.draftQuestion)
 	g.GET("/:question_id", handler.ShowQuestion)
-	// g.POST("/published/:question_id", handler.PublishQuestion, m)
+	g.GET("/published/:question_id", handler.PublishQuestion)
 
 	return handler
 }
 
-type data struct {
-	UserId int64
-}
+
 
 func (q *QuestionsHndlr) createQuestion(c echo.Context) error {
     slogger.Debug(c.Request().Context(), "Creating a new question...")
@@ -50,6 +47,7 @@ func (q *QuestionsHndlr) createQuestion(c echo.Context) error {
 func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 	// userId := serde.GetCurrentUser(c).UserId
 	userId := int64(1)
+
 	ctx := c.Request().Context()
 
 	req, err := serde.BindRequestBody[dto.CreateQuestionRequest](c)
@@ -74,7 +72,7 @@ func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 
 	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/questions/%v", resp.QuestionID))
 }
-
+ 
 
 func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 
@@ -89,6 +87,8 @@ func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
 	}
 
+    fmt.Printf("request: %+v",req)
+
 	resp, err := q.Services.QuestionsSrvc.GetQuestions(ctx, req, uint(userId))
 	if err != nil {
 		slogger.Debug(ctx, "showQuestions", slogger.Err("error", err))
@@ -96,15 +96,18 @@ func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 		return c.Render(http.StatusBadRequest, "questions.html", dto.QuestionsSummeryResponse{Error: err})
 	}
 
+	fmt.Printf("resp: %+v",resp)
+
 	return c.Render(http.StatusOK, "questions.html", resp)
 }
 
 func (q *QuestionsHndlr) PublishQuestion(c echo.Context) error {
-	userData := serde.GetCurrentUser(c)
+	// currentUser := serde.GetCurrentUser(c)
+	userId := 1
 
-	if !userData.IsAdmin {
-		return c.Redirect(http.StatusMovedPermanently, "/auth")
-	}
+	// if !currentUser.IsAdmin {
+	// 	return c.Redirect(http.StatusMovedPermanently, "/auth")
+	// }
 	ctx := c.Request().Context()
 	questionID := c.Param("question_id")
 	questionIDInt, _ := strconv.Atoi(questionID)
@@ -115,8 +118,17 @@ func (q *QuestionsHndlr) PublishQuestion(c echo.Context) error {
 		return c.Render(http.StatusBadRequest, "questions.html", dto.PublishResponse{Msg: err.Error()})
 	}
 
-	return c.Render(http.StatusOK, "questions.html", nil)
+	resp, err := q.Services.QuestionsSrvc.GetQuestions(ctx, dto.QuestionSummeryRequest{}, uint(userId))
+	if err != nil {
+		slogger.Debug(ctx, "showQuestions", slogger.Err("error", err))
+		// TODO: handle error
+		return c.Render(http.StatusBadRequest, "questions.html", dto.QuestionsSummeryResponse{Error: err})
+	}
+
+	return c.Render(http.StatusOK, "questions.html", resp)
 }
+
+
 
 func (q *QuestionsHndlr) ShowQuestion(c echo.Context) error {
 	questionID := c.Param("question_id")

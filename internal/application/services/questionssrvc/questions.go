@@ -93,7 +93,6 @@ func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto
 	if err != nil {
 		return dto.CreateQuestionResponse{}, err
 	}
-
 	return dto.CreateQuestionResponse{
 		Status:     model.UserMessage("question created successfully"),
 		UserID:     currentUserId,
@@ -195,6 +194,7 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 		QuestionFilter: questionsDto.QuestionValue,
 		SortFilter:     questionsDto.SortValue,
 		IsCurrentUserAdmin: currentUser.IsAdmin(),
+		CurrentUserId: int64(currentUser.ID),
 		Error:          nil,
 	}
 	fmt.Println(resp.CurrentPage)
@@ -248,17 +248,29 @@ func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.Ques
 
 func (c QuestionsSrvc) PublishQuestion(ctx context.Context, questionId uint) error {
 
+	var(
+		updateData =&entity.Question{Status: "published",PublishDate: time.Now()}
+		question *entity.Question
+		err error
+	)
+
+
 	queryFunc := func(r *repository.Repo) error {
-		err := r.Tables.Questions.PublishQuestion(ctx, questionId)
+		question,err = r.Tables.Questions.GetQuestionById(ctx,questionId)
 		if err != nil {
-			return fmt.Errorf("failed to get questions count: %w", err)
+			return fmt.Errorf("failed to publish question: %w", err)
+		}
+
+		err := r.Tables.Questions.PublishQuestion(ctx, question,updateData)
+		if err != nil {
+			return fmt.Errorf("failed to publish question: %w", err)
 		}
 		return nil
 	}
-	err := c.db.Query(ctx, queryFunc)
+	err = c.db.Query(ctx, queryFunc)
 	if err != nil {
 		return err
 	}
-
+	
 	return nil
 }
