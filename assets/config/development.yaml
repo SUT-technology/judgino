@@ -11,7 +11,7 @@ server:
 db:
   port: 5432
   db_name: judgino_db
-  host: localhost
+  host: postgres
   password: 12345678
   username: postgres
 logger:

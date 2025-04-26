@@ -23,18 +23,17 @@ func New(g *echo.Group, srvc service.Service, m echo.MiddlewareFunc) QuestionsHn
 
 	g.GET("/", handler.ShowQuestions)
 	g.GET("", handler.ShowQuestions)
-	g.POST("/create",handler.createQuestions)
+	g.POST("/create", handler.createQuestions)
 	g.GET("/:question_id", handler.ShowQuestion)
 	g.POST("/published/:question_id", handler.PublishQuestion, m)
 
 	return handler
 }
 
-
 func (q *QuestionsHndlr) createQuestions(c echo.Context) error {
 
 	userId := serde.GetCurrentUser(c).UserId
-	
+
 	ctx := c.Request().Context()
 
 	req, err := serde.BindRequestBody[dto.CreateQuestionRequest](c)
@@ -43,14 +42,13 @@ func (q *QuestionsHndlr) createQuestions(c echo.Context) error {
 		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
 	}
 
-
-	resp, err := q.Services.QuestionsSrvc.CreateQuestion(ctx, req,userId)
+	resp, err := q.Services.QuestionsSrvc.CreateQuestion(ctx, req, userId)
 	if err != nil {
 		slogger.Debug(ctx, "create_question", slogger.Err("error", err))
 		// TODO: handle error
 		return c.Render(http.StatusBadRequest, "create-question", resp)
 	}
-	return c.Redirect(http.StatusSeeOther, "/questions")	
+	return c.Redirect(http.StatusSeeOther, "/questions")
 }
 
 func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
