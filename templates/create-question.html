@@ -197,10 +197,11 @@
                     },
                     body: JSON.stringify(data)
                 }).then(response => {
-                    if (response.status!=303) {
-                
-                    alert("خطا در ارسال سوال");
-                }
+                    if (response.ok) {
+                        alert("سوال در حالت پیش نویس قرار گرفت");
+                    } else {
+                        alert("خطا در ارسال سوال")
+                    }
             })  
             } catch (error) {
                 console.error("Network error:", error);

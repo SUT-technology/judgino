@@ -63,14 +63,18 @@ func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 		return c.Render(http.StatusInternalServerError, "create-question.html", resp)
 	}
 
-
 	if resp.Error {
-		return c.Render(http.StatusBadRequest, "create-question.html", resp)
+		return c.Render(http.StatusOK, "create-question.html", resp)
 	}
 
-	fmt.Printf("question id: %v",resp.QuestionID)
+	resp2, err := q.Services.QuestionsSrvc.GetQuestion(ctx, uint(resp.QuestionID))
+	if err != nil {
+		slogger.Debug(ctx, "showQuestion", slogger.Err("error", err))
+		return c.Render(http.StatusBadRequest, "question.html", nil)
+	}
 
-	return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/questions/%v", resp.QuestionID))
+	return c.Render(http.StatusOK, "question.html", resp2)
+
 }
  
 
