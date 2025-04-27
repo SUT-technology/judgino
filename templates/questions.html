@@ -1,142 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صفحه اصلی</title>
-    <link rel="stylesheet" href="/static/css/lib/daisyui.min.css">
-    <script src="/static/js/lib/tailwind.min.js"></script>
-    <script src="/static/js/config.js"></script>
-    <link rel='stylesheet' href='/static/css/lib/uicons-regular-rounded.css'>
-    <link rel='stylesheet' href='/static/css/lib/uicons-solid-rounded.css'>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>صفحه اصلی</title>
+        <link rel="stylesheet" href="/static/css/lib/daisyui.min.css">
+        <script src="/static/js/lib/tailwind.min.js"></script>
+        <script src="/static/js/config.js"></script>
+        <link rel='stylesheet' href='/static/css/lib/uicons-regular-rounded.css'>
+        <link rel='stylesheet' href='/static/css/lib/uicons-solid-rounded.css'>
+        <link rel="stylesheet" href="/static/css/style.css">
+    </head>
 
-<body>
+    <body>
 
-    <header>
-        <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
-                    class="fi fi-sr-bars-staggered text-2xl"></i></button>
-        <div id="backdrop-menu" onclick="handlemenu()"
-             class="fixed top-0 right-0 bg-black bg-opacity-50 w-screen h-screen lg:hidden hidden z-10"></div>
-        <nav class="bg-gray-20 bg-opacity-45 backdrop-blur-3xl p-3 lg:w-2/12 w-1/2 h-[90vh] fixed lg:right-0 right-[-100%] top-[5%] rounded-l-2xl shadow-lg transition-all duration-300 z-20"
-             id="menu">
-            <div class="text-center font-fedra text-2xl mt-5">
-                judgino
-            </div>
-            <ul class="menu rounded-box mt-20">
-                <li class="mb-3 bg-gray-38 rounded-lg">
-                    <a>
-                        <i class="fi fi-rr-home"></i>
-                        سوال ها
-                    </a>
-                </li>
-                <li class="mb-3">
-                    <a href="/questions/create">
-                        <i class="fi fi-rr-edit"></i>
-                        سوال جدید
-                    </a>
-                </li>
-                <li class="mb-3">
-                    <a href="/questions/submissions">
-                        <i class="fi fi-rr-checkbox"></i>
-                        ارسال ها
-                    </a>
-                </li>
-                </li>
-                <li class="mb-3">
-                    <a href="/profile/{{.CurrentUserId}}">
-                        <i class="fi fi-rr-user"></i>
-                        پروفایل
-                    </a>
-                </li>
-                <!-- <li class="mb-3">
-                    <a href="#">
-                        <i class="fi fi-rr-user-pen"></i>
-                        ویرایش پروفایل
-                    </a>
-                </li> -->
-            </ul>
-        </nav>
-    </header>
-
-    <div class="lg:w-10/12 p-3 mr-auto mt-6">
-        <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
-            <form action="/questions" method="GET" id="filter">
-                <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
-            
-                    <h1 class="text-4xl text-center font-fedra mb-5">لیست سوالات</h1>
-    
-                    <div class="mb-4">
-                        <input type="text" id="SearchFilter" name="SearchFilter" placeholder="جستجوی سوالات..." class="p-2 w-full rounded-md border mb-4" value="{{.SearchFilter}}">
-                        <select id="questionFilter" name="questionFilter" class="p-2 w-1/4 rounded-md border">
-                            <option value="all" {{if eq .QuestionFilter "all"}} selected {{end}}>تمام سوالات</option>
-                            <option value="mine" {{if eq .QuestionFilter "mine"}} selected {{end}}>سوالات من</option>
-                        </select>
-                        <select id="sortFilter" name="sortFilter" class="p-2 w-1/4 rounded-md border">
-                            <option value="publish_date" {{if eq .SortFilter "publish_date"}} selected {{end}}>به ترتیب تاریخ انتشار</option>
-                            <option value="deadline" {{if eq .SortFilter "deadline"}} selected {{end}}>به ترتیب مهلت</option>
-                        </select>
-                    </div>
-                    
-                    <button type="submit" class="p-2 w-60 bg-gray-500 text-white rounded-md">ارسال</button>
-                    
-    
-                    <div class="overflow-x-auto w-3/4 mx-auto bg-base--gray rounded-xl table-con bg-opacity-75">
-                        <table class="table-auto w-full text-center border-collapse">
-                            <thead>
-                                <tr>
-                                    <th class="2">عنوان</th>
-                                    {{if .IsCurrentUserAdmin}}
-                                    <th class="2">طراح</th>
-                                    {{end}}
-                                    <th class="2">تاریخ انتشار</th>
-                                    <th class="2">مهلت</th>
-                                    {{if .IsCurrentUserAdmin}}
-                                    <th class="2">وضعیت</th>
-                                    {{end}}
-                                </tr>
-                            </thead>
-                            <tbody id="questions-list">
-                                {{range .Questions}}
-                                    <tr>
-                                        <td class="2"><a href="/questions/{{.QuestionId}}">{{.Title}}</a></td>
-                                        {{if .IsCurrentUserAdmin}}
-                                        <td class="2"><a href="/profile/{{.PublisherId}}">{{.Publisher}}</a></td>
-                                        {{end}}
-                                        {{if eq .Status "published"}}
-                                        <td class="2">{{.PublishDate}}</td>
-                                        {{else}}
-                                        <td class="2">-</td>
-                                        {{end}}
-                                        <td class="2">{{.Deadline}}</td>
-                                        {{if .IsCurrentUserAdmin}}
-                                        {{if eq .Status "published"}}
-                                        <td class="2">{{.Status}}</td>
-                                        {{else}}
-                                        <td class="2"><a href="/questions/published/{{.QuestionId}}">{{.Status}}</td>
-                                        {{end}}
-                                        {{end}}
-                                    </tr>
-                                {{end}}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="flex justify-center items-center mt-4">
-                        <input type="hidden" id="pageInfo" name="pageInfo" value="{{.CurrentPage}}">
-                        <button type="submit" name="page" value="prev" class="p-2 bg-gray-500 text-white rounded-md">قبلی</button>
-                    
-                        <span class="mx-6">صفحه {{.CurrentPage}} از {{.TotalPages}}</span>
-                    
-                        <button type="submit" name="page" value="next" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
-                    </div>
-                
+        <header>
+            <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
+                        class="fi fi-sr-bars-staggered text-2xl"></i></button>
+            <div id="backdrop-menu" onclick="handlemenu()"
+                class="fixed top-0 right-0 bg-black bg-opacity-50 w-screen h-screen lg:hidden hidden z-10"></div>
+            <nav class="bg-gray-20 bg-opacity-45 backdrop-blur-3xl p-3 lg:w-2/12 w-1/2 h-[90vh] fixed lg:right-0 right-[-100%] top-[5%] rounded-l-2xl shadow-lg transition-all duration-300 z-20"
+                id="menu">
+                <div class="text-center font-fedra text-2xl mt-5">
+                    judgino
                 </div>
-            </form>
-        </section>
-    </div>
-    <script src="/static/js/main.js"></script>
-</body>
+                <ul class="menu rounded-box mt-20">
+                    <li class="mb-3 bg-gray-38 rounded-lg">
+                        <a>
+                            <i class="fi fi-rr-home"></i>
+                            سوال ها
+                        </a>
+                    </li>
+                    <li class="mb-3">
+                        <a href="/questions/create">
+                            <i class="fi fi-rr-edit"></i>
+                            سوال جدید
+                        </a>
+                    </li>
+                    <li class="mb-3">
+                        <a href="/questions/submissions">
+                            <i class="fi fi-rr-checkbox"></i>
+                            ارسال ها
+                        </a>
+                    </li>
+                    </li>
+                    <li class="mb-3">
+                        <a href="/profile/{{.CurrentUserId}}">
+                            <i class="fi fi-rr-user"></i>
+                            پروفایل
+                        </a>
+                    </li>
+                    <!-- <li class="mb-3">
+                        <a href="#">
+                            <i class="fi fi-rr-user-pen"></i>
+                            ویرایش پروفایل
+                        </a>
+                    </li> -->
+                </ul>
+            </nav>
+        </header>
 
+        <div class="lg:w-10/12 p-3 mr-auto mt-6">
+            <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
+                <form action="/questions" method="GET" id="filter">
+                    <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
+                        <h1 class="text-4xl text-center font-fedra mb-5">لیست سوالات</h1>
+                        <div class="mb-4">
+                            <input type="text" id="SearchFilter" name="SearchFilter" placeholder="جستجوی سوالات..." class="p-2 w-full rounded-md border mb-4" value="{{.SearchFilter}}">
+                            <select id="questionFilter" name="questionFilter" class="p-2 w-1/4 rounded-md border">
+                                <option value="all" {{if eq .QuestionFilter "all"}} selected {{end}}>تمام سوالات</option>
+                                <option value="mine" {{if eq .QuestionFilter "mine"}} selected {{end}}>سوالات من</option>
+                            </select>
+                            <select id="sortFilter" name="sortFilter" class="p-2 w-1/4 rounded-md border">
+                                <option value="publish_date" {{if eq .SortFilter "publish_date"}} selected {{end}}>به ترتیب تاریخ انتشار</option>
+                                <option value="deadline" {{if eq .SortFilter "deadline"}} selected {{end}}>به ترتیب مهلت</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="p-2 w-60 bg-gray-500 text-white rounded-md">ارسال</button>
+                        <div class="overflow-x-auto w-3/4 mx-auto bg-base--gray rounded-xl table-con bg-opacity-75">
+                            <table class="table-auto w-full text-center border-collapse">
+                                {{if eq .QuestionFilter "mine"}}
+                                    <thead>
+                                        <tr>
+                                            <th class="2">عنوان</th>
+                                            <th class="2">تاریخ انتشار</th>
+                                            <th class="2">مهلت</th>
+                                            <th class="2">وضعیت</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="questions-list">
+                                        {{range .Questions}}
+                                            <tr>
+                                                <td class="2"><a href="/questions/{{.QuestionId}}">{{.Title}}</a></td>
+                                                {{if eq .Status "published"}}
+                                                    <td class="2">{{.PublishDate}}</td>
+                                                {{else}}
+                                                    <td class="2">-</td>
+                                                {{end}}
+                                                <td class="2">{{.Deadline}}</td>
+                                                {{if eq .Status "published"}}
+                                                    <td class="2">{{.Status}}</td>
+                                                {{else}}
+                                                    {{if .IsCurrentUserAdmin}}
+                                                        <td class="2"><a href="/questions/published/{{.QuestionId}}">{{.Status}}</td>
+                                                    {{else}}
+                                                        <td class="2">{{.Status}}</td>
+                                                    {{end}}
+                                                {{end}}
+                                            </tr>
+                                        {{end}}
+                                    </tbody>
+                                {{else}}
+                                    <thead>
+                                        <tr>
+                                            <th class="2">عنوان</th>
+                                            {{if .IsCurrentUserAdmin}}
+                                                <th class="2">طراح</th>
+                                            {{end}}
+                                            <th class="2">تاریخ انتشار</th>
+                                            <th class="2">مهلت</th>
+                                            {{if .IsCurrentUserAdmin}}
+                                                <th class="2">وضعیت</th>
+                                            {{end}}
+                                        </tr>
+                                    </thead>
+                                    <tbody id="questions-list">
+                                        {{range .Questions}}    
+                                            <tr>
+                                                {{if .IsCurrentUserAdmin}}
+                                                    <td class="2"><a href="/questions/{{.QuestionId}}">{{.Title}}</a></td> 
+                                                    <td class="2"><a href="/profile/{{.PublisherId}}">{{.Publisher}}</a></td>   
+                                                    {{if eq .Status "published"}}
+                                                        <td class="2">{{.PublishDate}}</td>
+                                                    {{else}}
+                                                        <td class="2">-</td>
+                                                    {{end}}
+                                                    <td class="2">{{.Deadline}}</td>
+                                                    {{if eq .Status "published"}}
+                                                        <td class="2">{{.Status}}</td>
+                                                    {{else}}
+                                                        <td class="2"><a href="/questions/published/{{.QuestionId}}">{{.Status}}</td>
+                                                    {{end}}
+                                                {{else}}
+                                                    {{if eq .Status "published"}}
+                                                        <td class="2"><a href="/questions/{{.QuestionId}}">{{.Title}}</a></td>
+                                                        <!-- <td class="2"><a href="/profile/{{.PublisherId}}">{{.Publisher}}</a></td> -->
+                                                        <td class="2">{{.PublishDate}}</td>
+                                                        <td class="2">{{.Deadline}}</td>
+                                                    {{end}}
+                                                {{end}}
+                                            </tr>
+                                        {{end}}
+                                    </tbody>
+                                {{end}}
+                            </table>
+                        </div>
+                        <div class="flex justify-center items-center mt-4">
+                            <input type="hidden" id="pageInfo" name="pageInfo" value="{{.CurrentPage}}">
+                            <button type="submit" name="page" value="prev" class="p-2 bg-gray-500 text-white rounded-md">قبلی</button>
+                            <span class="mx-6">صفحه {{.CurrentPage}} از {{.TotalPages}}</span>
+                            <button type="submit" name="page" value="next" class="p-2 bg-gray-500 text-white rounded-md">بعدی</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+        <script src="/static/js/main.js"></script>
+    </body>
 </html>
