@@ -46,7 +46,6 @@ func (c usersTable) FindAndUpdateUser(ctx context.Context,userId int64, data ent
 	if err := c.db.WithContext(ctx).Model(&user).Updates(data).Error; err != nil {
 		return err
 	}
-	c.db.First(&user, userId)
 	return nil
 }
 

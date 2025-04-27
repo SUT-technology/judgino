@@ -28,5 +28,17 @@ func register(e *echo.Echo, srvc service.Service, m *middlewares) {
 	authhdnlr.New(auth, srvc)
 	questionshndlr.New(questions, srvc, m.JWTMiddleware)
 	submissionshndlr.New(submissions, srvc)
+
+	// prof := e.Group("/profile")
+	// profhndlr.New(prof, srvc)
+
+	// auth := e.Group("/auth")
+	// // Todo change middleware
+	// questions := e.Group("/questions")
+	// submissions := e.Group("/submissions")
+
+	// authhdnlr.New(auth, srvc)
+	// questionshndlr.New(questions, srvc)
+	// submissionshndlr.New(submissions, srvc)
 	runnerhndlr.New(runner, srvc)
 }
