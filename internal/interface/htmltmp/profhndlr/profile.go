@@ -60,8 +60,8 @@ func (h ProfileHndlr) HandleProfile(c echo.Context) error {
 	userID64, _ := strconv.ParseUint(id, 10, 64)
 	userId := int64(userID64)
 
-	// currentUserId := serde.GetCurrentUser(c).UserId
-	currentUserId := int64(1)
+	currentUserId := serde.GetCurrentUser(c).UserId
+	// currentUserId := int64(1)
 
 	slogger.Debug(ctx, "received request", slog.Any("request", userId))
 

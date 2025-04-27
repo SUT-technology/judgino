@@ -202,8 +202,9 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 	return resp, nil
 }
 
-func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (*entity.Question, error) {
+func (c QuestionsSrvc) GetQuestion(ctx context.Context,currentUserId int64, questionId uint) (dto.GetQuestionResponse, error) {
 	var (
+		response dto.GetQuestionResponse
 		question *entity.Question
 		err      error
 	)
@@ -218,9 +219,12 @@ func (c QuestionsSrvc) GetQuestion(ctx context.Context, questionId uint) (*entit
 
 	err = c.db.Query(ctx, queryFuncFindQuestion)
 	if err != nil {
-		return nil, err
+		return response, err
 	}
-	return question, nil
+
+	response.Question = question
+	response.CurrentUserId = currentUserId
+	return response, nil
 }
 
 func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.QuestionSummeryRequest, userId uint) (int, error) {

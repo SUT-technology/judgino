@@ -1,7 +1,7 @@
 package dto
 
 import (
-
+	"github.com/SUT-technology/judgino/internal/domain/entity"
 	"github.com/SUT-technology/judgino/internal/domain/model"
 )
 
@@ -58,6 +58,10 @@ type CreateQuestionResponse struct {
 	OutputURL    bool
 }
 
+type GetQuestionResponse struct {
+	Question *entity.Question
+	CurrentUserId int64
+}
 
 
 type PublishResponse struct {
