@@ -7,12 +7,16 @@ import (
 )
 
 type Config struct {
-	DB     DB     `yaml:"db"`
-	Logger Logger `yaml:"logger"`
-	Env    string `yaml:"env"`
-	Server Server `yaml:"server"`
+	DB         DB         `yaml:"db"`
+	Logger     Logger     `yaml:"logger"`
+	Env        string     `yaml:"env"`
+	Server     Server     `yaml:"server"`
+	CodeRunner CodeRunner `yaml:"code-runner"`
 }
 
+type CodeRunner struct {
+	ApiKey string `yaml:"api-key"`
+}
 type RateLimiter struct {
 	Enabled bool          `yaml:"enabled"`
 	Rate    int           `yaml:"rate"`

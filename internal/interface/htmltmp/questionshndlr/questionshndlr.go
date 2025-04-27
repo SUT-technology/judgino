@@ -74,7 +74,6 @@ func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "question.html", resp2)
-
 }
  
 

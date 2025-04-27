@@ -23,11 +23,11 @@ type Server struct {
 	defers []func()
 }
 
-func NewServer(srvc service.Service, cfg config.Server) *Server {
+func NewServer(srvc service.Service, cfg config.Config) *Server {
 	var dfrs []func()
 
 	e := echo.New()
-	e.Static("/static" , "static")
+	e.Static("/static", "static")
 	e.Debug = true
 	e.HideBanner = true
 	e.HidePort = true
@@ -49,7 +49,7 @@ func NewServer(srvc service.Service, cfg config.Server) *Server {
 	var middleware []echo.MiddlewareFunc
 	m := newMiddlewares(cfg)
 
-	if cfg.Logger {
+	if cfg.Server.Logger {
 		middleware = append(middleware, m.loggerMiddleware)
 	}
 

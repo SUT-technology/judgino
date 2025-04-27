@@ -24,6 +24,19 @@ type SubmissionsResponse struct {
 	Error            error        `json:Error`
 }
 
-type SubmitRequest struct {
-	SubmitUrl string `form:"submit_url" validate="required"`
+type SubmissionRun struct {
+	ID             uint   `json:"id"`
+	Code           string `json:"code"`
+	Input          string `json:"input"`
+	ExpectedOutput string `json:"expectedOutput"`
+	TimeLimit      int    `json:"timeLimit"`
+	MemoryLimit    int    `json:"memoryLimit"`
+}
+
+type SubmissionRunResp struct {
+	Submissions []SubmissionRun `json:"submissions"`
+}
+type SubmissionResult struct {
+	ID     uint `json:"id"`
+	Status int  `json:"status"`
 }

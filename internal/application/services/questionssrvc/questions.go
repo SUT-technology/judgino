@@ -179,7 +179,6 @@ func (c QuestionsSrvc) GetQuestions(ctx context.Context, questionsDto dto.Questi
 
 			questionsData[i].Publisher = publisher.Username
 			questionsData[i].PublisherId = int64(publisher.ID)
-
 		}
 
 	}

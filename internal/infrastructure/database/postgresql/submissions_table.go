@@ -60,3 +60,23 @@ func (c submissionsTable) CreateSubmission(ctx context.Context, submission entit
 	}
 	return nil
 }
+
+func (c submissionsTable) UpdateSubmission(ctx context.Context, submission *entity.Submission) error {
+	if err := c.db.Save(&submission).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c submissionsTable) GetUnjudgedSubmissions (ctx context.Context) ([]*entity.Submission, error) {
+	var submissions []*entity.Submission
+	query := c.db.Where("status = ?", 1)
+	query.Find(&submissions)
+	for _, submission := range submissions {
+		submission.Status = 2
+		if err := c.db.Save(&submission).Error; err != nil {
+			return nil, err
+		}
+	}
+	return submissions, nil
+}

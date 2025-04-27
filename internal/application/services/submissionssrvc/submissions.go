@@ -3,6 +3,12 @@ package submissionssrvc
 import (
 	"context"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
@@ -154,14 +160,44 @@ func (c SubmissionService) SubmissionsCount(ctx context.Context, submissionDto d
 	return submissionsCount, nil
 }
 
-func (c SubmissionService) SubmitQuestion(ctx context.Context, submitDto dto.SubmitRequest, userId int64, questionId int) error {
+func (c SubmissionService) SubmitQuestion(ctx context.Context, file *multipart.FileHeader, userId int64, questionId int) error {
 
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	// Define the target directory and file path
+	targetDir := "./uploads/codes/" + strconv.Itoa(questionId)
+	err = os.MkdirAll(targetDir, os.ModePerm) // Ensure directory exists
+	if err != nil {
+		return err
+	}
+
+	ext := filepath.Ext(file.Filename)
+	name := strings.TrimSuffix(file.Filename, ext)
+
+	fileNameWithTime := name + "_" + time.Now().Format("20060102_150405") + ext
+	filePath := filepath.Join(targetDir, fileNameWithTime)
+
+	dst, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	// Copy the file content to the destination
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return err
+	}
 	submission := entity.Submission{
-		SubmitURL:  submitDto.SubmitUrl,
+		SubmitURL:  filePath,
 		IsFinal:    false,
 		QuestionID: uint(questionId),
 		UserID:     uint(userId),
-		Status:     2,
+		Status:     1,
 		SubmitTime: time.Now(),
 	}
 	queryFuncFindUser := func(r *repository.Repo) error {
@@ -171,7 +207,7 @@ func (c SubmissionService) SubmitQuestion(ctx context.Context, submitDto dto.Sub
 		}
 		return nil
 	}
-	err := c.db.Query(ctx, queryFuncFindUser)
+	err = c.db.Query(ctx, queryFuncFindUser)
 	if err != nil {
 		return err
 	}
