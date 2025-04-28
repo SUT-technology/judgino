@@ -17,32 +17,28 @@ type QuestionsHndlr struct {
 	Services service.Service
 }
 
-func New(g *echo.Group, srvc service.Service,m echo.MiddlewareFunc) QuestionsHndlr {
+func New(g *echo.Group, srvc service.Service, m echo.MiddlewareFunc) QuestionsHndlr {
 	handler := QuestionsHndlr{
 		Services: srvc,
 	}
 	g.GET("/", handler.ShowQuestions)
 	g.GET("", handler.ShowQuestions)
-	g.GET("/create",handler.createQuestion)
-	g.POST("/draft",handler.draftQuestion)
+	g.GET("/create", handler.createQuestion)
+	g.POST("/draft", handler.draftQuestion)
 	g.GET("/:question_id", handler.ShowQuestion)
-	g.GET("/published/:question_id", handler.PublishQuestion,m)
+	g.GET("/published/:question_id", handler.StateQuestion, m)
 
 	return handler
 }
 
-
-
 func (q *QuestionsHndlr) createQuestion(c echo.Context) error {
-    slogger.Debug(c.Request().Context(), "Creating a new question...")
-    currentUserId := serde.GetCurrentUser(c).UserId
+	slogger.Debug(c.Request().Context(), "Creating a new question...")
+	currentUserId := serde.GetCurrentUser(c).UserId
 	// currentUserId := int64(1)
-	data:=dto.CreateQuestionResponse{UserID: currentUserId}
+	data := dto.CreateQuestionResponse{UserID: currentUserId}
 	fmt.Println(data.Title)
-    return c.Render(http.StatusOK, "create-question.html", data)
+	return c.Render(http.StatusOK, "create-question.html", data)
 }
-
-
 
 func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 	currentUserId := serde.GetCurrentUser(c).UserId
@@ -67,7 +63,7 @@ func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 		return c.Render(http.StatusOK, "create-question.html", resp)
 	}
 
-	resp2, err := q.Services.QuestionsSrvc.GetQuestion(ctx, currentUserId,uint(resp.QuestionID))
+	resp2, err := q.Services.QuestionsSrvc.GetQuestion(ctx, currentUserId, uint(resp.QuestionID))
 	if err != nil {
 		slogger.Debug(ctx, "showQuestion", slogger.Err("error", err))
 		return c.Render(http.StatusBadRequest, "question.html", nil)
@@ -75,7 +71,6 @@ func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 
 	return c.Render(http.StatusOK, "question.html", resp2)
 }
- 
 
 func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 
@@ -90,7 +85,7 @@ func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
 	}
 
-    fmt.Printf("request: %+v",req)
+	fmt.Printf("request: %+v", req)
 
 	resp, err := q.Services.QuestionsSrvc.GetQuestions(ctx, req, uint(currentUserId))
 	if err != nil {
@@ -99,12 +94,12 @@ func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 		return c.Render(http.StatusBadRequest, "questions.html", dto.QuestionsSummeryResponse{Error: err})
 	}
 
-	fmt.Printf("resp: %+v",resp)
+	fmt.Printf("resp: %+v", resp)
 
 	return c.Render(http.StatusOK, "questions.html", resp)
 }
 
-func (q *QuestionsHndlr) PublishQuestion(c echo.Context) error {
+func (q *QuestionsHndlr) StateQuestion(c echo.Context) error {
 	currentUser := serde.GetCurrentUser(c)
 	// CurrentUserId := 1
 
@@ -115,7 +110,7 @@ func (q *QuestionsHndlr) PublishQuestion(c echo.Context) error {
 	questionID := c.Param("question_id")
 	questionIDInt, _ := strconv.Atoi(questionID)
 
-	err := q.Services.QuestionsSrvc.PublishQuestion(ctx, uint(questionIDInt))
+	err := q.Services.QuestionsSrvc.StateQuestion(ctx, uint(questionIDInt))
 	if err != nil {
 		slogger.Debug(ctx, "showQuestions", slogger.Err("error", err))
 		return c.Render(http.StatusBadRequest, "questions.html", dto.PublishResponse{Msg: err.Error()})
@@ -131,8 +126,6 @@ func (q *QuestionsHndlr) PublishQuestion(c echo.Context) error {
 	return c.Render(http.StatusOK, "questions.html", resp)
 }
 
-
-
 func (q *QuestionsHndlr) ShowQuestion(c echo.Context) error {
 
 	currentUserId := serde.GetCurrentUser(c).UserId
@@ -142,7 +135,7 @@ func (q *QuestionsHndlr) ShowQuestion(c echo.Context) error {
 	questionIDInt, _ := strconv.Atoi(questionID)
 	ctx := c.Request().Context()
 
-	resp, err := q.Services.QuestionsSrvc.GetQuestion(ctx, int64(currentUserId),uint(questionIDInt))
+	resp, err := q.Services.QuestionsSrvc.GetQuestion(ctx, int64(currentUserId), uint(questionIDInt))
 	if err != nil {
 		slogger.Debug(ctx, "showQuestion", slogger.Err("error", err))
 		// TODO: handle error
