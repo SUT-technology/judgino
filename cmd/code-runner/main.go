@@ -1,74 +1,154 @@
 package main
 
 import (
-	"bytes"
+	"context"
 	"fmt"
+	"strings"
+
 	"io/ioutil"
 	"os"
-	"os/exec"
-	"strings"
+
+	// "os/exec"
+	"path/filepath"
+	// "strings"
 	"time"
+	// "encoding/json"
+
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/network"
+	// "github.com/docker/docker/api/types/volume"
+	"github.com/docker/docker/client"
+
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	// "github.com/google/uuid"
+	// "github.com/docker/docker/api/types"
 )
 
-func RunGoCode(code string, input string, expectedOutput string, timeLimit int, memoryLimit int) string {
-    // Create a temporary directory for the Go code
-    tempDir, err := ioutil.TempDir("", "go_code")
+const (
+    StatusOK = iota
+    StatusWrongOutput
+    StatusCompileError
+    StatusRuntimeError
+    StatusTimeLimitExceeded
+    StatusMemoryLimitExceeded
+)
+func RunCodeInContainer(code, input, wantOutput string, timeLimit time.Duration, memLimitMB int) (int, error) {
+    wantOutput += "\n"
+
+    tmpDir, err := ioutil.TempDir("", "go-run-")
     if err != nil {
-        return "Compile error"
+        return StatusRuntimeError, err
     }
-    defer os.RemoveAll(tempDir)
+    defer os.RemoveAll(tmpDir)
 
-    // Write the provided Go code into a temporary Go file
-    tempFile := tempDir + "/main.go"
-    err = os.WriteFile(tempFile, []byte(code), 0644)
-    if err != nil {
-        return "Compile error"
+    srcPath := filepath.Join(tmpDir, "main.go")
+    if err := ioutil.WriteFile(srcPath, []byte(code), 0644); err != nil {
+        return StatusRuntimeError, err
     }
 
-    // Run the Go code using the `go run` command
-    cmd := exec.Command("go", "run", tempFile)
-    cmd.Stdin = strings.NewReader(input) // Pass the input to stdin
 
-    // Capture the output and error
-    var out, stderr bytes.Buffer
-    cmd.Stdout = &out
-    cmd.Stderr = &stderr
-
-    // Set a timeout for the execution
-    timer := time.NewTimer(time.Duration(timeLimit) * time.Second)
-
-    // Run the Go code
-    done := make(chan error)
-    go func() {
-        done <- cmd.Run()
+    cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		panic(err)
+	}
+    
+    resp, err := cli.ContainerCreate(context.Background(), &container.Config{
+        Image: "golang:latest",
+        WorkingDir: "/workspace",
+        Cmd: []string{"sh", "-c", "go mod init app\ngo mod tidy\ngo build main.go\ndate > start.txt\n./main > output.txt\ndate > end.txt"},
+        Tty:   true,
+        OpenStdin: true,
+        StdinOnce: true,
+        AttachStdin: true,
+        AttachStdout: true,
+        AttachStderr: true,
+    }, &container.HostConfig{
+        AutoRemove: false,
+        Binds: []string{fmt.Sprintf("%s:/workspace", tmpDir)},
+    }, &network.NetworkingConfig{}, &ocispec.Platform{}, "C1")
+    if err != nil { 
+        return StatusCompileError, err
+    }
+    defer func() {
+        if err := cli.ContainerRemove(context.Background(), resp.ID, container.RemoveOptions{
+            Force: true,
+        }); err != nil {
+            panic(err)
+        }
     }()
 
-    select {
-    case <-done:
-        // Check if the output matches the expected output
-        if out.String() == expectedOutput {
-            return "OK"
-        } else {
-            return "Wrong output"
-        }
-    case <-timer.C:
-        // Timeout, kill the process if time exceeds
-        cmd.Process.Kill()
-        return "Time limit exceeded"
+    if err := cli.ContainerStart(context.Background(), resp.ID, container.StartOptions{}); err != nil {
+        return StatusCompileError, err
     }
-}
 
 
-func PollForCode() {
+
+
+    for {
+        cn, err := cli.ContainerInspect(context.Background(), "C1")
+        if err != nil || cn.State.Status != "running" {
+
+            if cn.State.ExitCode != 0 {
+                return StatusRuntimeError, fmt.Errorf("runtime error: %s", cn.State.Error)
+            }
+            break
+        }
+        time.Sleep(50 * time.Millisecond)
+    }
+
+
+    outputPath := filepath.Join(tmpDir, "output.txt")
+    startPath := filepath.Join(tmpDir, "start.txt")
+    endPath := filepath.Join(tmpDir, "end.txt")
+    data, err := ioutil.ReadFile(outputPath)
+    if err != nil {
+        panic(err)
+    }
+    startData, err := ioutil.ReadFile(startPath)
+    if err != nil {
+        panic(err)
+    }
+    endData, err := ioutil.ReadFile(endPath)
+    if err != nil {
+        panic(err)
+    }
+    outputStr := string(data)
+
+    st := strings.Split(string(startData), " ")[3]
+    et := strings.Split(string(endData), " ")[3]
+    startTime, _ := time.Parse("15:04:05", st)
+    endTime, _ := time.Parse("15:04:05", et)
+    
+    duration := endTime.Sub(startTime)
+
+
+
+    if duration > timeLimit {
+        return StatusTimeLimitExceeded, fmt.Errorf("time limit exceeded")
+    }
+
+
+    if outputStr == wantOutput {
+        return StatusOK, nil
+    }
+    if outputStr != wantOutput {
+        return StatusWrongOutput, fmt.Errorf("wrong output: got %q, want %q", outputStr, wantOutput)
+    }
+    
+    
+
+    return StatusOK, nil
 }
 
 func main() {
 	// Start the polling loop
 	// PollForCode()
-	fmt.Println(RunGoCode(`package main
-	import "fmt"
+	fmt.Println(RunCodeInContainer(`
+    package main
+    import "fmt"
 	func main() {
-		time.Sleep(20 * time.Second)
-		fmt.Println(2)
-		}`, "", "2", 2, 128))
+        fmt.Println("fhsi")
+	}`, "", "fhsi", 2, 1))
+    
+
 }
