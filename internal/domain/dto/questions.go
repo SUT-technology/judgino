@@ -58,6 +58,33 @@ type CreateQuestionResponse struct {
 	OutputURL    bool
 }
 
+type EditQuestionResponse struct {
+	UserID  int64 	  `json:"UserID"`
+	QuestionID int64  `json:"QueationID"`
+	Status   string   `json:"Status"`
+	Title  string     `json:"Title"`
+	Body    string    `json:"Body"`
+	TimeLimit int64   `json:"TimeLimit"`
+	MemoryLimit int64 `json:"MemoryLimit"`
+	InputURL  string  `json:"InputURL"`
+	DeadlineDay  int64  `json:"DeadlineDay"`
+	DeadlineHour  int64  `json:"DeadlineHour"`
+	DeadlineMinute  int64  `json:"DeadlineMinute"`
+	OutputURL string  `json:"OutputURL"`
+}
+
+type UpdateQuestionRequest struct{
+	UserID  int64 	  `json:"UserID"`
+	Status   string   `json:"Status"`
+	Title  string     `json:"Title"`
+	Body    string    `json:"Body"`
+	TimeLimit int64   `json:"TimeLimit"`
+	MemoryLimit int64 `json:"MemoryLimit"`
+	InputURL  string  `json:"InputURL"`
+	Deadline  string  `json:"Deadline"`
+	OutputURL string  `json:"OutputURL"`
+}
+
 type GetQuestionResponse struct {
 	Question *entity.Question
 	CurrentUserId int64

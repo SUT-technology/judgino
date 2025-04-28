@@ -90,18 +90,26 @@
                 <div class="flex justify-between items-center">
                     <span class="text-gray-400 font-medium mr-2">نقش:</span>
                     <select class="select text-left" dir="ltr" id="role-select">
-                      <option selected>{{.Role}}</option>
+                    {{if eq .Role "admin"}}  
+                    <option selected>مدیر</option>
+                    {{else}}
+                    <option selected>کاربر</option>
+                    {{end}}
                       {{if eq .Role "admin"}}
-                      <option>user</option>
+                      <option>کاربر</option>
                       {{else}}
-                      <option>admin</option>
+                      <option>مدیر</option>
                       {{end}}
                     </select>
                   </div>
                 {{else}}
                 <div class="flex justify-between">
                     <span class="text-gray-400 font-medium">نقش:</span>
-                    <span class="text-gray-200">{{.Role}}</span>
+                    {{if eq .Role "admin"}}  
+                    <span class="text-gray-200">مدیر</span>
+                    {{else}}
+                    <span class="text-gray-200">کاربر</span>
+                    {{end}}
                 </div>
                 {{end}}
             </div>

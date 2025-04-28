@@ -64,17 +64,6 @@ func Run() error {
 	return nil
 }
 
-
-
-
-
-
-
-
-
-
-
-
 type Config struct {
 	DB     DB     `yaml:"db"`
 	Logger Logger `yaml:"logger"`
