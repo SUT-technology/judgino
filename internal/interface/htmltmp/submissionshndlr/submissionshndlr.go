@@ -56,13 +56,12 @@ func (q *SubmissionsHndlr) Submit(c echo.Context) error {
 
 	ctx := c.Request().Context()
 
-	req, err := serde.BindRequestBody[dto.SubmitRequest](c)
+	file, err := c.FormFile("answer")
 	if err != nil {
-		slogger.Debug(ctx, "bad request", slogger.Err("error", err))
-		return c.Redirect(http.StatusFound, c.Request().Referer())
+		return err
 	}
 
-	err = q.Services.SubmissionSrvc.SubmitQuestion(ctx, req, serde.GetCurrentUser(c).UserId, questionIDInt)
+	err = q.Services.SubmissionSrvc.SubmitQuestion(ctx, file, serde.GetCurrentUser(c).UserId, questionIDInt)
 	if err != nil {
 		slogger.Debug(ctx, "showSubmissions", slogger.Err("error", err))
 		return c.Redirect(http.StatusFound, c.Request().Referer())

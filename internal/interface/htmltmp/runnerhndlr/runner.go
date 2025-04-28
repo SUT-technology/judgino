@@ -1,4 +1,4 @@
-package submissionshndlr
+package runnerhndlr
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ type RunnerHndlr struct {
 	Services service.Service
 }
 
-func NewRunner(g *echo.Group, srvc service.Service) RunnerHndlr {
+func New(g *echo.Group, srvc service.Service) RunnerHndlr {
 	handler := RunnerHndlr{
 		Services: srvc,
 	}
@@ -25,11 +25,9 @@ func NewRunner(g *echo.Group, srvc service.Service) RunnerHndlr {
 	return handler
 }
 
-
-
 func (q *RunnerHndlr) SendSubmissions(c echo.Context) error {
 	ctx := c.Request().Context()
-	resp, err := q.Services.SubmissionSrvc.SendSubmissions(ctx)
+	resp, err := q.Services.RunnerSrvc.SendSubmissions(ctx)
 	if err != nil {
 		slogger.Debug(ctx, "showSubmissions", slogger.Err("error", err))
 		return c.Redirect(http.StatusFound, c.Request().Referer())
@@ -39,14 +37,13 @@ func (q *RunnerHndlr) SendSubmissions(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-
 func (q *RunnerHndlr) SubmitResultHandler(c echo.Context) error {
 	var result dto.SubmissionResult
 	if err := c.Bind(&result); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid result format"})
 	}
-	
-	err := q.Services.SubmissionSrvc.SubmitResult(c.Request().Context(), result)
+
+	err := q.Services.RunnerSrvc.SubmitResult(c.Request().Context(), result)
 	if err != nil {
 		slogger.Debug(c.Request().Context(), "SubmitResultHandler", slogger.Err("error", err))
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to submit result"})

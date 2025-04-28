@@ -10,5 +10,5 @@ type QuestionRepository interface {
 	GetQuestionByFilter(ctx context.Context, searchFilter string, questionFilter string, sortFilter string, pageParam int, userId uint) ([]*entity.Question, error)
 	GetQuestionsCount(ctx context.Context, searchFilter string, questionFilter string, userId uint) (int, error)
 	CreateQuestion(ctx context.Context, question *entity.Question) error
-	PublishQuestion(ctx context.Context, questionId uint) error
+	PublishQuestion(ctx context.Context, question *entity.Question,updateData *entity.Question) error
 }

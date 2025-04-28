@@ -19,10 +19,10 @@ import (
 )
 
 type middlewares struct {
-	cfg config.Server
+	cfg config.Config
 }
 
-func newMiddlewares(cfg config.Server) *middlewares {
+func newMiddlewares(cfg config.Config) *middlewares {
 	return &middlewares{cfg: cfg}
 }
 
@@ -38,7 +38,7 @@ func (m *middlewares) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		tokenStr := strings.TrimSpace(cookie.Value)
 		claims := &model.JWTClaims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte(m.cfg.SecretKey), nil
+			return []byte(m.cfg.Server.SecretKey), nil
 		})
 		if err != nil || !token.Valid {
 			return c.Render(http.StatusBadRequest, "login.html", nil)
@@ -52,6 +52,17 @@ func (m *middlewares) JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
+
+func (m *middlewares) CodeRunnerMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		key := c.Request().Header.Get("RUNNER-API-KEY")
+		if key == "" || key != m.cfg.CodeRunner.ApiKey {
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Unauthorized"})
+		}
+		return next(c)
+	}
+}
+
 func (m *middlewares) CurrentUserMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
@@ -66,9 +77,9 @@ func (m *middlewares) rateLimiterMiddleware() echo.MiddlewareFunc {
 		Skipper: middleware.DefaultSkipper,
 		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
 			middleware.RateLimiterMemoryStoreConfig{
-				Rate:      rate.Limit(m.cfg.RateLimiter.Rate),
-				Burst:     m.cfg.RateLimiter.Burst,
-				ExpiresIn: m.cfg.RateLimiter.Expires,
+				Rate:      rate.Limit(m.cfg.Server.RateLimiter.Rate),
+				Burst:     m.cfg.Server.RateLimiter.Burst,
+				ExpiresIn: m.cfg.Server.RateLimiter.Expires,
 			}),
 		IdentifierExtractor: func(c echo.Context) (string, error) {
 			return c.RealIP(), nil

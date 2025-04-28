@@ -4,6 +4,7 @@ import (
 	auth "github.com/SUT-technology/judgino/internal/application/services/authsrvc"
 	prof "github.com/SUT-technology/judgino/internal/application/services/profilesrvc"
 	"github.com/SUT-technology/judgino/internal/application/services/questionssrvc"
+	"github.com/SUT-technology/judgino/internal/application/services/runnersrvc"
 	"github.com/SUT-technology/judgino/internal/application/services/submissionssrvc"
 	"github.com/SUT-technology/judgino/internal/application/services/usersrvc"
 	"github.com/SUT-technology/judgino/internal/domain/repository"
@@ -18,5 +19,6 @@ func New(db repository.Pool, cfg config.Config) service.Service {
 		QuestionsSrvc:  questionssrvc.NewQuestionsSrvc(db),
 		UserSrvc:       usersrvc.NewUserSrvc(db),
 		SubmissionSrvc: submissionssrvc.NewSubmissionSrvc(db),
+		RunnerSrvc:     runnersrvc.NewRunnerSrvc(db),
 	}
 }

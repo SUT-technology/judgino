@@ -3,7 +3,12 @@ package submissionssrvc
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"mime/multipart"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
@@ -155,14 +160,44 @@ func (c SubmissionService) SubmissionsCount(ctx context.Context, submissionDto d
 	return submissionsCount, nil
 }
 
-func (c SubmissionService) SubmitQuestion(ctx context.Context, submitDto dto.SubmitRequest, userId int64, questionId int) error {
+func (c SubmissionService) SubmitQuestion(ctx context.Context, file *multipart.FileHeader, userId int64, questionId int) error {
 
+	src, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	// Define the target directory and file path
+	targetDir := "./uploads/codes/" + strconv.Itoa(questionId)
+	err = os.MkdirAll(targetDir, os.ModePerm) // Ensure directory exists
+	if err != nil {
+		return err
+	}
+
+	ext := filepath.Ext(file.Filename)
+	name := strings.TrimSuffix(file.Filename, ext)
+
+	fileNameWithTime := name + "_" + time.Now().Format("20060102_150405") + ext
+	filePath := filepath.Join(targetDir, fileNameWithTime)
+
+	dst, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	// Copy the file content to the destination
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return err
+	}
 	submission := entity.Submission{
-		SubmitURL:  submitDto.SubmitUrl,
+		SubmitURL:  filePath,
 		IsFinal:    false,
 		QuestionID: uint(questionId),
 		UserID:     uint(userId),
-		Status:     2,
+		Status:     1,
 		SubmitTime: time.Now(),
 	}
 	queryFuncFindUser := func(r *repository.Repo) error {
@@ -172,82 +207,7 @@ func (c SubmissionService) SubmitQuestion(ctx context.Context, submitDto dto.Sub
 		}
 		return nil
 	}
-	err := c.db.Query(ctx, queryFuncFindUser)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (c SubmissionService) SendSubmissions(ctx context.Context) (dto.SubmissionRunResp, error) {
-	var (
-		submissions []*entity.Submission
-		err error
-	)
-	queryFuncFindSubmissions := func(r *repository.Repo) error {
-		submissions, err = r.Tables.Submissions.GetUnjudgedSubmissions(ctx)
-		if err != nil {
-			return fmt.Errorf("failed to get submissions: %w", err)
-		}
-		return nil
-	}
-
-	err = c.db.Query(ctx, queryFuncFindSubmissions)
-	if err != nil {
-		// Todo fix error
-		return dto.SubmissionRunResp{}, err
-	}
-	var submissionData = make([]dto.SubmissionRun, len(submissions))
-	for i, submission := range submissions {
-		var qt *entity.Question
-		err = c.db.Query(ctx, func(r *repository.Repo) error {
-			qt, err = r.Tables.Questions.GetQuestionById(ctx, submission.QuestionID)
-			if err != nil {
-				return fmt.Errorf("failed to get question by id: %w", err)
-			}
-			return nil
-		})
-		if err != nil {
-			return dto.SubmissionRunResp{}, err
-		}
-		input, _ := ioutil.ReadFile(qt.InputURL)
-		output, _ := ioutil.ReadFile(qt.OutputURL)
-		code, _ := ioutil.ReadFile(submission.SubmitURL)
-		inputString := string(input)
-		outputString := string(output)
-		codeString := string(code)
-		submissionData[i] = dto.SubmissionRun{
-			ID: submission.ID,
-			Code: codeString,
-			Input: inputString,
-			ExpectedOutput: outputString,
-			TimeLimit: int(qt.TimeLimit),
-			MemoryLimit: int(qt.MemoryLimit),
-		}
-	}
-	return dto.SubmissionRunResp{
-		Submissions: submissionData,
-	}, nil
-
-}
-
-func (c SubmissionService) SubmitResult(ctx context.Context, result dto.SubmissionResult) error {
-	queryFuncFindSubmissions := func(r *repository.Repo) error {
-		submission, err := r.Tables.Submissions.GetSubmissionById(ctx, result.ID)
-		if err != nil {
-			return fmt.Errorf("failed to get submission: %w", err)
-		}
-		submission.Status = int64(result.Status)
-		fmt.Println(submission)
-		err = r.Tables.Submissions.UpdateSubmission(ctx, submission)
-		if err != nil {
-			return fmt.Errorf("failed to update submission: %w", err)
-		}
-		return nil
-	}
-
-	err := c.db.Query(ctx, queryFuncFindSubmissions)
+	err = c.db.Query(ctx, queryFuncFindUser)
 	if err != nil {
 		return err
 	}
