@@ -13,6 +13,11 @@ RUN go build -o /app/create-admin ./cmd/create-admin/main.go
 
 FROM debian:bookworm-slim
 
+# RUN apt-get update && \
+#     apt-get install -y docker.io && \
+#     apt-get clean && \
+#     rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY --from=builder /app/serve /usr/local/bin/

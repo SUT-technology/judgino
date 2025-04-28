@@ -77,7 +77,7 @@ func (c AuthSrvc) Signup(ctx context.Context, signupRequest dto.SignupRequest) (
 		return dto.AuthResponse{}, fmt.Errorf("generating password: %w", err)
 	}
 
-	user := entity.User{
+	user := &entity.User{
 		FirstName: signupRequest.FirstName,
 		LastName:  signupRequest.LastName,
 		Phone:     signupRequest.Phone,

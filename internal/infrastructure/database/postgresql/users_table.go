@@ -37,8 +37,7 @@ func (c usersTable) FindUserAndChangeRole(ctx context.Context, data dto.ChangeRo
 	return &user, nil
 }
 
-
-func (c usersTable) FindAndUpdateUser(ctx context.Context,userId int64, data entity.User) error {
+func (c usersTable) FindAndUpdateUser(ctx context.Context, userId int64, data entity.User) error {
 
 	var user entity.User
 	c.db.First(&user, userId)
@@ -57,8 +56,8 @@ func (c usersTable) GetUserByUsername(ctx context.Context, username string) (*en
 
 	return &user, nil
 }
-func (c usersTable) CreateUser(ctx context.Context, user entity.User) error {
-	if err := c.db.Create(&user).Error; err != nil {
+func (c usersTable) CreateUser(ctx context.Context, user *entity.User) error {
+	if err := c.db.Create(user).Error; err != nil {
 
 		return err
 	}
