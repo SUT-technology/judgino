@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحه اصلی</title>
+    <link rel="stylesheet" href="/static/css/lib/daisyui.min.css">
+    <script src="/static/js/lib/tailwind.min.js"></script>
+    <script src="/static/js/config.js"></script>
+    <link rel='stylesheet' href='/static/css/lib/uicons-regular-rounded.css'>
+    <link rel='stylesheet' href='/static/css/lib/uicons-solid-rounded.css'>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <header>
+        <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
+                    class="fi fi-sr-bars-staggered text-2xl"></i></button>
+        <div id="backdrop-menu" onclick="handlemenu()"
+             class="fixed top-0 right-0 bg-black bg-opacity-50 w-screen h-screen lg:hidden hidden z-10"></div>
+        <nav class="bg-gray-20 bg-opacity-45 backdrop-blur-3xl p-3 lg:w-2/12 w-1/2 h-[90vh] fixed lg:right-0 right-[-100%] top-[5%] rounded-l-2xl shadow-lg transition-all duration-300 z-20"
+             id="menu">
+            <div class="text-center font-fedra text-2xl mt-5">
+                judgino
+            </div>
+            <ul class="menu rounded-box mt-20">
+                <li class="mb-3">
+                    <a href="/questions">
+                        <i class="fi fi-rr-home"></i>
+                        سوال ها
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="/questions/create">
+                        <i class="fi fi-rr-edit"></i>
+                        سوال جدید
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="/questions/submissions">
+                        <i class="fi fi-rr-checkbox"></i>
+                        ارسال ها
+                    </a>
+                </li>
+                </li>
+                <li class="mb-3">
+                    <a href="/profile/{{.CurrentUserId}}">
+                        <i class="fi fi-rr-user"></i>
+                        پروفایل
+                    </a>
+                </li>
+                <li class="mb-3">
+                    <a href="/logout">
+                        <i class="fi fi-rr-user"></i>
+                        خروج
+                    </a>
+                </li>
+                <!-- <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-user-pen"></i>
+                        ویرایش پروفایل
+                    </a>
+                </li> -->
+            </ul>
+        </nav>
+    </header>
+
+    <div class="lg:w-10/12 p-3 mr-auto mt-6">
+        <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
+            <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
+                <!-- <div class="bg-gray-20 bg-opacity-45 backdrop-blur-2xl p-3 mx-auto w-4/5 mt-10 h-[90vh] rounded-3xl shadow-lg"> -->
+                <h1 class="text-4xl text-center font-fedra mb-5">{{.Question.Title}}</h1>
+
+                <!-- Question Details -->
+                <div class="mb-4">
+                    <p><strong>تاریخ ارسال:</strong> امروز<span id="senderDate"></span></p>
+                </div>
+                <div class="flex justify-between">
+                    <p><strong>محدودیت زمان:</strong><span id="timeLimit"> {{.Question.TimeLimit}} ثانیه</span></p>
+                    <p><strong>محدودیت حافظه:</strong><span id="memoryLimit"> {{.Question.MemoryLimit}}</span></p>
+                    <p><strong>مهلت ارسال:</strong><span id="deadline" data-time="{{.Question.Deadline}}" class="dir-ltr"> 
+                        <span id="second"></span>:
+                        <span id="minute"></span>:
+                        <span id="hour"></span>:
+                        <span id="day"></span>
+                    </span></p>
+                </div>
+
+                <!-- Horizontal line before the question body -->
+                <hr class="my-4">
+
+                <div id="questionBody">
+                    {{.Question.Body}}
+                </div>
+
+                <!-- Horizontal line after the question body -->
+                <hr class="my-4">
+            
+
+                <form action="/submissions/{{.Question.ID}}/submit" method="post" enctype="multipart/form-data"> 
+                    <!-- File Upload for Answer Submission -->
+                    <div class="mb-4">
+                        <label for="answer" class="block text-sm font-medium text-gray-400">پاسخ خود را ارسال کنید:</label>
+                        <input type="file" id="answer" class="p-1 w-1/3 rounded-md border" name="answer">
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="mb-4">
+                        <button id="submitAnswer" class="p-2 w-1/3 bg-blue-500 text-white rounded-md">ارسال پاسخ</button>
+                    </div>
+                </form>
+
+                <!-- View Submissions Button -->
+                <div class="mb-4">
+                    <button id="viewSubmissions" class="p-2 w-1/3 bg-green-500 text-white rounded-md">مشاهده ارسال‌ها</button>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+
+    <script src="/static/js/main.js"></script>
+
+    <script>
+        var countDownDate = new Date(document.getElementById("deadline").dataset.time);
+    </script>
+
+    <script src="/static/js/countdown.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,21 @@
+server:
+  port: 8000
+  secret_key: judginotechnology
+  logger: true
+  addr: 0.0.0.0:8000
+  rate-limiter:
+    enabled: true
+    rate: 10
+    burst: 30
+    expires: 3m
+db:
+  port: 5432
+  db_name: judgino_db
+  host: localhost
+  password: 12345678
+  username: postgres
+logger:
+  level: debug
+env: dev
+code-runner:
+  api-key: test-api-key

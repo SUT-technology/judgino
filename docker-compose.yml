@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: judgino_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./assets/db/:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
+    networks:
+      - judge_db_net
+    restart: always
+
+  judge:
+    image: judge:1
+    build: .
+    command: /bin/sh -c "tail -f /dev/null" 
+    volumes:
+      - ./uploads:/app/uploads
+      - ./assets:/app/assets
+    depends_on:
+      - postgres
+    networks:
+      - judge_db_net
+      - runner_net
+    ports:
+      - "8000:8000"
+
+  code-runner:
+    image: judge:1
+    command: /bin/sh -c "tail -f /dev/null" 
+    networks:
+      - runner_net
+    volumes:
+      - ./assets:/app/assets
+
+  create-admin:
+    image: judge:1
+    command: /bin/sh -c "tail -f /dev/null" 
+    networks:
+      - judge_db_net
+    depends_on:
+      - postgres
+    restart: "no"
+
+
+volumes:
+  postgres_data: {}
+
+networks:
+  judge_db_net: {}
+  runner_net: {}
+
