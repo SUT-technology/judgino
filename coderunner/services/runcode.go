@@ -20,7 +20,7 @@ import (
 )
 
 const (
-    StatusOK = iota
+    StatusOK = iota + 3
     StatusWrongOutput
     StatusCompileError
     StatusRuntimeError
@@ -36,7 +36,6 @@ func (c RunnerServices) RunCode(submission dto.SubmissionRun) error {
 	timeLimit := time.Duration(submission.TimeLimit) * time.Second
 	memLimitMB := submission.MemoryLimit
 
-	wantOutput += "\n"
 
     tmpDir, err := ioutil.TempDir("", "go-run-")
     if err != nil {
@@ -102,16 +101,26 @@ func (c RunnerServices) RunCode(submission dto.SubmissionRun) error {
 
 
 
+    checkloop:
     for {
-        cn, err := cli.ContainerInspect(context.Background(), "C1")
-        if err != nil || cn.State.Status != "running" {
-            if cn.State.OOMKilled {
-				c.SendResult(id, StatusMemoryLimitExceeded)
-                return fmt.Errorf("memory limit exceeded")
+        select {
+        case <-time.After(40 * time.Second):
+            if err := cli.ContainerKill(context.Background(), resp.ID, "SIGKILL"); err != nil {
+                panic(err)
             }
-            break
+            c.SendResult(id, StatusTimeLimitExceeded)
+            return fmt.Errorf("timeout")
+        default:
+            cn, err := cli.ContainerInspect(context.Background(), "C1")
+            if err != nil || cn.State.Status != "running" {
+                if cn.State.OOMKilled {
+                    c.SendResult(id, StatusMemoryLimitExceeded)
+                    return fmt.Errorf("memory limit exceeded")
+                }
+                break checkloop
+            }
+            time.Sleep(50 * time.Millisecond)
         }
-        time.Sleep(50 * time.Millisecond)
     }
 
 
@@ -142,6 +151,9 @@ func (c RunnerServices) RunCode(submission dto.SubmissionRun) error {
 		c.SendResult(id, StatusRuntimeError)
         return fmt.Errorf("runtime error")
     }
+
+    outputStr = strings.TrimRight(outputStr, "\n")
+    wantOutput = strings.TrimRight(wantOutput, "\n")
 
 
 
