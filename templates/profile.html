@@ -160,7 +160,8 @@
     document.addEventListener("DOMContentLoaded", function () {
         const select = document.getElementById("role-select");
         select.addEventListener("change", function () {
-            const selectedRole = select.value;
+            if (select.value == "کاربر") selectedRole = "user";
+            else selectedRole = "admin"
             const userId = `{{.UserId}}`; 
             fetch(`/profile/change-role`, {
                 method: "POST",
