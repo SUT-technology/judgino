@@ -1,7 +1,6 @@
 package questionshndlr
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -138,16 +137,12 @@ func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
 	}
 
-	fmt.Printf("request: %+v", req)
-
 	resp, err := q.Services.QuestionsSrvc.GetQuestions(ctx, req, uint(currentUserId))
 	if err != nil {
 		slogger.Debug(ctx, "showQuestions", slogger.Err("error", err))
 		// TODO: handle error
 		return c.Render(http.StatusBadRequest, "questions.html", dto.QuestionsSummeryResponse{Error: err})
 	}
-
-	fmt.Printf("resp: %+v", resp)
 
 	return c.Render(http.StatusOK, "questions.html", resp)
 }
