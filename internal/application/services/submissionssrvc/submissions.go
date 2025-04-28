@@ -178,6 +178,7 @@ func (c SubmissionService) SubmitQuestion(ctx context.Context, file *multipart.F
 	ext := filepath.Ext(file.Filename)
 	name := strings.TrimSuffix(file.Filename, ext)
 
+
 	fileNameWithTime := name + "_" + time.Now().Format("20060102_150405") + ext
 	filePath := filepath.Join(targetDir, fileNameWithTime)
 
