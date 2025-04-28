@@ -3,6 +3,7 @@ package questionshndlr
 import (
 	"net/http"
 	"strconv"
+	"fmt"
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
 	"github.com/SUT-technology/judgino/internal/domain/model"
@@ -27,7 +28,7 @@ func New(g *echo.Group, srvc service.Service, m echo.MiddlewareFunc) QuestionsHn
 	g.GET("/edit/:question_id",handler.editQuestion)
 	g.POST("/update/:question_id",handler.updateQuestion)
 	g.GET("/:question_id", handler.ShowQuestion)
-	g.GET("/published/:question_id", handler.StateQuestion, m)
+	g.GET("/published/:question_id", handler.StateQuestion)
 	return handler
 }
 
@@ -154,6 +155,7 @@ func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 func (q *QuestionsHndlr) StateQuestion(c echo.Context) error {
 	currentUser := serde.GetCurrentUser(c)
 	// CurrentUserId := 1
+
 
 	if !currentUser.IsAdmin {
 		return c.Redirect(http.StatusMovedPermanently, "/auth")

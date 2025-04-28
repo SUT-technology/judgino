@@ -334,7 +334,7 @@ func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.Ques
 func (c QuestionsSrvc) StateQuestion(ctx context.Context, questionId uint) error {
 
 	var(
-		updateData =&entity.Question{}
+		updateData = &entity.Question{}
 		question *entity.Question
 		err error
 	)
@@ -346,6 +346,16 @@ func (c QuestionsSrvc) StateQuestion(ctx context.Context, questionId uint) error
 			return fmt.Errorf("failed to publish question: %w", err)
 		}
 
+		fmt.Printf("\n\n\n question to be published: \n %+v\n\n\n",question)
+
+		if question.Status=="draft" {
+			updateData.Status = "published"
+			updateData.PublishDate = time.Now()
+		} else if question.Status=="published" {
+			updateData.Status = "draft"
+			updateData.PublishDate = time.Time{}
+		}
+
 		err := r.Tables.Questions.PublishQuestion(ctx, question,updateData)
 		if err != nil {
 			return fmt.Errorf("failed to publish question: %w", err)
@@ -353,13 +363,6 @@ func (c QuestionsSrvc) StateQuestion(ctx context.Context, questionId uint) error
 		return nil
 	}
 
-	if question.Status=="draft" {
-		updateData.Status = "published"
-		updateData.PublishDate = time.Now()
-	} else if question.Status=="published" {
-		updateData.Status = "draft"
-		updateData.PublishDate = time.Time{}
-	}
 	err = c.db.Query(ctx, queryFunc)
 	if err != nil {
 		return err

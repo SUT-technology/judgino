@@ -106,14 +106,10 @@
                                                     <td>-</td>
                                                 {{end}}
                                                 <td>{{.Deadline}}</td>
-                                                {{if eq .Status "published"}}
-                                                    <td>{{.Status}}</td>
+                                                {{if .IsCurrentUserAdmin}}
+                                                    <td><a href="/questions/published/{{.QuestionId}}">{{.Status}}</a></td>
                                                 {{else}}
-                                                    {{if .IsCurrentUserAdmin}}
-                                                        <td><a href="/questions/published/{{.QuestionId}}">{{.Status}}</a></td>
-                                                    {{else}}
-                                                        <td>{{.Status}}</td>
-                                                    {{end}}
+                                                    <td>{{.Status}}</td>
                                                 {{end}}
                                                 <td>
                                                     <a href="/questions/edit/{{.QuestionId}}" class="text-blue-500 hover:underline">ویرایش</a>
@@ -146,12 +142,8 @@
                                                     {{else}}
                                                         <td class="2">-</td>
                                                     {{end}}
-                                                    <td class="2">{{.Deadline}}</td>
-                                                    {{if eq .Status "published"}}
-                                                        <td class="2">{{.Status}}</td>
-                                                    {{else}}
-                                                        <td class="2"><a href="/questions/published/{{.QuestionId}}">{{.Status}}</td>
-                                                    {{end}}
+                                                    <td class="2">{{.Deadline}}</td>                                                   
+                                                    <td class="2"><a href="/questions/published/{{.QuestionId}}">{{.Status}}</td>                                            
                                                 {{else}}
                                                     {{if eq .Status "published"}}
                                                         <td class="2"><a href="/questions/{{.QuestionId}}">{{.Title}}</a></td>
