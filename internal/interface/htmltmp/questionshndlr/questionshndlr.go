@@ -3,7 +3,6 @@ package questionshndlr
 import (
 	"net/http"
 	"strconv"
-	"fmt"
 
 	"github.com/SUT-technology/judgino/internal/domain/dto"
 	"github.com/SUT-technology/judgino/internal/domain/model"

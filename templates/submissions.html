@@ -23,42 +23,36 @@
         <button class="pr-4 pt-5 lg:hidden" onclick="handlemenu()"><i
                     class="fi fi-sr-bars-staggered text-2xl"></i></button>
         <div id="backdrop-menu" onclick="handlemenu()"
-             class="fixed top-0 right-0 bg-black bg-opacity-50 w-screen h-screen lg:hidden hidden z-10"></div>
+            class="fixed top-0 right-0 bg-black bg-opacity-50 w-screen h-screen lg:hidden hidden z-10"></div>
         <nav class="bg-gray-20 bg-opacity-45 backdrop-blur-3xl p-3 lg:w-2/12 w-1/2 h-[90vh] fixed lg:right-0 right-[-100%] top-[5%] rounded-l-2xl shadow-lg transition-all duration-300 z-20"
-             id="menu">
+            id="menu">
             <div class="text-center font-fedra text-2xl mt-5">
                 judgino
             </div>
             <ul class="menu rounded-box mt-20">
                 <li class="mb-3">
-                    <a href="#">
+                    <a>
                         <i class="fi fi-rr-home"></i>
                         سوال ها
                     </a>
                 </li>
                 <li class="mb-3">
-                    <a href="#">
+                    <a href="/questions/create">
                         <i class="fi fi-rr-edit"></i>
                         سوال جدید
                     </a>
                 </li>
                 <li class="mb-3 bg-gray-38 rounded-lg">
-                    <a href="#">
+                    <a href="/questions/submissions">
                         <i class="fi fi-rr-checkbox"></i>
                         ارسال ها
                     </a>
                 </li>
                 </li>
                 <li class="mb-3">
-                    <a>
+                    <a href="/profile/{{.CurrentUserId}}">
                         <i class="fi fi-rr-user"></i>
                         پروفایل
-                    </a>
-                </li>
-                <li class="mb-3">
-                    <a>
-                        <i class="fi fi-rr-user-pen"></i>
-                        ویرایش پروفایل
                     </a>
                 </li>
                 <li class="mb-3">
@@ -67,6 +61,12 @@
                         خروج
                     </a>
                 </li>
+                <!-- <li class="mb-3">
+                    <a href="#">
+                        <i class="fi fi-rr-user-pen"></i>
+                        ویرایش پروفایل
+                    </a>
+                </li> -->
             </ul>
         </nav>
     </header>

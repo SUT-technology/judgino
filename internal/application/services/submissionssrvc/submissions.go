@@ -127,6 +127,7 @@ func (c SubmissionService) GetSubmissions(ctx context.Context, submissionDto dto
 	totalPages = submissionsCount/10 + 1
 
 	resp := dto.SubmissionsResponse{
+		CurrentUserId: int64(userId),
 		Submissions:      submissionsData,
 		TotalPages:       totalPages,
 		QuestionId:       questionId,

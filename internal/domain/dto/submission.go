@@ -15,6 +15,7 @@ type Submission struct {
 	Type          string `json:"Type"`
 }
 type SubmissionsResponse struct {
+	CurrentUserId int64 `json:"CurrentUserId"`
 	Submissions      []Submission `json:"Submissions"`
 	TotalPages       int          `json:"TotalPages"`
 	QuestionId       int          `json:"QuestionId"`
