@@ -90,9 +90,8 @@ func RunCodeInContainer(code, input, wantOutput string, timeLimit time.Duration,
     for {
         cn, err := cli.ContainerInspect(context.Background(), "C1")
         if err != nil || cn.State.Status != "running" {
-
-            if cn.State.ExitCode != 0 {
-                return StatusRuntimeError, fmt.Errorf("runtime error: %s", cn.State.Error)
+            if cn.State.OOMKilled {
+                return StatusMemoryLimitExceeded, fmt.Errorf("memory limit exceeded")
             }
             break
         }
@@ -123,6 +122,9 @@ func RunCodeInContainer(code, input, wantOutput string, timeLimit time.Duration,
     endTime, _ := time.Parse("15:04:05", et)
     
     duration := endTime.Sub(startTime)
+    if outputStr == "" {
+        return StatusRuntimeError, fmt.Errorf("runtime error")
+    }
 
 
 
@@ -150,7 +152,7 @@ func main() {
     package main
     import "fmt"
 	func main() {
-        fmt.Println("fhsi")
-	}`, "", "fhsi", 2, 512))
+        fmt.Println("")
+	}`, "", "", 2, 1024))
     
 }
