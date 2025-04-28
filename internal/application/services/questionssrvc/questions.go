@@ -21,6 +21,80 @@ func NewQuestionsSrvc(db repository.Pool) QuestionsSrvc {
 	}
 }
 
+func (c QuestionsSrvc) UpdateQuestion(ctx context.Context,questionId uint,request dto.UpdateQuestionRequest) error {
+	
+	time,err := time.Parse("2006-01-02T15:04:05.000Z",request.Deadline)
+	if err!= nil {
+		fmt.Errorf(err.Error())
+	}
+	
+	var updateData = &entity.Question{
+		Title:  request.Title,
+		Body: request.Body,
+		TimeLimit: request.TimeLimit,
+		MemoryLimit: request.MemoryLimit,
+		InputURL: request.InputURL,
+		OutputURL: request.OutputURL,
+		Deadline: time,
+	}
+
+	queryFuncUpdateData := func(r *repository.Repo) error {
+		err := r.Tables.Questions.UpdateQuestion(ctx,int64(questionId),updateData)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err=c.db.Query(ctx,queryFuncUpdateData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c QuestionsSrvc) EditQuestion(ctx context.Context,questionId uint) (dto.EditQuestionResponse,error) {
+
+	var (
+		question *entity.Question
+		err error
+	)
+
+	queryFuncFindQuestion := func(r *repository.Repo) error {
+		question,err = r.Tables.Questions.GetQuestionById(ctx,questionId)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err = c.db.Query(ctx, queryFuncFindQuestion)
+	if err != nil {
+		return dto.EditQuestionResponse{}, err
+	}
+
+	diff := question.Deadline.Sub(time.Now())
+
+	days := int(diff.Hours()) / 24
+	hours := int(diff.Hours()) % 24
+	minutes := int(diff.Minutes()) % 60
+
+	return dto.EditQuestionResponse{
+		UserID: int64(question.UserID),
+		QuestionID: int64(questionId),
+		Status: question.Status,
+		Title: question.Title,
+		Body: question.Body,
+		TimeLimit: question.TimeLimit,
+		MemoryLimit: question.MemoryLimit,
+		InputURL: question.InputURL,
+		DeadlineDay: int64(days),
+		DeadlineHour: int64(hours),
+		DeadlineMinute: int64(minutes),
+	},nil
+}
+
 func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto.CreateQuestionRequest, currentUserId int64) (dto.CreateQuestionResponse, error) {
 	var (
 		response dto.CreateQuestionResponse

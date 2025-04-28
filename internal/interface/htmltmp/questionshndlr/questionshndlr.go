@@ -25,20 +25,70 @@ func New(g *echo.Group, srvc service.Service, m echo.MiddlewareFunc) QuestionsHn
 	g.GET("", handler.ShowQuestions)
 	g.GET("/create", handler.createQuestion)
 	g.POST("/draft", handler.draftQuestion)
+	g.GET("edit/:question_id",handler.editQuestion)
+	g.POST("/update/:question_id",handler.updateQuestion)
 	g.GET("/:question_id", handler.ShowQuestion)
 	g.GET("/published/:question_id", handler.StateQuestion, m)
-
 	return handler
 }
+
+
+
+
+func (q *QuestionsHndlr) editQuestion(c echo.Context) error {
+	questionID := c.Param("question_id")
+	questionIDInt, _ := strconv.Atoi(questionID)
+	response,err := q.Services.QuestionsSrvc.EditQuestion(c.Request().Context(),uint(questionIDInt))
+	if err != nil {
+		slogger.Debug(c.Request().Context(), "bad request", slogger.Err("error", err))
+		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
+	}
+	return c.Render(http.StatusOK,"create-question.html",response)
+}
+
+
+
+
+
+func (q *QuestionsHndlr) updateQuestion(c echo.Context) error {
+	
+	ctx := c.Request().Context()
+
+	questionID := c.Param("question_id")
+	questionIDInt, _ := strconv.Atoi(questionID)
+	currentUserId := serde.GetCurrentUser(c).UserId
+
+	req, err := serde.BindRequestBody[dto.UpdateQuestionRequest](c)
+	// fmt.Printf("request: %v",req)
+	if err != nil {
+		slogger.Debug(ctx, "bad request", slogger.Err("error", err))
+		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
+	}
+
+	err = q.Services.QuestionsSrvc.UpdateQuestion(ctx,uint(questionIDInt),req)
+	if err != nil {
+		slogger.Debug(c.Request().Context(), "bad request", slogger.Err("error", err))
+		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
+	}
+	data := dto.CreateQuestionResponse{UserID: currentUserId}
+	return c.Render(http.StatusOK, "create-question.html", data)
+}
+
+
+
+
 
 func (q *QuestionsHndlr) createQuestion(c echo.Context) error {
 	slogger.Debug(c.Request().Context(), "Creating a new question...")
 	currentUserId := serde.GetCurrentUser(c).UserId
 	// currentUserId := int64(1)
 	data := dto.CreateQuestionResponse{UserID: currentUserId}
-	fmt.Println(data.Title)
 	return c.Render(http.StatusOK, "create-question.html", data)
 }
+
+
+
+
 
 func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 	currentUserId := serde.GetCurrentUser(c).UserId
@@ -72,6 +122,9 @@ func (q *QuestionsHndlr) draftQuestion(c echo.Context) error {
 	return c.Render(http.StatusOK, "question.html", resp2)
 }
 
+
+
+
 func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 
 	currentUserId := serde.GetCurrentUser(c).UserId
@@ -99,6 +152,10 @@ func (q *QuestionsHndlr) ShowQuestions(c echo.Context) error {
 	return c.Render(http.StatusOK, "questions.html", resp)
 }
 
+
+
+
+
 func (q *QuestionsHndlr) StateQuestion(c echo.Context) error {
 	currentUser := serde.GetCurrentUser(c)
 	// CurrentUserId := 1
@@ -125,6 +182,9 @@ func (q *QuestionsHndlr) StateQuestion(c echo.Context) error {
 
 	return c.Render(http.StatusOK, "questions.html", resp)
 }
+
+
+
 
 func (q *QuestionsHndlr) ShowQuestion(c echo.Context) error {
 

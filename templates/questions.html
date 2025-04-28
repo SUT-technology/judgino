@@ -83,31 +83,35 @@
                                 {{if eq .QuestionFilter "mine"}}
                                     <thead>
                                         <tr>
-                                            <th class="2">عنوان</th>
-                                            <th class="2">تاریخ انتشار</th>
-                                            <th class="2">مهلت</th>
-                                            <th class="2">وضعیت</th>
+                                            <th>عنوان</th>
+                                            <th>تاریخ انتشار</th>
+                                            <th>مهلت</th>
+                                            <th>وضعیت</th>
+                                            <th>ویرایش</th>
                                         </tr>
                                     </thead>
                                     <tbody id="questions-list">
                                         {{range .Questions}}
                                             <tr>
-                                                <td class="2"><a href="/questions/{{.QuestionId}}">{{.Title}}</a></td>
+                                                <td><a href="/questions/{{.QuestionId}}">{{.Title}}</a></td>
                                                 {{if eq .Status "published"}}
-                                                    <td class="2">{{.PublishDate}}</td>
+                                                    <td>{{.PublishDate}}</td>
                                                 {{else}}
-                                                    <td class="2">-</td>
+                                                    <td>-</td>
                                                 {{end}}
-                                                <td class="2">{{.Deadline}}</td>
+                                                <td>{{.Deadline}}</td>
                                                 {{if eq .Status "published"}}
-                                                    <td class="2">{{.Status}}</td>
+                                                    <td>{{.Status}}</td>
                                                 {{else}}
                                                     {{if .IsCurrentUserAdmin}}
-                                                        <td class="2"><a href="/questions/published/{{.QuestionId}}">{{.Status}}</td>
+                                                        <td><a href="/questions/published/{{.QuestionId}}">{{.Status}}</a></td>
                                                     {{else}}
-                                                        <td class="2">{{.Status}}</td>
+                                                        <td>{{.Status}}</td>
                                                     {{end}}
                                                 {{end}}
+                                                <td>
+                                                    <a href="/questions/edit/{{.QuestionId}}" class="text-blue-500 hover:underline">ویرایش</a>
+                                                </td>
                                             </tr>
                                         {{end}}
                                     </tbody>
@@ -145,7 +149,6 @@
                                                 {{else}}
                                                     {{if eq .Status "published"}}
                                                         <td class="2"><a href="/questions/{{.QuestionId}}">{{.Title}}</a></td>
-                                                        <!-- <td class="2"><a href="/profile/{{.PublisherId}}">{{.Publisher}}</a></td> -->
                                                         <td class="2">{{.PublishDate}}</td>
                                                         <td class="2">{{.Deadline}}</td>
                                                     {{end}}
