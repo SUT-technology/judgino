@@ -43,7 +43,7 @@ func (q *QuestionsHndlr) editQuestion(c echo.Context) error {
 		slogger.Debug(c.Request().Context(), "bad request", slogger.Err("error", err))
 		return serde.Response(c, http.StatusBadRequest, model.BadRequestMessage, nil)
 	}
-	return c.Render(http.StatusOK,"create-question.html",response)
+	return c.Render(http.StatusOK,"edit-question.html",response)
 }
 
 
