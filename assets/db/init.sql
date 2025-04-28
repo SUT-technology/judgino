@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS "questions" (
 	"title" varchar(255) NOT NULL,
 	"body" varchar(10000) NOT NULL,
 	"time_limit" bigint NOT NULL,
-	"memoy_limit" bigint NOT NULL,
+	"memory_limit" bigint NOT NULL,
 	"input_url" varchar(255) NOT NULL,
 	"deadline" timestamp with time zone NOT NULL,
 	"output_url" varchar(255) NOT NULL,

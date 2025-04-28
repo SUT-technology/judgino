@@ -55,6 +55,16 @@ func (c questionsTable) CreateQuestion(ctx context.Context,question *entity.Ques
 	return nil
 }
 
+func (c questionsTable) UpdateQuestion(ctx context.Context, questionId int64,updateData *entity.Question)error {
+	var question entity.Question
+	c.db.First(&question, questionId)
+
+	if err := c.db.WithContext(ctx).Model(&question).Updates(updateData).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c questionsTable) PublishQuestion(ctx context.Context, question *entity.Question,updateData *entity.Question) error {
 	fmt.Printf("update data: %v",*updateData)
 	if err := c.db.WithContext(ctx).Model(question).Updates(updateData).Error; err != nil {
