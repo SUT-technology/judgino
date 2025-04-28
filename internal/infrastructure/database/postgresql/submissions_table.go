@@ -2,10 +2,14 @@ package postgresql
 
 import (
 	"context"
+	"fmt"
+	"time"
+
 	// "fmt"
 
 	"github.com/SUT-technology/judgino/internal/domain/entity"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type submissionsTable struct {
@@ -68,15 +72,60 @@ func (c submissionsTable) UpdateSubmission(ctx context.Context, submission *enti
 	return nil
 }
 
-func (c submissionsTable) GetUnjudgedSubmissions (ctx context.Context) ([]*entity.Submission, error) {
+func (c submissionsTable) GetSubmissionsForRunner(ctx context.Context, limit int) ([]*entity.Submission, error) {
 	var submissions []*entity.Submission
-	query := c.db.Where("status = ?", 1)
-	query.Find(&submissions)
+
+	now := time.Now()
+
+	query := c.db.
+		Clauses(clause.Locking{Strength: "UPDATE", Options: "SKIP LOCKED"}).
+		Where(
+			c.db.Where("status = ?", 1).
+				Or("status = 2 AND runner_started_at < ?", now.Add(-1*time.Minute)),
+		).
+		Order("id ASC").
+		Limit(limit)
+
+	if err := query.Find(&submissions).Error; err != nil {
+		return nil, fmt.Errorf("querying submissions: %w", err)
+	}
+
+	if len(submissions) == 0 {
+		return nil, nil
+	}
+
+	var toFailIDs []uint
+	var toRunningIDs []uint
+
 	for _, submission := range submissions {
-		submission.Status = 2
-		if err := c.db.Save(&submission).Error; err != nil {
-			return nil, err
+		if submission.TryCount >= 3 {
+			toFailIDs = append(toFailIDs, submission.ID)
+		} else {
+			toRunningIDs = append(toRunningIDs, submission.ID)
 		}
 	}
+
+	if len(toFailIDs) > 0 {
+		if err := c.db.Model(&entity.Submission{}).
+			Where("id IN ?", toFailIDs).
+			Updates(map[string]interface{}{
+				"status": 9,
+			}).Error; err != nil {
+			return nil, fmt.Errorf("bulk update fail submissions: %w", err)
+		}
+	}
+
+	if len(toRunningIDs) > 0 {
+		if err := c.db.Model(&entity.Submission{}).
+			Where("id IN ?", toRunningIDs).
+			Updates(map[string]interface{}{
+				"status":            2,
+				"runner_started_at": now,
+				"try_count":         gorm.Expr("try_count + 1"),
+			}).Error; err != nil {
+			return nil, fmt.Errorf("bulk update running submissions: %w", err)
+		}
+	}
+
 	return submissions, nil
 }

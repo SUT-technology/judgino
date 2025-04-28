@@ -69,51 +69,34 @@
         <section class="bg-gray-20 bg-opacity-45 min-h-full backdrop-blur-3xl p-3 rounded-2xl w-full min-h-[90h] z-20">
             <div class="card lg:w-8/12 w-10/12  mx-auto bg-gray-700 bg-opacity-30 backdrop-blur-xl p-4 rounded-xl">
                 <div class="inp-con">
-                    {{if .Title}}
-                    <input type="text" id="title" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-red-700" placeholder="عنوان" py-3/>
-                    {{else}}
-                    <input type="text" id="title"data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="عنوان" py-3/>
-                    {{end}}
+                    <input type="text" id="title"data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder={{.Title}} py-3/>
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
                 <br>
-                {{if .Body}}
-                <div 
-                    id="textEditor"
-                    contenteditable="true"
-                    spellcheck="false"
-                    class="mt-6 w-full min-h-[200px] p-4 bg-gray-800 rounded-lg border border-red-700 whitespace-pre-wrap overflow-y-auto focus:outline-none"
-                >متن سوال را وارد کنید:</div>
-                {{else}}
                 <div 
                     id="textEditor"
                     contenteditable="true"
                     spellcheck="false"
                     class="mt-6 w-full min-h-[200px] p-4 bg-gray-800 rounded-lg border border-gray-700 whitespace-pre-wrap overflow-y-auto focus:outline-none"
-                >متن سوال را وارد کنید:</div>
-                {{end}}
+                >{{.Body}}</div>
                 <br>
                 <br>
                 <div class="flex w-full">
                 <div
                     class="inp-con">
-                    {{if .TimeLimit}}
-                    <input type="text" id="timeLimit" data-validations="required" class="text-input h-12 text-lg px-4 bg-red-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
-                    {{else}}
-                    <input type="text" id="timeLimit" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت زمانی (ثانیه)" py-3/>
-                    {{end}}
+                    
+                    <input type="text" id="timeLimit" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder={{.TimeLimit}} py-3/>
+                    
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
                 <div class="divider divider-horizontal"></div>
                 <div
                     class="inp-con">
-                    {{if .MemoryLimit}}
-                    <input type="text" id="memoryLimit" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
-                    {{else}}
-                    <input type="text" id="memoryLimit" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="محدودیت حافظه (مگابایت)" py-3/>
-                    {{end}}
+                    
+                    <input type="text" id="memoryLimit" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder={{.MemoryLimit}} py-3/>
+                    
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
@@ -122,14 +105,14 @@
                 <br>
                 <div class="flex w-full">
                     <div class="inp-con">
-                    <input type="text" id="input" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="ورودی:" py-3/>
+                    <input type="text" id="input" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder={{.InputURL}} py-3/>
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
                     <div class="divider divider-horizontal"></div>
                     <div
                     class="inp-con">
-                    <input type="text" id="output" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder="خروجی:" py-3/>
+                    <input type="text" id="output" data-validations="required" class="text-input h-12 text-lg px-4 bg-gray-800 rounded-lg border border-gray-700" placeholder={{.OutputURL}} py-3/>
                     <i class="fi fi-sr-check-circle -text-success hidden error-icon"></i>
                     <i class="fi fi-sr-exclamation -text-error hidden success-icon"></i>
                 </div>
@@ -139,17 +122,17 @@
             <br>  
             <div class="bg-gray-800 m-4 p-4 rounded-lg space-y-4">
                     <label for="daysSlider" class="block mb-2 text-lg">📅 روز: <span id="daysValue">1</span></label>
-                    <input id="daysSlider" type="range" min="1" max="365" value="0"
+                    <input id="daysSlider" type="range" min="1" max="365" value={{.DeadlineDay}}
                       class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
                   </div>
                   <div class="bg-gray-800 m-4 p-4 rounded-lg space-y-4">
                     <label for="hoursSlider" class="block mb-2 text-lg">🕒 ساعت: <span id="hoursValue">0</span></label>
-                    <input id="hoursSlider" type="range" min="0" max="23" value="0"
+                    <input id="hoursSlider" type="range" min="0" max="23" value={{.DeadlineHour}}
                       class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
                   </div>
                   <div class="bg-gray-800 m-4 p-4 rounded-lg space-y-4">
                     <label for="minutesSlider" class="block mb-2 text-lg">⏱️ دقیقه: <span id="minutesValue">0</span></label>
-                    <input id="minutesSlider" type="range" min="0" max="59" value="0"
+                    <input id="minutesSlider" type="range" min="0" max="59" value={{.DeadlineMinute}}
                       class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
                   </div>
                   <div>
@@ -184,7 +167,7 @@
         
             const data = {
                 UserID: {{.UserID}}, // replace with actual user ID
-                Status: "draft", // or "published", etc.
+                Status: "{{.Status}}", // or "published", etc.
                 Title: title,
                 Body: body,
                 TimeLimit: timeLimit,
@@ -196,7 +179,7 @@
 
             console.log(data)
             try {
-                fetch("/questions/draft", {
+                fetch("/questions/update/{{.QuestionID}}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -204,9 +187,9 @@
                     body: JSON.stringify(data)
                 }).then(response => {
                     if (response.ok) {
-                        alert("سوال در حالت پیش نویس قرار گرفت");
+                        alert("سوال ویرایش شد");
                     } else {
-                        alert("خطا در ارسال سوال")
+                        alert("خطا در ویرایش سوال")
                     }
             })  
             } catch (error) {

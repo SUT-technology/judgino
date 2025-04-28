@@ -3,13 +3,15 @@ package entity
 import "time"
 
 type Submission struct {
-	ID         uint      `gorm:"primaryKey"`
-	QuestionID uint      `gorm:"not null"`
-	UserID     uint      `gorm:"not null"`
-	SubmitURL  string    `gorm:"size:255;not null"`
-	Status     int64     `gorm:"not null"`
-	IsFinal    bool      `gorm:"default:true"`
-	SubmitTime time.Time `gorm:"not null"`
+	ID              uint      `gorm:"primaryKey"`
+	QuestionID      uint      `gorm:"not null"`
+	UserID          uint      `gorm:"not null"`
+	SubmitURL       string    `gorm:"size:255;not null"`
+	Status          int64     `gorm:"not null"`
+	IsFinal         bool      `gorm:"default:true"`
+	SubmitTime      time.Time `gorm:"not null"`
+	RunnerStartedAt *time.Time `gorm:"column:runner_started_at"`
+	TryCount        int     `gorm:"column:try_count"`
 
 	// Foreign keys
 	Question Question `gorm:"foreignKey:QuestionID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`

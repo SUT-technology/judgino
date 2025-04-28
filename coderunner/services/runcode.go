@@ -20,7 +20,7 @@ import (
 )
 
 const (
-    StatusOK = iota
+    StatusOK = iota + 3
     StatusWrongOutput
     StatusCompileError
     StatusRuntimeError
