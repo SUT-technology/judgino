@@ -25,7 +25,7 @@ func New(g *echo.Group, srvc service.Service, m echo.MiddlewareFunc) QuestionsHn
 	g.GET("", handler.ShowQuestions)
 	g.GET("/create", handler.createQuestion)
 	g.POST("/draft", handler.draftQuestion)
-	g.GET("edit/:question_id",handler.editQuestion)
+	g.GET("/edit/:question_id",handler.editQuestion)
 	g.POST("/update/:question_id",handler.updateQuestion)
 	g.GET("/:question_id", handler.ShowQuestion)
 	g.GET("/published/:question_id", handler.StateQuestion, m)
