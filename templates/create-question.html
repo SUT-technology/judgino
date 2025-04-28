@@ -177,7 +177,7 @@
             deadline.setMinutes(now.getMinutes() + minutes);
         
             const data = {
-                UserID: "{{.UserID}}", // replace with actual user ID
+                UserID: {{.UserID}}, // replace with actual user ID
                 Status: "draft", // or "published", etc.
                 Title: title,
                 Body: body,
