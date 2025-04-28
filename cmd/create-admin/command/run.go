@@ -1,14 +1,15 @@
 package command
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log/slog"
 	"os"
 	"time"
-	"context"
 
 	"github.com/SUT-technology/judgino/pkg/slogger"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/go-playground/validator/v10"
 	"gorm.io/driver/postgres"
@@ -16,7 +17,6 @@ import (
 
 	"gopkg.in/yaml.v3"
 )
-
 
 func Run() error {
 	var username, password string
@@ -37,17 +37,20 @@ func Run() error {
 	logger := slogger.NewJSONLogger(c.Logger.Level, os.Stdout)
 	slog.SetDefault(logger)
 
-
-
-
 	db, err := NewPool(c.DB)
 	if err != nil {
 		fmt.Printf("Error initializing database connection: %v\n", err)
 	}
 
 	ctx := context.Background()
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("generating password: %w", err)
+	}
+
 	err = db.Query(ctx, func(r *Repo) error {
-		user, err := r.Users.CreateAdmin(ctx, username, password)
+		user, err := r.Users.CreateAdmin(ctx, username, string(hashedPassword))
 		if err != nil {
 			return fmt.Errorf("creating admin: %w", err)
 		}
@@ -59,7 +62,6 @@ func Run() error {
 	}
 
 	slog.Debug("initial db")
-
 
 	return nil
 }
@@ -153,9 +155,6 @@ func NewDB(db *gorm.DB) Tables {
 	}
 }
 
-
-
-
 type QueryFunc = func(r *Repo) error
 
 type Querier interface {
@@ -163,7 +162,6 @@ type Querier interface {
 	Find(dest interface{}, query string, args ...interface{}) error
 	First(dest interface{}, query string, args ...interface{}) error
 }
-
 
 type Tables struct {
 	Users UserRepository
@@ -173,7 +171,6 @@ type Repo struct {
 	Tables
 	Querier
 }
-
 
 type Pool struct {
 	db *gorm.DB
@@ -238,7 +235,6 @@ type UserRepository interface {
 	CreateAdmin(ctx context.Context, username string, password string) (user User, error error)
 }
 
-
 type usersTable struct {
 	db *gorm.DB
 }
@@ -248,39 +244,43 @@ func newUsersTable(db *gorm.DB) usersTable {
 }
 
 type User struct {
-    ID                   uint   `gorm:"primaryKey"`
-    FirstName            string `gorm:"size:255;not null"`
-    Email                *string `gorm:"size:255;unique"`
-    Phone                *string `gorm:"size:11;unique"`
-    Username             string  `gorm:"not null;unique"`
-    Password             string `gorm:"size:255"`
-    Role                 string `gorm:"size:255;not null"`
-    CreatedQuestionsCount int64 `gorm:"not null"`
-    SolvedQuestionsCount  int64 `gorm:"not null"`
+	ID                    uint    `gorm:"primaryKey"`
+	FirstName             string  `gorm:"size:255;not null"`
+	Email                 *string `gorm:"size:255;unique"`
+	Phone                 *string `gorm:"size:11;unique"`
+	Username              string  `gorm:"not null;unique"`
+	Password              string  `gorm:"size:255"`
+	Role                  string  `gorm:"size:255;not null"`
+	CreatedQuestionsCount int64   `gorm:"not null"`
+	SolvedQuestionsCount  int64   `gorm:"not null"`
+	SubmissionsCount      int64   `gorm:"not null"`
 }
 
 func (c usersTable) CreateAdmin(ctx context.Context, username string, password string) (User, error) {
-    var user User
+	var user User
 
-    if err := c.db.Where("username = ?", username).First(&user).Error; err == nil {
-        user.Role = "admin"
-        if err := c.db.Save(&user).Error; err != nil {
-            return User{}, fmt.Errorf("updating user role: %w", err)
-        }
-        return user, nil
-    }
+	if err := c.db.Where("username = ?", username).First(&user).Error; err == nil {
+		user.Role = "admin"
+		if err := c.db.Save(&user).Error; err != nil {
+			return User{}, fmt.Errorf("updating user role: %w", err)
+		}
+		return user, nil
+	}
 
-    newUser := User{
-        Username: username,
-        Password: password, // Make sure to hash the password before saving in production
-        Role:     "admin",
-		Email: nil,
-		Phone: nil,
-    }
+	newUser := User{
+		Username:              username,
+		Password:              password, // Make sure to hash the password before saving in production
+		Role:                  "admin",
+		Email:                 nil,
+		Phone:                 nil,
+		CreatedQuestionsCount: 0,
+		SolvedQuestionsCount:  0,
+		SubmissionsCount:      0,
+	}
 
-    if err := c.db.Create(&newUser).Error; err != nil {
-        return User{}, fmt.Errorf("creating new user: %w", err)
-    }
+	if err := c.db.Create(&newUser).Error; err != nil {
+		return User{}, fmt.Errorf("creating new user: %w", err)
+	}
 
-    return newUser, nil
+	return newUser, nil
 }

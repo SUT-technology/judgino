@@ -20,15 +20,13 @@ func NewRunnerSrvc(db repository.Pool) RunnerService {
 	}
 }
 
-
-
 func (c RunnerService) SendSubmissions(ctx context.Context) (dto.SubmissionRunResp, error) {
 	var (
 		submissions []*entity.Submission
 		err         error
 	)
 	queryFuncFindSubmissions := func(r *repository.Repo) error {
-		submissions, err = r.Tables.Submissions.GetUnjudgedSubmissions(ctx)
+		submissions, err = r.Tables.Submissions.GetSubmissionsForRunner(ctx, 10)
 		if err != nil {
 			return fmt.Errorf("failed to get submissions: %w", err)
 		}
@@ -37,7 +35,6 @@ func (c RunnerService) SendSubmissions(ctx context.Context) (dto.SubmissionRunRe
 
 	err = c.db.Query(ctx, queryFuncFindSubmissions)
 	if err != nil {
-		// Todo fix error
 		return dto.SubmissionRunResp{}, err
 	}
 	var submissionData = make([]dto.SubmissionRun, len(submissions))

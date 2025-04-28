@@ -38,7 +38,7 @@ func generateToken(userID uint, isAdmin bool, secret_key string) (string, error)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(secret_key))
 }
-func (c AuthSrvc) Login(ctx context.Context, loginRequest dto.LoginRequest) (*dto.AuthResponse, error) {
+func (c AuthSrvc) Login(ctx context.Context, loginRequest dto.LoginRequest) (dto.AuthResponse, error) {
 
 	var (
 		user *entity.User
@@ -54,27 +54,27 @@ func (c AuthSrvc) Login(ctx context.Context, loginRequest dto.LoginRequest) (*dt
 	}
 	err = c.db.Query(ctx, queryFuncFindUser)
 	if err != nil {
-		return nil, err
+		return dto.AuthResponse{}, err
 	}
 
 	// Check password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginRequest.Password)); err != nil {
-		return nil, err // Invalid password
+		return dto.AuthResponse{Error: model.InvalidPassword}, err
 	}
 
 	// Generate token
 	token, err := generateToken(user.ID, user.IsAdmin(), c.secret_key)
 	if err != nil {
-		return nil, err
+		return dto.AuthResponse{}, err
 	}
 
-	return &dto.AuthResponse{Token: token}, nil
+	return dto.AuthResponse{Token: token}, nil
 }
-func (c AuthSrvc) Signup(ctx context.Context, signupRequest dto.SignupRequest) (*dto.AuthResponse, error) {
+func (c AuthSrvc) Signup(ctx context.Context, signupRequest dto.SignupRequest) (dto.AuthResponse, error) {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(signupRequest.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("generating password: %w", err)
+		return dto.AuthResponse{}, fmt.Errorf("generating password: %w", err)
 	}
 
 	user := entity.User{
@@ -96,14 +96,14 @@ func (c AuthSrvc) Signup(ctx context.Context, signupRequest dto.SignupRequest) (
 	}
 	err = c.db.Query(ctx, queryFuncFindUser)
 	if err != nil {
-		return nil, err
+		return dto.AuthResponse{}, err
 	}
 
 	// Generate token
 	token, err := generateToken(user.ID, user.IsAdmin(), c.secret_key)
 	if err != nil {
-		return nil, fmt.Errorf("generating token: %w : %v", err, c.secret_key)
+		return dto.AuthResponse{}, fmt.Errorf("generating token: %w : %v", err, c.secret_key)
 	}
 
-	return &dto.AuthResponse{Token: token}, nil
+	return dto.AuthResponse{Token: token}, nil
 }
