@@ -305,14 +305,22 @@ func (c QuestionsSrvc) QuestionsCount(ctx context.Context, questionsDto dto.Ques
 	var (
 		count int
 		err   error
+		user *entity.User
 	)
 
 	queryFuncFindQuestions := func(r *repository.Repo) error {
-		count, err = r.Tables.Questions.GetQuestionsCount(ctx, questionsDto.SearchFilter, questionsDto.QuestionValue, userId)
+		user, err = r.Tables.Users.GetUserById(ctx, int64(userId))
 		if err != nil {
 			return fmt.Errorf("failed to get questions count: %w", err)
 		}
 		return nil
+		
+		count, err = r.Tables.Questions.GetQuestionsCount(ctx, questionsDto.SearchFilter, questionsDto.QuestionValue, userId,user.IsAdmin())
+		if err != nil {
+			return fmt.Errorf("failed to get questions count: %w", err)
+		}
+		return nil
+
 	}
 
 	err = c.db.Query(ctx, queryFuncFindQuestions)
