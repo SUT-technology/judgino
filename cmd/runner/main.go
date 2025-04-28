@@ -22,11 +22,23 @@ func main() {
 	var submissions []Submission
 	now := time.Now()
 
-	for i := 1; i <= 500; i++ {
+	for i := 1; i <= 2; i++ {
 		submission := Submission{
 			QuestionID: 1, // سوال های فرضی بین ۱ تا ۱۰
 			UserID:     1, // کاربر فرضی بین ۱ تا ۱۰۰۰
-			SubmitURL:  "./uploads/code/1/main_21312.go",
+			SubmitURL:  "./uploads/codes/1/main_12345.go",
+			Status:     1, // ۱ یعنی "آماده برای جاج شدن"
+			IsFinal:    true,
+			SubmitTime: now.Add(time.Duration(-i) * time.Minute), // هر سابمیشن یه دقیقه قبل تر
+			TryCount:   0,
+		}
+		submissions = append(submissions, submission)
+	}
+	for i := 1; i <= 2; i++ {
+		submission := Submission{
+			QuestionID: 1, // سوال های فرضی بین ۱ تا ۱۰
+			UserID:     1, // کاربر فرضی بین ۱ تا ۱۰۰۰
+			SubmitURL:  "./uploads/codes/1/main.go",
 			Status:     1, // ۱ یعنی "آماده برای جاج شدن"
 			IsFinal:    true,
 			SubmitTime: now.Add(time.Duration(-i) * time.Minute), // هر سابمیشن یه دقیقه قبل تر

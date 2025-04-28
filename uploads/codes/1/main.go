@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
 	var name string
@@ -9,5 +12,6 @@ func main() {
 		fmt.Println("Error reading input:", err)
 		return
 	}
-	fmt.Print("1")
+	time.Sleep(time.Second * 5)
+	fmt.Println("1")
 }
