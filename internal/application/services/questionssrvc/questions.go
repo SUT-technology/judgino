@@ -5,10 +5,14 @@ import (
 	"fmt"
 	"time"
 
+	"os"
+	"path/filepath"
+
 	"github.com/SUT-technology/judgino/internal/domain/dto"
 	"github.com/SUT-technology/judgino/internal/domain/entity"
 	"github.com/SUT-technology/judgino/internal/domain/model"
 	"github.com/SUT-technology/judgino/internal/domain/repository"
+	"github.com/labstack/gommon/random"
 )
 
 type QuestionsSrvc struct {
@@ -23,9 +27,51 @@ func NewQuestionsSrvc(db repository.Pool) QuestionsSrvc {
 
 func (c QuestionsSrvc) UpdateQuestion(ctx context.Context,questionId uint,request dto.UpdateQuestionRequest) error {
 	
-	time,err := time.Parse("2006-01-02T15:04:05.000Z",request.Deadline)
+	ttime,err := time.Parse("2006-01-02T15:04:05.000Z",request.Deadline)
 	if err!= nil {
 		fmt.Errorf(err.Error())
+	}
+
+	// Define the target directory and file path
+	inputDir := "./uploads/testcases/"
+	err = os.MkdirAll(inputDir, os.ModePerm) // Ensure directory exists
+	if err != nil {
+		return err
+	}
+
+	inputFileName := "input.txt" + "_" + time.Now().Format("20060102_150405") + "_" + random.String(10) + ".txt"
+	inputFilePath := filepath.Join(inputDir, inputFileName)
+
+	dst, err := os.Create(inputFilePath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	_, err = dst.WriteString(request.InputURL)
+	if err != nil {
+		return err
+	}
+
+	// Define the target directory and file path
+	outputDir := "./uploads/testcases/"
+	err = os.MkdirAll(inputDir, os.ModePerm) // Ensure directory exists
+	if err != nil {
+		return err
+	}
+
+	outputFileName := "output.txt" + "_" + time.Now().Format("20060102_150405") + "_" + random.String(10) + ".txt"
+	outputFilePath := filepath.Join(outputDir, outputFileName)
+
+	dst, err = os.Create(outputFilePath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	_, err = dst.WriteString(request.OutputURL)
+	if err != nil {
+		return err
 	}
 	
 	var updateData = &entity.Question{
@@ -33,9 +79,9 @@ func (c QuestionsSrvc) UpdateQuestion(ctx context.Context,questionId uint,reques
 		Body: request.Body,
 		TimeLimit: request.TimeLimit,
 		MemoryLimit: request.MemoryLimit,
-		InputURL: request.InputURL,
-		OutputURL: request.OutputURL,
-		Deadline: time,
+		InputURL: inputFilePath,
+		OutputURL: outputFilePath,
+		Deadline: ttime,
 	}
 
 	queryFuncUpdateData := func(r *repository.Repo) error {
@@ -131,12 +177,56 @@ func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto
 		response.Status = model.UserMessage("error creating question")
 		return response, nil
 	}
-	time,err := time.Parse("2006-01-02T15:04:05.000Z",createQuestionDto.Deadline)
+	ttime,err := time.Parse("2006-01-02T15:04:05.000Z",createQuestionDto.Deadline)
 	if err!= nil {
 		fmt.Errorf(err.Error())
 	}
-
 	createQuestionDto.UserID = currentUserId
+	
+
+
+	// Define the target directory and file path
+	inputDir := "./uploads/testcases/"
+	err = os.MkdirAll(inputDir, os.ModePerm) // Ensure directory exists
+	if err != nil {
+		return dto.CreateQuestionResponse{}, err
+	}
+
+	inputFileName := "input.txt" + "_" + time.Now().Format("20060102_150405") + "_" + random.String(10) + ".txt"
+	inputFilePath := filepath.Join(inputDir, inputFileName)
+
+	dst, err := os.Create(inputFilePath)
+	if err != nil {
+		return dto.CreateQuestionResponse{}, err
+	}
+	defer dst.Close()
+
+	_, err = dst.WriteString(createQuestionDto.InputURL)
+	if err != nil {
+		return dto.CreateQuestionResponse{}, err
+	}
+
+	// Define the target directory and file path
+	outputDir := "./uploads/testcases/"
+	err = os.MkdirAll(inputDir, os.ModePerm) // Ensure directory exists
+	if err != nil {
+		return dto.CreateQuestionResponse{}, err
+	}
+
+	outputFileName := "output.txt" + "_" + time.Now().Format("20060102_150405") + "_" + random.String(10) + ".txt"
+	outputFilePath := filepath.Join(outputDir, outputFileName)
+
+	dst, err = os.Create(outputFilePath)
+	if err != nil {
+		return dto.CreateQuestionResponse{}, err
+	}
+	defer dst.Close()
+
+	_, err = dst.WriteString(createQuestionDto.OutputURL)
+	if err != nil {
+		return dto.CreateQuestionResponse{}, err
+	}
+
 	question = &entity.Question{
 		UserID:      uint(createQuestionDto.UserID),
 		Status:      "draft",
@@ -144,10 +234,13 @@ func (c QuestionsSrvc) CreateQuestion(ctx context.Context, createQuestionDto dto
 		Body:        createQuestionDto.Body,
 		TimeLimit:   createQuestionDto.TimeLimit,
 		MemoryLimit: createQuestionDto.MemoryLimit,
-		InputURL:    createQuestionDto.InputURL,
-		OutputURL:   createQuestionDto.OutputURL,
-		Deadline:    time,
+		InputURL:    inputFilePath,
+		OutputURL:   outputFilePath,
+		Deadline:    ttime,
 	}
+
+
+	
 
 	queryFuncCreateQuestion := func(r *repository.Repo) error {
 		err = r.Tables.Questions.CreateQuestion(ctx, question)
