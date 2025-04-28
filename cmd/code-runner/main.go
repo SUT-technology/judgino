@@ -64,6 +64,9 @@ func RunCodeInContainer(code, input, wantOutput string, timeLimit time.Duration,
         AttachStderr: true,
     }, &container.HostConfig{
         AutoRemove: false,
+        Resources: container.Resources{
+            Memory: int64(memLimitMB) * 1024 * 1024,
+        },
         Binds: []string{fmt.Sprintf("%s:/workspace", tmpDir)},
     }, &network.NetworkingConfig{}, &ocispec.Platform{}, "C1")
     if err != nil { 
@@ -148,7 +151,6 @@ func main() {
     import "fmt"
 	func main() {
         fmt.Println("fhsi")
-	}`, "", "fhsi", 2, 1))
+	}`, "", "fhsi", 2, 512))
     
-
 }
